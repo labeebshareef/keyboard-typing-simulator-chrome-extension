@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from 'react';
-import { Play, Settings, Keyboard, Zap, Clock } from 'lucide-react';
+import { Clock, Keyboard, Play, Settings, Zap } from 'lucide-react';
+import type React from 'react';
+import { useCallback, useState } from 'react';
 
 interface TypingState {
   isTyping: boolean;
@@ -22,7 +23,7 @@ const App: React.FC = () => {
 
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      
+
       if (!tab.id) {
         alert('Unable to access the current tab');
         return;
@@ -93,7 +94,7 @@ const App: React.FC = () => {
           />
           <div className="flex justify-between text-xs text-gray-500">
             <span>{text.length} characters</span>
-            <span>{text.split(' ').filter(word => word.length > 0).length} words</span>
+            <span>{text.split(' ').filter((word) => word.length > 0).length} words</span>
           </div>
         </div>
 
@@ -103,7 +104,7 @@ const App: React.FC = () => {
             <Clock className="w-4 h-4 text-gray-600" />
             <label className="text-sm font-semibold text-gray-700">Typing Speed</label>
           </div>
-          
+
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className={`text-sm font-medium ${getDelayColor(delay)}`}>
@@ -111,7 +112,7 @@ const App: React.FC = () => {
               </span>
               <span className="text-xs text-gray-500">{delay}ms delay</span>
             </div>
-            
+
             <div className="relative">
               <input
                 type="range"
@@ -172,9 +173,7 @@ const App: React.FC = () => {
 
         {/* Footer */}
         <div className="text-center">
-          <p className="text-xs text-gray-500">
-            v2.0 • Perfect for testing forms and demos
-          </p>
+          <p className="text-xs text-gray-500">v2.0 • Perfect for testing forms and demos</p>
         </div>
       </div>
     </div>
@@ -199,34 +198,42 @@ function simulateTyping(text: string, delay: number) {
       const char = text[index];
 
       // Simulate realistic keyboard events
-      el.dispatchEvent(new KeyboardEvent('keydown', { 
-        key: char, 
-        bubbles: true, 
-        cancelable: true 
-      }));
-      
-      el.dispatchEvent(new KeyboardEvent('keypress', { 
-        key: char, 
-        bubbles: true, 
-        cancelable: true 
-      }));
+      el.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: char,
+          bubbles: true,
+          cancelable: true,
+        })
+      );
+
+      el.dispatchEvent(
+        new KeyboardEvent('keypress', {
+          key: char,
+          bubbles: true,
+          cancelable: true,
+        })
+      );
 
       // Update the value
       el.value += char;
 
       // Trigger input and change events
-      el.dispatchEvent(new InputEvent('input', { 
-        bubbles: true, 
-        cancelable: true,
-        data: char,
-        inputType: 'insertText'
-      }));
+      el.dispatchEvent(
+        new InputEvent('input', {
+          bubbles: true,
+          cancelable: true,
+          data: char,
+          inputType: 'insertText',
+        })
+      );
 
-      el.dispatchEvent(new KeyboardEvent('keyup', { 
-        key: char, 
-        bubbles: true, 
-        cancelable: true 
-      }));
+      el.dispatchEvent(
+        new KeyboardEvent('keyup', {
+          key: char,
+          bubbles: true,
+          cancelable: true,
+        })
+      );
 
       // Continue typing
       setTimeout(() => typeChar(index + 1), delay);
