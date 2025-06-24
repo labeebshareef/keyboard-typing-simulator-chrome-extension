@@ -46,7 +46,7 @@ const TypingControls: React.FC<TypingControlsProps> = ({
       onPauseResume();
     }
   };
-  const isControlDisabled = disabled || (isTyping && buttonState !== 'pause' && buttonState !== 'resume');
+
   return (
     <div className="space-y-4">
       {/* Speed Control */}
@@ -55,7 +55,7 @@ const TypingControls: React.FC<TypingControlsProps> = ({
           <Clock className="w-4 h-4 text-gray-600" />
           <label className="text-sm font-semibold text-gray-700">Typing Speed</label>
         </div>
-
+        
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className={`text-sm font-medium ${getDelayColor(config.delay)}`}>
@@ -63,21 +63,19 @@ const TypingControls: React.FC<TypingControlsProps> = ({
             </span>
             <span className="text-xs text-gray-500">{config.delay}ms delay</span>
           </div>
-
+          
           <div className="relative">
             <input
               type="range"
               min="1"
               max="300"
-              step="1"
               value={config.delay}
               onChange={(e) => updateConfig({ delay: Number(e.target.value) })}
-              disabled={isControlDisabled}
-              className={`w-full h-2 rounded-lg appearance-none cursor-pointer
-             ${isControlDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-gray-200'}
-             slider-thumb:appearance-none slider-thumb:w-4 slider-thumb:h-4
-             slider-thumb:rounded-full slider-thumb:cursor-pointer slider-thumb:shadow-lg
-             ${isControlDisabled ? 'slider-thumb:bg-gray-400' : 'slider-thumb:bg-primary-500'}`}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer
+                       slider-thumb:appearance-none slider-thumb:w-4 slider-thumb:h-4
+                       slider-thumb:rounded-full slider-thumb:bg-primary-500
+                       slider-thumb:cursor-pointer slider-thumb:shadow-lg"
+              disabled={isTyping}
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
               <span>Fastest</span>

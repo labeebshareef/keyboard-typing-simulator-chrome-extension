@@ -85,8 +85,9 @@ const App: React.FC = () => {
           >
             <span>{showAdvanced ? 'Hide' : 'Show'} Advanced Settings</span>
             <svg
-              className={`w-4 h-4 transition-transform duration-200 ${showAdvanced ? 'rotate-180' : ''
-                }`}
+              className={`w-4 h-4 transition-transform duration-200 ${
+                showAdvanced ? 'rotate-180' : ''
+              }`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -97,8 +98,9 @@ const App: React.FC = () => {
 
           {/* Advanced Settings */}
           <div
-            className={`transition-all duration-300 ease-in-out overflow-hidden ${showAdvanced ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-              }`}
+            className={`transition-all duration-300 ease-in-out overflow-hidden ${
+              showAdvanced ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+            }`}
           >
             <AdvancedSettings
               config={config}
@@ -114,7 +116,7 @@ const App: React.FC = () => {
         {/* Footer */}
         <div className="text-center">
           <p className="text-xs text-gray-500">
-            v2.0 • Advanced typing simulation for developers
+            v2.1.0 • Advanced typing simulation for developers
           </p>
         </div>
       </div>
