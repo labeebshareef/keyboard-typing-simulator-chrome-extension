@@ -1,39 +1,34 @@
 import React, { useState } from 'react';
 import { Keyboard } from 'lucide-react';
-import TypingArea from './components/TypingArea';
-import TypingControls from './components/TypingControls';
-import AdvancedSettings from './components/AdvancedSettings';
-import ProgressDisplay from './components/ProgressDisplay';
-import Instructions from './components/Instructions';
-import { useTypingSimulator } from './hooks/useTypingSimulator';
-import type { TypingConfig } from './types';
+import TabNavigation from './components/TabNavigation';
+import BasicTyping from './components/BasicTyping';
+import AdvancedTyping from './components/AdvancedTyping';
+import type { TypingConfig, AdvancedTypingConfig } from './types';
 
 const App: React.FC = () => {
-  const [text, setText] = useState('');
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const [config, setConfig] = useState<TypingConfig>({
+  const [activeTab, setActiveTab] = useState<'basic' | 'advanced'>('basic');
+  const [typingConfig, setTypingConfig] = useState<TypingConfig>({
     delay: 50,
     includeMistakes: false,
     soundEnabled: false,
     typingStyle: 'normal',
   });
+  const [advancedConfig, setAdvancedConfig] = useState<AdvancedTypingConfig>({
+    initialDelay: 2,
+    hideExtension: false,
+    interFieldDelay: 1,
+  });
 
-  const {
-    typingState,
-    handleStartTyping,
-    handlePauseResume,
-    handleStop,
-  } = useTypingSimulator(text, config);
-
-  const updateConfig = (updates: Partial<TypingConfig>) => {
-    setConfig(prev => ({ ...prev, ...updates }));
+  const updateTypingConfig = (updates: Partial<TypingConfig>) => {
+    setTypingConfig(prev => ({ ...prev, ...updates }));
   };
 
-  const getButtonState = () => {
-    if (!typingState.isTyping) return 'start';
-    if (typingState.isPaused) return 'resume';
-    return 'pause';
+  const updateAdvancedConfig = (updates: Partial<AdvancedTypingConfig>) => {
+    setAdvancedConfig(prev => ({ ...prev, ...updates }));
   };
+
+  // Check if any typing is in progress to disable tab switching
+  const isTypingInProgress = false; // This would need to be tracked properly
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6 animate-fade-in">
@@ -51,67 +46,27 @@ const App: React.FC = () => {
           </p>
         </div>
 
-        {/* Typing Area */}
-        <TypingArea
-          text={text}
-          setText={setText}
-          disabled={typingState.isTyping}
+        {/* Tab Navigation */}
+        <TabNavigation
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          disabled={isTypingInProgress}
         />
 
-        {/* Typing Controls */}
-        <TypingControls
-          config={config}
-          updateConfig={updateConfig}
-          buttonState={getButtonState()}
-          onStart={handleStartTyping}
-          onPauseResume={handlePauseResume}
-          onStop={handleStop}
-          disabled={!text.trim()}
-          isTyping={typingState.isTyping}
-        />
-
-        {/* Progress Display */}
-        {typingState.isTyping && (
-          <ProgressDisplay progress={typingState.progress} />
+        {/* Tab Content */}
+        {activeTab === 'basic' ? (
+          <BasicTyping
+            config={typingConfig}
+            updateConfig={updateTypingConfig}
+          />
+        ) : (
+          <AdvancedTyping
+            config={advancedConfig}
+            typingConfig={typingConfig}
+            updateConfig={updateAdvancedConfig}
+            disabled={isTypingInProgress}
+          />
         )}
-
-        {/* Advanced Settings Toggle */}
-        <div className="space-y-3">
-          <button
-            onClick={() => setShowAdvanced(!showAdvanced)}
-            className="w-full py-2 px-4 text-sm font-medium text-gray-700 bg-white 
-                     border border-gray-200 rounded-lg hover:bg-gray-50 
-                     transition-all duration-200 flex items-center justify-center space-x-2"
-          >
-            <span>{showAdvanced ? 'Hide' : 'Show'} Advanced Settings</span>
-            <svg
-              className={`w-4 h-4 transition-transform duration-200 ${
-                showAdvanced ? 'rotate-180' : ''
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-
-          {/* Advanced Settings */}
-          <div
-            className={`transition-all duration-300 ease-in-out overflow-hidden ${
-              showAdvanced ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-            }`}
-          >
-            <AdvancedSettings
-              config={config}
-              updateConfig={updateConfig}
-              disabled={typingState.isTyping}
-            />
-          </div>
-        </div>
-
-        {/* Instructions */}
-        <Instructions />
 
         {/* Footer */}
         <div className="text-center">
