@@ -4,8 +4,8 @@
  */
 
 import { playKeySound } from './audio';
-import { triggerInputEvents } from './events';
 import { safeSetTimeout } from './control';
+import { triggerInputEvents } from './events';
 
 interface WordTypingState {
   isStopped: boolean;
@@ -34,9 +34,13 @@ export function typeWordByWord(
   onComplete: () => void
 ): void {
   if (state.isStopped) return;
-  
+
   if (state.isPaused) {
-    safeSetTimeout(() => typeWordByWord(element, words, wordIndex, config, state, getDelay, onProgress, onComplete), 100);
+    safeSetTimeout(
+      () =>
+        typeWordByWord(element, words, wordIndex, config, state, getDelay, onProgress, onComplete),
+      100
+    );
     return;
   }
 
@@ -57,5 +61,18 @@ export function typeWordByWord(
   triggerInputEvents(element, textToAdd);
   playKeySound(config.soundEnabled);
 
-  safeSetTimeout(() => typeWordByWord(element, words, wordIndex + 1, config, state, getDelay, onProgress, onComplete), getDelay() * 3);
+  safeSetTimeout(
+    () =>
+      typeWordByWord(
+        element,
+        words,
+        wordIndex + 1,
+        config,
+        state,
+        getDelay,
+        onProgress,
+        onComplete
+      ),
+    getDelay() * 3
+  );
 }

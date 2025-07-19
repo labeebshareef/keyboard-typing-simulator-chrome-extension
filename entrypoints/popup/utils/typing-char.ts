@@ -4,9 +4,9 @@
  */
 
 import { playKeySound } from './audio';
-import { shouldMakeMistake, generateWrongCharacter } from './mistakes';
-import { triggerInputEvents, triggerBackspaceEvents } from './events';
 import { safeSetTimeout } from './control';
+import { triggerBackspaceEvents, triggerInputEvents } from './events';
+import { generateWrongCharacter, shouldMakeMistake } from './mistakes';
 
 interface CharTypingState {
   isStopped: boolean;
@@ -37,9 +37,12 @@ export function typeCharacter(
   onComplete: () => void
 ): void {
   if (state.isStopped) return;
-  
+
   if (state.isPaused) {
-    safeSetTimeout(() => typeCharacter(element, text, index, config, state, getDelay, onProgress, onComplete), 100);
+    safeSetTimeout(
+      () => typeCharacter(element, text, index, config, state, getDelay, onProgress, onComplete),
+      100
+    );
     return;
   }
 
@@ -55,11 +58,18 @@ export function typeCharacter(
   const char = text[index];
 
   // Check for mistakes
-  if (shouldMakeMistake(config.includeMistakes, state.mistakeCount, state.maxMistakes, element.value.length)) {
+  if (
+    shouldMakeMistake(
+      config.includeMistakes,
+      state.mistakeCount,
+      state.maxMistakes,
+      element.value.length
+    )
+  ) {
     state.mistakeCount++;
-    
+
     const wrongChar = generateWrongCharacter();
-    
+
     // Type wrong character
     element.value += wrongChar;
     triggerInputEvents(element, wrongChar);
@@ -69,12 +79,16 @@ export function typeCharacter(
     safeSetTimeout(() => {
       if (!state.isStopped && element.value.length > 0) {
         simulateBackspace(element, config.soundEnabled);
-        
+
         // Continue with correct character after another delay
-        safeSetTimeout(() => typeCharacter(element, text, index, config, state, getDelay, onProgress, onComplete), getDelay());
+        safeSetTimeout(
+          () =>
+            typeCharacter(element, text, index, config, state, getDelay, onProgress, onComplete),
+          getDelay()
+        );
       }
     }, getDelay() * 1.5);
-    
+
     return;
   }
 
@@ -83,7 +97,10 @@ export function typeCharacter(
   triggerInputEvents(element, char);
   playKeySound(config.soundEnabled);
 
-  safeSetTimeout(() => typeCharacter(element, text, index + 1, config, state, getDelay, onProgress, onComplete), getDelay());
+  safeSetTimeout(
+    () => typeCharacter(element, text, index + 1, config, state, getDelay, onProgress, onComplete),
+    getDelay()
+  );
 }
 
 /**
@@ -91,9 +108,12 @@ export function typeCharacter(
  * @param element - Target input element
  * @param soundEnabled - Whether to play sound
  */
-function simulateBackspace(element: HTMLInputElement | HTMLTextAreaElement, soundEnabled: boolean): void {
+function simulateBackspace(
+  element: HTMLInputElement | HTMLTextAreaElement,
+  soundEnabled: boolean
+): void {
   if (element.value.length === 0) return;
-  
+
   element.value = element.value.slice(0, -1);
   triggerBackspaceEvents(element);
   playKeySound(soundEnabled);

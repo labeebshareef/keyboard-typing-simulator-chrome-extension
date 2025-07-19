@@ -8,23 +8,42 @@
  * @param element - Target input element
  * @param char - Character being typed
  */
-export function triggerInputEvents(element: HTMLInputElement | HTMLTextAreaElement, char: string): void {
-  element.dispatchEvent(new KeyboardEvent('keydown', { 
-    key: char, bubbles: true, cancelable: true 
-  }));
-  
-  element.dispatchEvent(new KeyboardEvent('keypress', { 
-    key: char, bubbles: true, cancelable: true 
-  }));
-  
-  element.dispatchEvent(new InputEvent('input', { 
-    bubbles: true, cancelable: true,
-    data: char, inputType: 'insertText'
-  }));
-  
-  element.dispatchEvent(new KeyboardEvent('keyup', { 
-    key: char, bubbles: true, cancelable: true 
-  }));
+export function triggerInputEvents(
+  element: HTMLInputElement | HTMLTextAreaElement,
+  char: string
+): void {
+  element.dispatchEvent(
+    new KeyboardEvent('keydown', {
+      key: char,
+      bubbles: true,
+      cancelable: true,
+    })
+  );
+
+  element.dispatchEvent(
+    new KeyboardEvent('keypress', {
+      key: char,
+      bubbles: true,
+      cancelable: true,
+    })
+  );
+
+  element.dispatchEvent(
+    new InputEvent('input', {
+      bubbles: true,
+      cancelable: true,
+      data: char,
+      inputType: 'insertText',
+    })
+  );
+
+  element.dispatchEvent(
+    new KeyboardEvent('keyup', {
+      key: char,
+      bubbles: true,
+      cancelable: true,
+    })
+  );
 }
 
 /**
@@ -32,20 +51,31 @@ export function triggerInputEvents(element: HTMLInputElement | HTMLTextAreaEleme
  * @param element - Target input element
  */
 export function triggerBackspaceEvents(element: HTMLInputElement | HTMLTextAreaElement): void {
-  element.dispatchEvent(new KeyboardEvent('keydown', { 
-    key: 'Backspace', code: 'Backspace',
-    bubbles: true, cancelable: true 
-  }));
-  
-  element.dispatchEvent(new InputEvent('input', { 
-    bubbles: true, cancelable: true,
-    inputType: 'deleteContentBackward'
-  }));
-  
-  element.dispatchEvent(new KeyboardEvent('keyup', { 
-    key: 'Backspace', code: 'Backspace',
-    bubbles: true, cancelable: true 
-  }));
+  element.dispatchEvent(
+    new KeyboardEvent('keydown', {
+      key: 'Backspace',
+      code: 'Backspace',
+      bubbles: true,
+      cancelable: true,
+    })
+  );
+
+  element.dispatchEvent(
+    new InputEvent('input', {
+      bubbles: true,
+      cancelable: true,
+      inputType: 'deleteContentBackward',
+    })
+  );
+
+  element.dispatchEvent(
+    new KeyboardEvent('keyup', {
+      key: 'Backspace',
+      code: 'Backspace',
+      bubbles: true,
+      cancelable: true,
+    })
+  );
 }
 
 /**

@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import type { TypingConfig, TypingState } from '../types';
 
 export const useTypingSimulator = (text: string, config: TypingConfig) => {
@@ -17,7 +17,7 @@ export const useTypingSimulator = (text: string, config: TypingConfig) => {
   }>({
     isActive: false,
     tabId: null,
-    cleanup: () => { },
+    cleanup: () => {},
   });
 
   // Progress update interval ref
@@ -37,22 +37,24 @@ export const useTypingSimulator = (text: string, config: TypingConfig) => {
     // Execute content script cleanup if we have an active tab
     if (typingSessionRef.current.tabId) {
       try {
-        chrome.scripting.executeScript({
-          target: { tabId: typingSessionRef.current.tabId },
-          func: () => {
-            // Stop typing in content script
-            if ((window as any).typingControl) {
-              (window as any).typingControl.stop();
-              delete (window as any).typingControl;
-            }
-            // Clean up progress tracking
-            if ((window as any).typingProgress !== undefined) {
-              delete (window as any).typingProgress;
-            }
-          },
-        }).catch(() => {
-          // Ignore errors if tab is closed or script injection fails
-        });
+        chrome.scripting
+          .executeScript({
+            target: { tabId: typingSessionRef.current.tabId },
+            func: () => {
+              // Stop typing in content script
+              if ((window as any).typingControl) {
+                (window as any).typingControl.stop();
+                delete (window as any).typingControl;
+              }
+              // Clean up progress tracking
+              if ((window as any).typingProgress !== undefined) {
+                delete (window as any).typingProgress;
+              }
+            },
+          })
+          .catch(() => {
+            // Ignore errors if tab is closed or script injection fails
+          });
       } catch (error) {
         // Ignore cleanup errors
       }
@@ -70,63 +72,69 @@ export const useTypingSimulator = (text: string, config: TypingConfig) => {
     typingSessionRef.current = {
       isActive: false,
       tabId: null,
-      cleanup: () => { },
+      cleanup: () => {},
     };
   }, []);
 
   // Enhanced progress monitoring that gets actual progress from content script
-  const startProgressMonitoring = useCallback((textLength: number, tabId: number) => {
-    let fallbackProgress = 0;
+  const startProgressMonitoring = useCallback(
+    (textLength: number, tabId: number) => {
+      let fallbackProgress = 0;
 
-    progressIntervalRef.current = setInterval(() => {
-      if (!typingSessionRef.current.isActive) {
-        if (progressIntervalRef.current) {
-          clearInterval(progressIntervalRef.current);
-          progressIntervalRef.current = null;
-        }
-        return;
-      }
-
-      // Try to get actual progress from content script
-      chrome.scripting.executeScript({
-        target: { tabId },
-        func: () => (window as any).typingProgress || 0,
-      }).then((results) => {
-        if (results?.[0]?.result !== undefined) {
-          const actualProgress = Math.min(Math.max(results[0].result, 0), 100);
-          setTypingState(prev => ({
-            ...prev,
-            progress: actualProgress,
-            currentIndex: Math.floor((actualProgress / 100) * textLength)
-          }));
-
-          if (actualProgress >= 100) {
-            setTimeout(() => {
-              if (typingSessionRef.current.isActive) {
-                stopTyping();
-              }
-            }, 500);
+      progressIntervalRef.current = setInterval(() => {
+        if (!typingSessionRef.current.isActive) {
+          if (progressIntervalRef.current) {
+            clearInterval(progressIntervalRef.current);
+            progressIntervalRef.current = null;
           }
+          return;
         }
-      }).catch(() => {
-        // Fallback to estimated progress if script execution fails
-        fallbackProgress = Math.min(fallbackProgress + (100 / Math.max(textLength, 1)), 100);
-        setTypingState(prev => ({
-          ...prev,
-          progress: fallbackProgress,
-          currentIndex: Math.floor((fallbackProgress / 100) * textLength)
-        }));
 
-        if (fallbackProgress >= 100) {
-          setTimeout(() => {
-            if (typingSessionRef.current.isActive) {
-              stopTyping();
+        // Try to get actual progress from content script
+        chrome.scripting
+          .executeScript({
+            target: { tabId },
+            func: () => (window as any).typingProgress || 0,
+          })
+          .then((results) => {
+            if (results?.[0]?.result !== undefined) {
+              const actualProgress = Math.min(Math.max(results[0].result, 0), 100);
+              setTypingState((prev) => ({
+                ...prev,
+                progress: actualProgress,
+                currentIndex: Math.floor((actualProgress / 100) * textLength),
+              }));
+
+              if (actualProgress >= 100) {
+                setTimeout(() => {
+                  if (typingSessionRef.current.isActive) {
+                    stopTyping();
+                  }
+                }, 500);
+              }
             }
-          }, 500);
-        }
-      });
-    }, 150); // Reduced frequency for better performance
-  }, [stopTyping]);
+          })
+          .catch(() => {
+            // Fallback to estimated progress if script execution fails
+            fallbackProgress = Math.min(fallbackProgress + 100 / Math.max(textLength, 1), 100);
+            setTypingState((prev) => ({
+              ...prev,
+              progress: fallbackProgress,
+              currentIndex: Math.floor((fallbackProgress / 100) * textLength),
+            }));
+
+            if (fallbackProgress >= 100) {
+              setTimeout(() => {
+                if (typingSessionRef.current.isActive) {
+                  stopTyping();
+                }
+              }, 500);
+            }
+          });
+      }, 150); // Reduced frequency for better performance
+    },
+    [stopTyping]
+  );
 
   const handleStartTyping = useCallback(async () => {
     if (!text.trim()) {
@@ -142,7 +150,7 @@ export const useTypingSimulator = (text: string, config: TypingConfig) => {
     if (typingSessionRef.current.isActive) {
       stopTyping();
       // Wait a bit for cleanup to complete
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 200));
     }
 
     try {
@@ -154,7 +162,11 @@ export const useTypingSimulator = (text: string, config: TypingConfig) => {
       }
 
       // Check if tab is accessible (not chrome:// or extension pages)
-      if (tab.url?.startsWith('chrome://') || tab.url?.startsWith('chrome-extension://') || tab.url?.startsWith('moz-extension://')) {
+      if (
+        tab.url?.startsWith('chrome://') ||
+        tab.url?.startsWith('chrome-extension://') ||
+        tab.url?.startsWith('moz-extension://')
+      ) {
         alert('Cannot type on this page. Please navigate to a regular website.');
         return;
       }
@@ -177,12 +189,13 @@ export const useTypingSimulator = (text: string, config: TypingConfig) => {
       await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: simulateTypingWithFeatures,
-        args: [{
-          text,
-          ...effectiveConfig
-        }],
+        args: [
+          {
+            text,
+            ...effectiveConfig,
+          },
+        ],
       });
-
     } catch (error: any) {
       console.error('Error executing script:', error);
       let errorMessage = 'Failed to execute typing simulation.';
@@ -222,7 +235,7 @@ export const useTypingSimulator = (text: string, config: TypingConfig) => {
         args: [!isPaused],
       });
 
-      setTypingState(prev => ({ ...prev, isPaused: !isPaused }));
+      setTypingState((prev) => ({ ...prev, isPaused: !isPaused }));
 
       // Handle progress monitoring pause/resume
       if (!isPaused) {
@@ -290,10 +303,10 @@ function simulateTypingWithFeatures(config: TypingConfig & { text: string }) {
       },
       cleanupAudio: () => {
         if (audioContext) {
-          audioContext.close().catch(() => { });
+          audioContext.close().catch(() => {});
           audioContext = null;
         }
-      }
+      },
     };
   };
 
@@ -302,57 +315,106 @@ function simulateTypingWithFeatures(config: TypingConfig & { text: string }) {
     let timeoutIds: number[] = [];
 
     return {
-      validateInputElement: (element: Element | null): HTMLInputElement | HTMLTextAreaElement | null => {
+      validateInputElement: (
+        element: Element | null
+      ): HTMLInputElement | HTMLTextAreaElement | null => {
         if (!element || !['INPUT', 'TEXTAREA'].includes(element.tagName)) return null;
         const inputElement = element as HTMLInputElement | HTMLTextAreaElement;
-        if (inputElement.hasAttribute('readonly') || inputElement.hasAttribute('disabled')) return null;
+        if (inputElement.hasAttribute('readonly') || inputElement.hasAttribute('disabled'))
+          return null;
         return inputElement;
       },
       safeSetTimeout: (callback: () => void, delay: number) => {
-        const timeoutId = window.setTimeout(() => {
-          const index = timeoutIds.indexOf(timeoutId);
-          if (index > -1) timeoutIds.splice(index, 1);
-          callback();
-        }, Math.max(delay, 10));
+        const timeoutId = window.setTimeout(
+          () => {
+            const index = timeoutIds.indexOf(timeoutId);
+            if (index > -1) timeoutIds.splice(index, 1);
+            callback();
+          },
+          Math.max(delay, 10)
+        );
         timeoutIds.push(timeoutId);
       },
       clearAllTimeouts: () => {
-        timeoutIds.forEach(id => clearTimeout(id));
+        timeoutIds.forEach((id) => clearTimeout(id));
         timeoutIds = [];
       },
       getTypingDelay: (baseDelay: number, typingStyle: string) => {
         const safeDelay = Math.max(baseDelay, 10);
         switch (typingStyle) {
-          case 'random': return Math.random() * (safeDelay * 2) + (safeDelay * 0.5);
-          case 'word-by-word': return safeDelay;
-          default: return safeDelay;
+          case 'random':
+            return Math.random() * (safeDelay * 2) + safeDelay * 0.5;
+          case 'word-by-word':
+            return safeDelay;
+          default:
+            return safeDelay;
         }
-      }
+      },
     };
   };
 
   // Event utilities
   const createEventUtils = () => ({
     triggerInputEvents: (element: HTMLInputElement | HTMLTextAreaElement, char: string) => {
-      element.dispatchEvent(new KeyboardEvent('keydown', { key: char, bubbles: true, cancelable: true }));
-      element.dispatchEvent(new KeyboardEvent('keypress', { key: char, bubbles: true, cancelable: true }));
-      element.dispatchEvent(new InputEvent('input', { bubbles: true, cancelable: true, data: char, inputType: 'insertText' }));
-      element.dispatchEvent(new KeyboardEvent('keyup', { key: char, bubbles: true, cancelable: true }));
+      element.dispatchEvent(
+        new KeyboardEvent('keydown', { key: char, bubbles: true, cancelable: true })
+      );
+      element.dispatchEvent(
+        new KeyboardEvent('keypress', { key: char, bubbles: true, cancelable: true })
+      );
+      element.dispatchEvent(
+        new InputEvent('input', {
+          bubbles: true,
+          cancelable: true,
+          data: char,
+          inputType: 'insertText',
+        })
+      );
+      element.dispatchEvent(
+        new KeyboardEvent('keyup', { key: char, bubbles: true, cancelable: true })
+      );
     },
     triggerBackspaceEvents: (element: HTMLInputElement | HTMLTextAreaElement) => {
-      element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', code: 'Backspace', bubbles: true, cancelable: true }));
-      element.dispatchEvent(new InputEvent('input', { bubbles: true, cancelable: true, inputType: 'deleteContentBackward' }));
-      element.dispatchEvent(new KeyboardEvent('keyup', { key: 'Backspace', code: 'Backspace', bubbles: true, cancelable: true }));
+      element.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'Backspace',
+          code: 'Backspace',
+          bubbles: true,
+          cancelable: true,
+        })
+      );
+      element.dispatchEvent(
+        new InputEvent('input', {
+          bubbles: true,
+          cancelable: true,
+          inputType: 'deleteContentBackward',
+        })
+      );
+      element.dispatchEvent(
+        new KeyboardEvent('keyup', {
+          key: 'Backspace',
+          code: 'Backspace',
+          bubbles: true,
+          cancelable: true,
+        })
+      );
     },
     triggerChangeEvent: (element: HTMLInputElement | HTMLTextAreaElement) => {
       element.dispatchEvent(new Event('change', { bubbles: true }));
-    }
+    },
   });
 
   // Mistake utilities
   const createMistakeUtils = () => ({
-    shouldMakeMistake: (includeMistakes: boolean, mistakeCount: number, maxMistakes: number, currentLength: number) => {
-      return includeMistakes && mistakeCount < maxMistakes && Math.random() < 0.03 && currentLength > 0;
+    shouldMakeMistake: (
+      includeMistakes: boolean,
+      mistakeCount: number,
+      maxMistakes: number,
+      currentLength: number
+    ) => {
+      return (
+        includeMistakes && mistakeCount < maxMistakes && Math.random() < 0.03 && currentLength > 0
+      );
     },
     generateWrongCharacter: () => {
       const qwertyRows = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
@@ -361,7 +423,7 @@ function simulateTypingWithFeatures(config: TypingConfig & { text: string }) {
     },
     calculateMaxMistakes: (textLength: number) => {
       return Math.max(1, Math.floor(textLength * 0.05));
-    }
+    },
   });
 
   // Initialize utilities
@@ -370,7 +432,7 @@ function simulateTypingWithFeatures(config: TypingConfig & { text: string }) {
   const eventUtils = createEventUtils();
   const mistakeUtils = createMistakeUtils();
 
-  const el:any = controlUtils.validateInputElement(document.activeElement);
+  const el: any = controlUtils.validateInputElement(document.activeElement);
 
   if (!el) {
     alert('Please click inside a text input field first.');
@@ -414,9 +476,13 @@ function simulateTypingWithFeatures(config: TypingConfig & { text: string }) {
 
   // Expose controls
   (window as any).typingControl = {
-    pause: () => { isPaused = true; },
-    resume: () => { isPaused = false; },
-    stop: cleanup
+    pause: () => {
+      isPaused = true;
+    },
+    resume: () => {
+      isPaused = false;
+    },
+    stop: cleanup,
   };
 
   // Character typing function
@@ -441,7 +507,9 @@ function simulateTypingWithFeatures(config: TypingConfig & { text: string }) {
     const char = text[index];
 
     // Mistake simulation
-    if (mistakeUtils.shouldMakeMistake(includeMistakes, mistakeCount, maxMistakes, el.value.length)) {
+    if (
+      mistakeUtils.shouldMakeMistake(includeMistakes, mistakeCount, maxMistakes, el.value.length)
+    ) {
       mistakeCount++;
       const wrongChar = mistakeUtils.generateWrongCharacter();
 
@@ -454,7 +522,10 @@ function simulateTypingWithFeatures(config: TypingConfig & { text: string }) {
           el.value = el.value.slice(0, -1);
           eventUtils.triggerBackspaceEvents(el);
           audioUtils.playKeySound(soundEnabled);
-          controlUtils.safeSetTimeout(() => typeChar(index), controlUtils.getTypingDelay(delay, typingStyle));
+          controlUtils.safeSetTimeout(
+            () => typeChar(index),
+            controlUtils.getTypingDelay(delay, typingStyle)
+          );
         }
       }, controlUtils.getTypingDelay(delay, typingStyle) * 1.5);
       return;
@@ -464,7 +535,10 @@ function simulateTypingWithFeatures(config: TypingConfig & { text: string }) {
     eventUtils.triggerInputEvents(el, char);
     audioUtils.playKeySound(soundEnabled);
 
-    controlUtils.safeSetTimeout(() => typeChar(index + 1), controlUtils.getTypingDelay(delay, typingStyle));
+    controlUtils.safeSetTimeout(
+      () => typeChar(index + 1),
+      controlUtils.getTypingDelay(delay, typingStyle)
+    );
   }
 
   // Word-by-word typing function
@@ -494,12 +568,15 @@ function simulateTypingWithFeatures(config: TypingConfig & { text: string }) {
     eventUtils.triggerInputEvents(el, textToAdd);
     audioUtils.playKeySound(soundEnabled);
 
-    controlUtils.safeSetTimeout(() => typeWordByWord(words, wordIndex + 1), controlUtils.getTypingDelay(delay, typingStyle) * 3);
+    controlUtils.safeSetTimeout(
+      () => typeWordByWord(words, wordIndex + 1),
+      controlUtils.getTypingDelay(delay, typingStyle) * 3
+    );
   }
 
   // Start typing based on style
   if (typingStyle === 'word-by-word') {
-    const words = text.split(/\s+/).filter(word => word.length > 0);
+    const words = text.split(/\s+/).filter((word) => word.length > 0);
     if (words.length === 0) {
       alert('No valid words found in the text.');
       cleanup();

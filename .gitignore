@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# WXT Extension build output
+.output/
+.wxt/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

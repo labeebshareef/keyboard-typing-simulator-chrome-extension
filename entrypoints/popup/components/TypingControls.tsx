@@ -1,5 +1,5 @@
-import React from 'react';
-import { Play, Pause, Square, Clock } from 'lucide-react';
+import { Clock, Pause, Play, Square } from 'lucide-react';
+import type React from 'react';
 import type { TypingConfig } from '../types';
 
 interface TypingControlsProps {
@@ -55,7 +55,7 @@ const TypingControls: React.FC<TypingControlsProps> = ({
           <Clock className="w-4 h-4 text-gray-600" />
           <label className="text-sm font-semibold text-gray-700">Typing Speed</label>
         </div>
-        
+
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className={`text-sm font-medium ${getDelayColor(config.delay)}`}>
@@ -63,7 +63,7 @@ const TypingControls: React.FC<TypingControlsProps> = ({
             </span>
             <span className="text-xs text-gray-500">{config.delay}ms delay</span>
           </div>
-          
+
           <div className="relative">
             <input
               type="range"

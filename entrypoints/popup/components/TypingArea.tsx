@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 interface TypingAreaProps {
   text: string;
@@ -25,7 +25,7 @@ const TypingArea: React.FC<TypingAreaProps> = ({ text, setText, disabled }) => {
       />
       <div className="flex justify-between text-xs text-gray-500">
         <span>{text.length} characters</span>
-        <span>{text.split(' ').filter(word => word.length > 0).length} words</span>
+        <span>{text.split(' ').filter((word) => word.length > 0).length} words</span>
       </div>
     </div>
   );

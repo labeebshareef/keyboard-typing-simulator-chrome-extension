@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
 import { Keyboard } from 'lucide-react';
-import TabNavigation from './components/TabNavigation';
-import BasicTyping from './components/BasicTyping';
+import type React from 'react';
+import { useState } from 'react';
 import AdvancedTyping from './components/AdvancedTyping';
-import type { TypingConfig, AdvancedTypingConfig } from './types';
+import BasicTyping from './components/BasicTyping';
+import TabNavigation from './components/TabNavigation';
+import type { AdvancedTypingConfig, TypingConfig } from './types';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'basic' | 'advanced'>('basic');
@@ -20,11 +21,11 @@ const App: React.FC = () => {
   });
 
   const updateTypingConfig = (updates: Partial<TypingConfig>) => {
-    setTypingConfig(prev => ({ ...prev, ...updates }));
+    setTypingConfig((prev) => ({ ...prev, ...updates }));
   };
 
   const updateAdvancedConfig = (updates: Partial<AdvancedTypingConfig>) => {
-    setAdvancedConfig(prev => ({ ...prev, ...updates }));
+    setAdvancedConfig((prev) => ({ ...prev, ...updates }));
   };
 
   // Check if any typing is in progress to disable tab switching
@@ -55,10 +56,7 @@ const App: React.FC = () => {
 
         {/* Tab Content */}
         {activeTab === 'basic' ? (
-          <BasicTyping
-            config={typingConfig}
-            updateConfig={updateTypingConfig}
-          />
+          <BasicTyping config={typingConfig} updateConfig={updateTypingConfig} />
         ) : (
           <AdvancedTyping
             config={advancedConfig}

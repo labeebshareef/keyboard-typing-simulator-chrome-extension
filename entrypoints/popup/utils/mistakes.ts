@@ -17,10 +17,12 @@ export function shouldMakeMistake(
   maxMistakes: number,
   currentLength: number
 ): boolean {
-  return includeMistakes && 
-         mistakeCount < maxMistakes && 
-         Math.random() < 0.03 && // 3% chance
-         currentLength > 0;
+  return (
+    includeMistakes &&
+    mistakeCount < maxMistakes &&
+    Math.random() < 0.03 && // 3% chance
+    currentLength > 0
+  );
 }
 
 /**

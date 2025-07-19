@@ -1,31 +1,26 @@
 import { useState } from 'react';
 import type React from 'react';
-import TypingArea from './TypingArea';
-import TypingControls from './TypingControls';
-import AdvancedSettings from './AdvancedSettings';
-import ProgressDisplay from './ProgressDisplay';
-import Instructions from './Instructions';
 import { useTypingSimulator } from '../hooks/useTypingSimulator';
 import type { TypingConfig } from '../types';
+import AdvancedSettings from './AdvancedSettings';
+import Instructions from './Instructions';
+import ProgressDisplay from './ProgressDisplay';
+import TypingArea from './TypingArea';
+import TypingControls from './TypingControls';
 
 interface BasicTypingProps {
   config: TypingConfig;
   updateConfig: (updates: Partial<TypingConfig>) => void;
 }
 
-const BasicTyping: React.FC<BasicTypingProps> = ({
-  config,
-  updateConfig,
-}) => {
+const BasicTyping: React.FC<BasicTypingProps> = ({ config, updateConfig }) => {
   const [text, setText] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const {
-    typingState,
-    handleStartTyping,
-    handlePauseResume,
-    handleStop,
-  } = useTypingSimulator(text, config);
+  const { typingState, handleStartTyping, handlePauseResume, handleStop } = useTypingSimulator(
+    text,
+    config
+  );
 
   const getButtonState = () => {
     if (!typingState.isTyping) return 'start';
@@ -36,11 +31,7 @@ const BasicTyping: React.FC<BasicTypingProps> = ({
   return (
     <div className="space-y-6">
       {/* Typing Area */}
-      <TypingArea
-        text={text}
-        setText={setText}
-        disabled={typingState.isTyping}
-      />
+      <TypingArea text={text} setText={setText} disabled={typingState.isTyping} />
 
       {/* Typing Controls */}
       <TypingControls
@@ -55,9 +46,7 @@ const BasicTyping: React.FC<BasicTypingProps> = ({
       />
 
       {/* Progress Display */}
-      {typingState.isTyping && (
-        <ProgressDisplay progress={typingState.progress} />
-      )}
+      {typingState.isTyping && <ProgressDisplay progress={typingState.progress} />}
 
       {/* Advanced Settings Toggle */}
       <div className="space-y-3">

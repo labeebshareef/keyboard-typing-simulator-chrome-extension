@@ -1,5 +1,5 @@
-import React from 'react';
 import { Settings, Volume2, VolumeX, Zap } from 'lucide-react';
+import type React from 'react';
 import type { TypingConfig, TypingStyle } from '../types';
 
 interface AdvancedSettingsProps {
@@ -8,17 +8,17 @@ interface AdvancedSettingsProps {
   disabled: boolean;
 }
 
-const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
-  config,
-  updateConfig,
-  disabled,
-}) => {
+const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({ config, updateConfig, disabled }) => {
   const getTypingStyleDescription = (style: TypingStyle): string => {
     switch (style) {
-      case 'normal': return 'Consistent timing';
-      case 'random': return 'Variable human-like timing';
-      case 'word-by-word': return 'Types complete words';
-      default: return '';
+      case 'normal':
+        return 'Consistent timing';
+      case 'random':
+        return 'Variable human-like timing';
+      case 'word-by-word':
+        return 'Types complete words';
+      default:
+        return '';
     }
   };
 
@@ -28,14 +28,18 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
       <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
         <div className="flex items-center space-x-3">
           <div className="text-gray-600">
-            {config.soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+            {config.soundEnabled ? (
+              <Volume2 className="w-4 h-4" />
+            ) : (
+              <VolumeX className="w-4 h-4" />
+            )}
           </div>
           <div>
             <label className="text-sm font-semibold text-gray-700">Typing Sounds</label>
             <p className="text-xs text-gray-500">Enable keystroke audio feedback</p>
           </div>
         </div>
-        
+
         <button
           onClick={() => updateConfig({ soundEnabled: !config.soundEnabled })}
           disabled={disabled}
@@ -56,7 +60,7 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
           <Zap className="w-4 h-4 text-gray-600" />
           <label className="text-sm font-semibold text-gray-700">Typing Style</label>
         </div>
-        
+
         <select
           value={config.typingStyle}
           onChange={(e) => updateConfig({ typingStyle: e.target.value as TypingStyle })}
@@ -69,10 +73,8 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
           <option value="random">Random Delay</option>
           <option value="word-by-word">Word-by-Word</option>
         </select>
-        
-        <p className="text-xs text-gray-500">
-          {getTypingStyleDescription(config.typingStyle)}
-        </p>
+
+        <p className="text-xs text-gray-500">{getTypingStyleDescription(config.typingStyle)}</p>
       </div>
 
       {/* Mistakes Toggle */}
@@ -86,7 +88,7 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({
             <p className="text-xs text-gray-500">Simulate typos and corrections</p>
           </div>
         </div>
-        
+
         <button
           onClick={() => updateConfig({ includeMistakes: !config.includeMistakes })}
           disabled={disabled}

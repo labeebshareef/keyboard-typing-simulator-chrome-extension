@@ -12,15 +12,18 @@ let timeoutIds: number[] = [];
  * @param delay - Delay in milliseconds
  */
 export function safeSetTimeout(callback: () => void, delay: number): void {
-  const timeoutId = window.setTimeout(() => {
-    // Remove this timeout ID from tracking array
-    const index = timeoutIds.indexOf(timeoutId);
-    if (index > -1) {
-      timeoutIds.splice(index, 1);
-    }
-    callback();
-  }, Math.max(delay, 10)); // Enforce minimum delay
-  
+  const timeoutId = window.setTimeout(
+    () => {
+      // Remove this timeout ID from tracking array
+      const index = timeoutIds.indexOf(timeoutId);
+      if (index > -1) {
+        timeoutIds.splice(index, 1);
+      }
+      callback();
+    },
+    Math.max(delay, 10)
+  ); // Enforce minimum delay
+
   timeoutIds.push(timeoutId);
 }
 
@@ -28,7 +31,7 @@ export function safeSetTimeout(callback: () => void, delay: number): void {
  * Clear all tracked timeouts
  */
 export function clearAllTimeouts(): void {
-  timeoutIds.forEach(id => clearTimeout(id));
+  timeoutIds.forEach((id) => clearTimeout(id));
   timeoutIds = [];
 }
 
@@ -40,10 +43,10 @@ export function clearAllTimeouts(): void {
  */
 export function getTypingDelay(baseDelay: number, typingStyle: string): number {
   const safeDelay = Math.max(baseDelay, 10); // Enforce minimum 10ms
-  
+
   switch (typingStyle) {
     case 'random':
-      return Math.random() * (safeDelay * 2) + (safeDelay * 0.5);
+      return Math.random() * (safeDelay * 2) + safeDelay * 0.5;
     case 'word-by-word':
       return safeDelay;
     case 'normal':
@@ -57,13 +60,15 @@ export function getTypingDelay(baseDelay: number, typingStyle: string): number {
  * @param element - Potential input element
  * @returns Validated element or null if invalid
  */
-export function validateInputElement(element: Element | null): HTMLInputElement | HTMLTextAreaElement | null {
+export function validateInputElement(
+  element: Element | null
+): HTMLInputElement | HTMLTextAreaElement | null {
   if (!element || !['INPUT', 'TEXTAREA'].includes(element.tagName)) {
     return null;
   }
 
   const inputElement = element as HTMLInputElement | HTMLTextAreaElement;
-  
+
   // Check if element is editable
   if (inputElement.hasAttribute('readonly') || inputElement.hasAttribute('disabled')) {
     return null;
