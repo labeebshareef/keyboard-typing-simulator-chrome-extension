@@ -1,4 +1,4 @@
-import { Clock, EyeOff, Play, Scan, Settings, Timer } from 'lucide-react';
+import { Play, Scan } from 'lucide-react';
 import { useState } from 'react';
 import type React from 'react';
 import type { AdvancedTypingConfig, DetectedField, TypingConfig } from '../types';
@@ -8,6 +8,7 @@ interface AdvancedTypingProps {
   config: AdvancedTypingConfig;
   typingConfig: TypingConfig;
   updateConfig: (updates: Partial<AdvancedTypingConfig>) => void;
+  updateTypingConfig: (updates: Partial<TypingConfig>) => void;
   disabled: boolean;
 }
 
@@ -15,6 +16,7 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
   config,
   typingConfig,
   updateConfig,
+  updateTypingConfig,
   disabled,
 }) => {
   const [detectedFields, setDetectedFields] = useState<DetectedField[]>([]);
@@ -126,18 +128,18 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-4 space-y-4">
       {/* Scan Page Section */}
       <div className="space-y-3">
         <button
           type="button"
           onClick={handleScanPage}
           disabled={disabled || isScanning || isTyping}
-          className="w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 
+          className="w-full py-2.5 px-4 bg-blue-500 hover:bg-blue-600 
                    disabled:bg-gray-300 disabled:cursor-not-allowed
-                   text-white font-semibold rounded-xl transition-all duration-200
+                   text-white font-semibold rounded-lg transition-all duration-200
                    transform hover:scale-[1.02] active:scale-[0.98]
-                   shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
+                   shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
         >
           <Scan className={`w-4 h-4 ${isScanning ? 'animate-spin' : ''}`} />
           <span>{isScanning ? 'Scanning...' : 'Scan Page'}</span>
@@ -160,111 +162,6 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
         />
       )}
 
-      {/* Advanced Settings */}
-      <div className="space-y-4">
-        <div className="flex items-center space-x-2 mb-3">
-          <Settings className="w-4 h-4 text-gray-600" />
-          <h3 className="text-sm font-semibold text-gray-700">Advanced Settings</h3>
-        </div>
-
-        {/* Initial Delay */}
-        <div className="p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-center space-x-2 mb-3">
-            <Clock className="w-4 h-4 text-gray-600" />
-            <label className="text-sm font-semibold text-gray-700">Initial Delay</label>
-          </div>
-
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">
-                {config.initialDelay === 0
-                  ? 'No delay'
-                  : `${config.initialDelay} second${config.initialDelay !== 1 ? 's' : ''}`}
-              </span>
-            </div>
-
-            <input
-              type="range"
-              min="0"
-              max="10"
-              step="0.5"
-              value={config.initialDelay}
-              onChange={(e) => updateConfig({ initialDelay: Number(e.target.value) })}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer
-                       slider-thumb:appearance-none slider-thumb:w-4 slider-thumb:h-4
-                       slider-thumb:rounded-full slider-thumb:bg-primary-500
-                       slider-thumb:cursor-pointer slider-thumb:shadow-lg"
-              disabled={disabled || isTyping}
-            />
-            <div className="flex justify-between text-xs text-gray-400">
-              <span>0s</span>
-              <span>10s</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Inter-field Delay */}
-        <div className="p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-center space-x-2 mb-3">
-            <Timer className="w-4 h-4 text-gray-600" />
-            <label className="text-sm font-semibold text-gray-700">Inter-field Delay</label>
-          </div>
-
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">
-                {config.interFieldDelay === 0
-                  ? 'No delay'
-                  : `${config.interFieldDelay} second${config.interFieldDelay !== 1 ? 's' : ''}`}
-              </span>
-            </div>
-
-            <input
-              type="range"
-              min="0"
-              max="5"
-              step="0.5"
-              value={config.interFieldDelay}
-              onChange={(e) => updateConfig({ interFieldDelay: Number(e.target.value) })}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer
-                       slider-thumb:appearance-none slider-thumb:w-4 slider-thumb:h-4
-                       slider-thumb:rounded-full slider-thumb:bg-primary-500
-                       slider-thumb:cursor-pointer slider-thumb:shadow-lg"
-              disabled={disabled || isTyping}
-            />
-            <div className="flex justify-between text-xs text-gray-400">
-              <span>0s</span>
-              <span>5s</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Hide Extension Toggle */}
-        <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-center space-x-3">
-            <EyeOff className="w-4 h-4 text-gray-600" />
-            <div>
-              <label className="text-sm font-semibold text-gray-700">Hide Extension</label>
-              <p className="text-xs text-gray-500">Close popup during typing</p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => updateConfig({ hideExtension: !config.hideExtension })}
-            disabled={disabled || isTyping}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-                       focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
-                       ${config.hideExtension ? 'bg-primary-500' : 'bg-gray-200'}`}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
-                         ${config.hideExtension ? 'translate-x-6' : 'translate-x-1'}`}
-            />
-          </button>
-        </div>
-      </div>
-
       {/* Start Typing Button */}
       {detectedFields.length > 0 && (
         <button
@@ -275,11 +172,11 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
             isTyping ||
             detectedFields.filter((f) => f.enabled && f.text.trim()).length === 0
           }
-          className="w-full py-3 px-4 bg-green-500 hover:bg-green-600 
+          className="w-full py-2.5 px-4 bg-green-500 hover:bg-green-600 
                    disabled:bg-gray-300 disabled:cursor-not-allowed
-                   text-white font-semibold rounded-xl transition-all duration-200
+                   text-white font-semibold rounded-lg transition-all duration-200
                    transform hover:scale-[1.02] active:scale-[0.98]
-                   shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
+                   shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
         >
           <Play className="w-4 h-4" />
           <span>{isTyping ? 'Typing...' : 'Start Typing'}</span>
