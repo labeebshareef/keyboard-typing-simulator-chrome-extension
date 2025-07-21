@@ -66,201 +66,150 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           </CardTitle>
         </CardHeader>
         
-        <CardContent className="space-y-4 px-4 pb-4">
+        <CardContent className="space-y-2 px-4 pb-4">
           {/* Typing Speed */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center space-x-2 text-sm">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
                 <Clock className="w-3 h-3 text-primary" />
-                <span>Typing Speed</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Speed</span>
+              </div>
+              <div className="flex items-center space-x-2">
                 <Badge variant={getDelayColor(typingConfig.delay)} className="text-xs">
                   {getDelayLabel(typingConfig.delay)}
                 </Badge>
                 <span className="text-xs text-muted-foreground">{typingConfig.delay}ms</span>
               </div>
+            </div>
+            <Slider
+              value={[typingConfig.delay]}
+              onValueChange={([value]) => updateTypingConfig({ delay: value })}
+              max={300}
+              min={1}
+              step={1}
+              disabled={disabled}
+            />
+          </div>
 
-              <div className="space-y-2">
-                <Slider
-                  value={[typingConfig.delay]}
-                  onValueChange={([value]) => updateTypingConfig({ delay: value })}
-                  max={300}
-                  min={1}
-                  step={1}
-                  disabled={disabled}
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Fast</span>
-                  <span>Slow</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <Separator />
 
           {/* Advanced Settings (only for Advanced Typing) */}
           {showAdvancedSettings && advancedConfig && updateAdvancedConfig && (
             <>
-              <Separator />
-              
               {/* Initial Delay */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center space-x-2 text-sm">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
                     <Clock className="w-3 h-3 text-primary" />
-                    <span>Initial Delay</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">
-                      {advancedConfig.initialDelay === 0
-                        ? 'No delay'
-                        : `${advancedConfig.initialDelay}s`}
-                    </span>
+                    <span className="text-sm font-medium">Initial Delay</span>
                   </div>
-
-                  <div className="space-y-2">
-                    <Slider
-                      value={[advancedConfig.initialDelay]}
-                      onValueChange={([value]) => updateAdvancedConfig({ initialDelay: value })}
-                      max={10}
-                      min={0}
-                      step={0.5}
-                      disabled={disabled}
-                    />
-                    <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>0s</span>
-                      <span>10s</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  <span className="text-xs text-muted-foreground">
+                    {advancedConfig.initialDelay === 0
+                      ? 'No delay'
+                      : `${advancedConfig.initialDelay}s`}
+                  </span>
+                </div>
+                <Slider
+                  value={[advancedConfig.initialDelay]}
+                  onValueChange={([value]) => updateAdvancedConfig({ initialDelay: value })}
+                  max={10}
+                  min={0}
+                  step={0.5}
+                  disabled={disabled}
+                />
+              </div>
 
               {/* Inter-field Delay */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center space-x-2 text-sm">
-                    <Timer className="w-3 h-3 text-primary" />
-                    <span>Inter-field Delay</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">
-                      {advancedConfig.interFieldDelay === 0
-                        ? 'No delay'
-                        : `${advancedConfig.interFieldDelay}s`}
-                    </span>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Slider
-                      value={[advancedConfig.interFieldDelay]}
-                      onValueChange={([value]) => updateAdvancedConfig({ interFieldDelay: value })}
-                      max={5}
-                      min={0}
-                      step={0.5}
-                      disabled={disabled}
-                    />
-                    <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>0s</span>
-                      <span>5s</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Hide Extension */}
-              <Card>
-                <CardContent className="flex items-center justify-between py-4">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <EyeOff className="w-4 h-4 text-primary" />
-                    <div>
-                      <Label className="text-sm font-medium">Hide Extension</Label>
-                      <p className="text-xs text-muted-foreground">Close during typing</p>
-                    </div>
+                    <Timer className="w-3 h-3 text-primary" />
+                    <span className="text-sm font-medium">Field Delay</span>
                   </div>
-                  <Switch
-                    checked={advancedConfig.hideExtension}
-                    onCheckedChange={(checked) => updateAdvancedConfig({ hideExtension: checked })}
-                    disabled={disabled}
-                  />
-                </CardContent>
-              </Card>
+                  <span className="text-xs text-muted-foreground">
+                    {advancedConfig.interFieldDelay === 0
+                      ? 'No delay'
+                      : `${advancedConfig.interFieldDelay}s`}
+                  </span>
+                </div>
+                <Slider
+                  value={[advancedConfig.interFieldDelay]}
+                  onValueChange={([value]) => updateAdvancedConfig({ interFieldDelay: value })}
+                  max={5}
+                  min={0}
+                  step={0.5}
+                  disabled={disabled}
+                />
+              </div>
+
+              <Separator />
             </>
           )}
 
-          <Separator />
-
           {/* Typing Sounds */}
-          <Card>
-            <CardContent className="flex items-center justify-between py-4">
-              <div className="flex items-center space-x-2">
-                <div className="text-primary">
-                  {typingConfig.soundEnabled ? (
-                    <Volume2 className="w-4 h-4" />
-                  ) : (
-                    <VolumeX className="w-4 h-4" />
-                  )}
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">Typing Sounds</Label>
-                  <p className="text-xs text-muted-foreground">Audio feedback</p>
-                </div>
+          <div className="flex items-center justify-between py-1">
+            <div className="flex items-center space-x-2">
+              <div className="text-primary">
+                {typingConfig.soundEnabled ? (
+                  <Volume2 className="w-3 h-3" />
+                ) : (
+                  <VolumeX className="w-3 h-3" />
+                )}
               </div>
-              <Switch
-                checked={typingConfig.soundEnabled}
-                onCheckedChange={(checked) => updateTypingConfig({ soundEnabled: checked })}
-                disabled={disabled}
-              />
-            </CardContent>
-          </Card>
+              <span className="text-sm font-medium">Sounds</span>
+            </div>
+            <Switch
+              checked={typingConfig.soundEnabled}
+              onCheckedChange={(checked) => updateTypingConfig({ soundEnabled: checked })}
+              disabled={disabled}
+            />
+          </div>
 
           {/* Typing Style */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center space-x-2 text-sm">
-                <Zap className="w-3 h-3 text-primary" />
-                <span>Typing Style</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Select
-                value={typingConfig.typingStyle}
-                onChange={(e) => updateTypingConfig({ typingStyle: e.target.value as TypingStyle })}
-                className="h-8 text-xs"
-                disabled={disabled}
-              >
-                <option value="normal">Normal</option>
-                <option value="random">Random Delay</option>
-                <option value="word-by-word">Word-by-Word</option>
-              </Select>
-              <p className="text-xs text-muted-foreground">
-                {getTypingStyleDescription(typingConfig.typingStyle)}
-              </p>
-            </CardContent>
-          </Card>
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Zap className="w-3 h-3 text-primary" />
+              <span className="text-sm font-medium">Style</span>
+            </div>
+            <Select
+              value={typingConfig.typingStyle}
+              onChange={(e) => updateTypingConfig({ typingStyle: e.target.value as TypingStyle })}
+              className="h-7 text-xs"
+              disabled={disabled}
+            >
+              <option value="normal">Normal</option>
+              <option value="random">Random</option>
+              <option value="word-by-word">Word-by-Word</option>
+            </Select>
+          </div>
 
           {/* Include Mistakes */}
-          <Card>
-            <CardContent className="flex items-center justify-between py-4">
+          <div className="flex items-center justify-between py-1">
+            <div className="flex items-center space-x-2">
+              <Settings className="w-3 h-3 text-primary" />
+              <span className="text-sm font-medium">Mistakes</span>
+            </div>
+            <Switch
+              checked={typingConfig.includeMistakes}
+              onCheckedChange={(checked) => updateTypingConfig({ includeMistakes: checked })}
+              disabled={disabled}
+            />
+          </div>
+
+          {/* Hide Extension (Advanced only) */}
+          {showAdvancedSettings && advancedConfig && updateAdvancedConfig && (
+            <div className="flex items-center justify-between py-1">
               <div className="flex items-center space-x-2">
-                <Settings className="w-4 h-4 text-primary" />
-                <div>
-                  <Label className="text-sm font-medium">Include Mistakes</Label>
-                  <p className="text-xs text-muted-foreground">Typos & corrections</p>
-                </div>
+                <EyeOff className="w-3 h-3 text-primary" />
+                <span className="text-sm font-medium">Hide Extension</span>
               </div>
               <Switch
-                checked={typingConfig.includeMistakes}
-                onCheckedChange={(checked) => updateTypingConfig({ includeMistakes: checked })}
+                checked={advancedConfig.hideExtension}
+                onCheckedChange={(checked) => updateAdvancedConfig({ hideExtension: checked })}
                 disabled={disabled}
               />
-            </CardContent>
-          </Card>
+            </div>
+          )}
         </CardContent>
       </ScrollArea>
     </Card>

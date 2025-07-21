@@ -214,7 +214,7 @@ const FieldList: React.FC<FieldListProps> = ({
       </CardHeader>
 
       <CardContent className="flex-1 overflow-hidden p-0">
-        <ScrollArea className="h-full">
+        <ScrollArea className="h-[300px]">
           <div className="p-3 space-y-3">
             {fields.map((field, index) => (
               <Card
