@@ -1,9 +1,9 @@
 import { Clock, EyeOff, Settings, Timer, Volume2, VolumeX, Zap } from 'lucide-react';
 import type React from 'react';
 import type { AdvancedTypingConfig, TypingConfig, TypingStyle } from '../types';
-import { Switch } from './ui/switch';
 import { Label } from './ui/label';
 import { Select } from './ui/select';
+import { Switch } from './ui/switch';
 
 interface SettingsSidebarProps {
   typingConfig: TypingConfig;
@@ -92,7 +92,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
         </div>
       </div>
 
- {/* Advanced Settings (only for Advanced Typing) */}
+      {/* Advanced Settings (only for Advanced Typing) */}
       {showAdvancedSettings && advancedConfig && updateAdvancedConfig && (
         <>
           {/* Initial Delay */}
@@ -185,7 +185,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           </div>
         </>
       )}
-      
+
       {/* Typing Sounds */}
       <div className="flex items-center justify-between p-2 bg-white rounded border border-emerald-200 shadow-sm">
         <div className="flex items-center space-x-2">
@@ -227,7 +227,9 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           <option value="word-by-word">Word-by-Word</option>
         </Select>
 
-        <p className="text-xs text-emerald-500">{getTypingStyleDescription(typingConfig.typingStyle)}</p>
+        <p className="text-xs text-emerald-500">
+          {getTypingStyleDescription(typingConfig.typingStyle)}
+        </p>
       </div>
 
       {/* Include Mistakes */}
@@ -248,7 +250,6 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           disabled={disabled}
         />
       </div>
-
     </div>
   );
 };

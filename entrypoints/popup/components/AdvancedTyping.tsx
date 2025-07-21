@@ -188,7 +188,9 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
           <div className="text-center">
             <Scan className="w-12 h-12 mx-auto mb-4 text-emerald-300" />
             <p className="text-sm font-medium">No fields detected yet</p>
-            <p className="text-xs text-emerald-500 mt-1">Click "Scan Page" to detect input fields</p>
+            <p className="text-xs text-emerald-500 mt-1">
+              Click "Scan Page" to detect input fields
+            </p>
           </div>
         </div>
       )}
