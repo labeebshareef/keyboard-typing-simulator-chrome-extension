@@ -89,86 +89,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
         </div>
       </div>
 
-      {/* Typing Sounds */}
-      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-        <div className="flex items-center space-x-2">
-          <div className="text-gray-600">
-            {typingConfig.soundEnabled ? (
-              <Volume2 className="w-3 h-3" />
-            ) : (
-              <VolumeX className="w-3 h-3" />
-            )}
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-gray-700">Typing Sounds</label>
-            <p className="text-xs text-gray-500">Audio feedback</p>
-          </div>
-        </div>
-
-        <button
-          onClick={() => updateTypingConfig({ soundEnabled: !typingConfig.soundEnabled })}
-          disabled={disabled}
-          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
-                     focus:outline-none focus:ring-1 focus:ring-primary-500 focus:ring-offset-1
-                     ${typingConfig.soundEnabled ? 'bg-primary-500' : 'bg-gray-200'}`}
-        >
-          <span
-            className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform
-                       ${typingConfig.soundEnabled ? 'translate-x-5' : 'translate-x-1'}`}
-          />
-        </button>
-      </div>
-
-      {/* Typing Style */}
-      <div className="space-y-2 p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-        <div className="flex items-center space-x-2">
-          <Zap className="w-3 h-3 text-gray-600" />
-          <label className="text-xs font-semibold text-gray-700">Typing Style</label>
-        </div>
-
-        <select
-          value={typingConfig.typingStyle}
-          onChange={(e) => updateTypingConfig({ typingStyle: e.target.value as TypingStyle })}
-          className="w-full px-2 py-1.5 border border-gray-200 rounded-md focus:ring-1 
-                   focus:ring-primary-500 focus:border-transparent transition-all duration-200
-                   bg-white text-xs"
-          disabled={disabled}
-        >
-          <option value="normal">Normal</option>
-          <option value="random">Random Delay</option>
-          <option value="word-by-word">Word-by-Word</option>
-        </select>
-
-        <p className="text-xs text-gray-500">{getTypingStyleDescription(typingConfig.typingStyle)}</p>
-      </div>
-
-      {/* Include Mistakes */}
-      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-        <div className="flex items-center space-x-2">
-          <div className="text-gray-600">
-            <Settings className="w-3 h-3" />
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-gray-700">Include Mistakes</label>
-            <p className="text-xs text-gray-500">Typos & corrections</p>
-          </div>
-        </div>
-
-        <button
-          onClick={() => updateTypingConfig({ includeMistakes: !typingConfig.includeMistakes })}
-          disabled={disabled}
-          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
-                     focus:outline-none focus:ring-1 focus:ring-primary-500 focus:ring-offset-1
-                     ${typingConfig.includeMistakes ? 'bg-primary-500' : 'bg-gray-200'}`}
-        >
-          <span
-            className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform
-                       ${typingConfig.includeMistakes ? 'translate-x-5' : 'translate-x-1'}`}
-          />
-        </button>
-      </div>
-
-      {/* Advanced Settings (only for Advanced Typing) */}
+ {/* Advanced Settings (only for Advanced Typing) */}
       {showAdvancedSettings && advancedConfig && updateAdvancedConfig && (
         <>
           {/* Separator */}
@@ -271,6 +192,85 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           </div>
         </>
       )}
+      {/* Typing Sounds */}
+      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+        <div className="flex items-center space-x-2">
+          <div className="text-gray-600">
+            {typingConfig.soundEnabled ? (
+              <Volume2 className="w-3 h-3" />
+            ) : (
+              <VolumeX className="w-3 h-3" />
+            )}
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-700">Typing Sounds</label>
+            <p className="text-xs text-gray-500">Audio feedback</p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => updateTypingConfig({ soundEnabled: !typingConfig.soundEnabled })}
+          disabled={disabled}
+          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
+                     focus:outline-none focus:ring-1 focus:ring-primary-500 focus:ring-offset-1
+                     ${typingConfig.soundEnabled ? 'bg-primary-500' : 'bg-gray-200'}`}
+        >
+          <span
+            className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform
+                       ${typingConfig.soundEnabled ? 'translate-x-5' : 'translate-x-1'}`}
+          />
+        </button>
+      </div>
+
+      {/* Typing Style */}
+      <div className="space-y-2 p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+        <div className="flex items-center space-x-2">
+          <Zap className="w-3 h-3 text-gray-600" />
+          <label className="text-xs font-semibold text-gray-700">Typing Style</label>
+        </div>
+
+        <select
+          value={typingConfig.typingStyle}
+          onChange={(e) => updateTypingConfig({ typingStyle: e.target.value as TypingStyle })}
+          className="w-full px-2 py-1.5 border border-gray-200 rounded-md focus:ring-1 
+                   focus:ring-primary-500 focus:border-transparent transition-all duration-200
+                   bg-white text-xs"
+          disabled={disabled}
+        >
+          <option value="normal">Normal</option>
+          <option value="random">Random Delay</option>
+          <option value="word-by-word">Word-by-Word</option>
+        </select>
+
+        <p className="text-xs text-gray-500">{getTypingStyleDescription(typingConfig.typingStyle)}</p>
+      </div>
+
+      {/* Include Mistakes */}
+      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+        <div className="flex items-center space-x-2">
+          <div className="text-gray-600">
+            <Settings className="w-3 h-3" />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-700">Include Mistakes</label>
+            <p className="text-xs text-gray-500">Typos & corrections</p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => updateTypingConfig({ includeMistakes: !typingConfig.includeMistakes })}
+          disabled={disabled}
+          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
+                     focus:outline-none focus:ring-1 focus:ring-primary-500 focus:ring-offset-1
+                     ${typingConfig.includeMistakes ? 'bg-primary-500' : 'bg-gray-200'}`}
+        >
+          <span
+            className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform
+                       ${typingConfig.includeMistakes ? 'translate-x-5' : 'translate-x-1'}`}
+          />
+        </button>
+      </div>
+
     </div>
   );
 };

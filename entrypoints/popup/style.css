@@ -5,8 +5,8 @@
 body {
   margin: 0;
   padding: 0;
-  width: 570px; /* Increased by ~50% from 380px */
-  min-height: 500px;
+  width: 790px; /* Increased by ~50% from 380px */
+  min-height: 600px;
 }
 
 /* Custom scrollbar styling */
