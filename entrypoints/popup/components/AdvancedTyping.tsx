@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type React from 'react';
 import type { AdvancedTypingConfig, DetectedField, TypingConfig } from '../types';
 import FieldList from './FieldList';
+import { Button } from './ui/button';
 
 interface AdvancedTypingProps {
   config: AdvancedTypingConfig;
@@ -132,19 +133,15 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
       {/* Scan Page Section - Compact */}
       <div className="p-3 border-b border-emerald-200 bg-emerald-50/50 shrink-0">
         <div className="flex items-center space-x-3">
-          <button
-            type="button"
+          <Button
             onClick={handleScanPage}
             disabled={disabled || isScanning || isTyping}
-            className="flex-1 py-2 px-4 bg-emerald-500 hover:bg-emerald-600 
-                     disabled:bg-gray-300 disabled:cursor-not-allowed
-                     text-white font-semibold rounded-md transition-all duration-200
-                     transform hover:scale-[1.02] active:scale-[0.98]
-                     shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
+            className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white"
+            variant="default"
           >
-            <Scan className={`w-4 h-4 ${isScanning ? 'animate-spin' : ''}`} />
-            <span>{isScanning ? 'Scanning...' : 'Scan Page'}</span>
-          </button>
+            <Scan className={`w-4 h-4 mr-2 ${isScanning ? 'animate-spin' : ''}`} />
+            {isScanning ? 'Scanning...' : 'Scan Page'}
+          </Button>
 
           {detectedFields.length > 0 && (
             <div className="text-sm text-emerald-700 font-medium px-3 py-2 bg-emerald-100 rounded-md">
@@ -169,23 +166,19 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
       {/* Start Typing Button - Fixed at bottom */}
       {detectedFields.length > 0 && (
         <div className="p-3 border-t border-emerald-200 bg-emerald-50/50 shrink-0">
-          <button
-            type="button"
+          <Button
             onClick={handleStartTyping}
             disabled={
               disabled ||
               isTyping ||
               detectedFields.filter((f) => f.enabled && f.text.trim()).length === 0
             }
-            className="w-full py-2 px-4 bg-emerald-600 hover:bg-emerald-700 
-                     disabled:bg-gray-300 disabled:cursor-not-allowed
-                     text-white font-semibold rounded-md transition-all duration-200
-                     transform hover:scale-[1.02] active:scale-[0.98]
-                     shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+            variant="default"
           >
-            <Play className="w-4 h-4" />
-            <span>{isTyping ? 'Typing...' : 'Start Typing'}</span>
-          </button>
+            <Play className="w-4 h-4 mr-2" />
+            {isTyping ? 'Typing...' : 'Start Typing'}
+          </Button>
         </div>
       )}
 

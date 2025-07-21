@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Type Simulator Preview</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f3f4f6;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .preview-container {
+      display: inline-block;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <h1>Chrome Extension Popup Preview</h1>
+  <p>Dimensions: 790px × 600px</p>
+  
+  <div class="preview-container">
+    <iframe 
+      src="./.output/chrome-mv3/popup.html" 
+      width="790" 
+      height="600"
+      style="border: none; display: block;"
+      title="Extension Popup">
+    </iframe>
+  </div>
+</body>
+</html>

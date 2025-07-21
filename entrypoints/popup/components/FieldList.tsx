@@ -2,6 +2,11 @@ import { GripVertical, Hash, ToggleLeft, ToggleRight, Type } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react';
 import type React from 'react';
 import type { DetectedField } from '../types';
+import { Switch } from './ui/switch';
+import { Textarea } from './ui/textarea';
+import { Input } from './ui/input';
+import { Button } from './ui/button';
+import { cn } from '../lib/utils';
 
 interface FieldListProps {
   fields: DetectedField[];
@@ -248,27 +253,28 @@ const FieldList: React.FC<FieldListProps> = ({
                 <div className="flex items-center space-x-1">
                   <Hash className="w-2 h-2 text-emerald-400" />
                   {editingPriority === field.id ? (
-                    <input
+                    <Input
                       type="number"
                       value={tempPriority}
                       onChange={(e) => setTempPriority(e.target.value)}
                       onBlur={() => handlePrioritySubmit(field.id)}
                       onKeyDown={(e) => handlePriorityKeyDown(e, field.id)}
-                      className="w-6 h-4 text-xs font-mono text-center border border-emerald-300 rounded focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+                      className="w-6 h-4 text-xs font-mono text-center"
                       min="1"
                       max={fields.length}
                       autoFocus
                     />
                   ) : (
-                    <button
-                      type="button"
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => handlePriorityClick(field.id, field.priority)}
                       disabled={disabled}
-                      className="text-xs font-mono text-emerald-600 min-w-[1rem] text-center hover:bg-emerald-100 hover:text-emerald-800 px-1 py-0.5 rounded transition-colors"
+                      className="h-4 w-4 p-0 text-xs font-mono text-emerald-600 hover:bg-emerald-100 hover:text-emerald-800"
                       title="Click to edit priority"
                     >
                       {field.priority}
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>
@@ -286,36 +292,28 @@ const FieldList: React.FC<FieldListProps> = ({
               </div>
 
               {/* Enable/Disable Toggle */}
-              <button
-                type="button"
-                onClick={() => onUpdateField(field.id, { enabled: !field.enabled })}
-                disabled={disabled}
-                className="flex items-center space-x-1 text-xs text-emerald-600 hover:text-emerald-800 transition-all p-1 rounded hover:bg-emerald-50 shrink-0"
-              >
-                {field.enabled ? (
-                  <>
-                    <ToggleRight className="w-4 h-4 text-emerald-500" />
-                    <span className="text-emerald-600 font-medium">On</span>
-                  </>
-                ) : (
-                  <>
-                    <ToggleLeft className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-400">Off</span>
-                  </>
-                )}
-              </button>
+              <div className="flex items-center space-x-1 shrink-0">
+                <Switch
+                  checked={field.enabled}
+                  onCheckedChange={(checked) => onUpdateField(field.id, { enabled: checked })}
+                  disabled={disabled}
+                />
+                <span className={cn(
+                  "text-xs font-medium",
+                  field.enabled ? "text-emerald-600" : "text-gray-400"
+                )}>
+                  {field.enabled ? 'On' : 'Off'}
+                </span>
+              </div>
             </div>
 
             {/* Text Input - Compact */}
             <div className="space-y-1">
-              <textarea
+              <Textarea
                 value={field.text}
                 onChange={(e) => onUpdateField(field.id, { text: e.target.value })}
                 placeholder="Text to type into this field..."
-                className="w-full h-8 px-2 py-1 text-xs border border-emerald-200 rounded
-                         focus:ring-1 focus:ring-emerald-500 focus:border-transparent
-                         transition-all duration-200 resize-none
-                         disabled:bg-gray-50 disabled:text-gray-500"
+                className="min-h-[2rem] h-8 text-xs resize-none"
                 disabled={disabled || !field.enabled}
               />
 

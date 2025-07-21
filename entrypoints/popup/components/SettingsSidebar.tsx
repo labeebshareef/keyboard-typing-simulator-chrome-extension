@@ -1,6 +1,9 @@
 import { Clock, EyeOff, Settings, Timer, Volume2, VolumeX, Zap } from 'lucide-react';
 import type React from 'react';
 import type { AdvancedTypingConfig, TypingConfig, TypingStyle } from '../types';
+import { Switch } from './ui/switch';
+import { Label } from './ui/label';
+import { Select } from './ui/select';
 
 interface SettingsSidebarProps {
   typingConfig: TypingConfig;
@@ -59,7 +62,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
       <div className="p-2 bg-white rounded border border-emerald-200 shadow-sm">
         <div className="flex items-center space-x-2 mb-2">
           <Clock className="w-3 h-3 text-emerald-600" />
-          <label className="text-xs font-semibold text-emerald-700">Typing Speed</label>
+          <Label className="text-xs font-semibold text-emerald-700">Typing Speed</Label>
         </div>
 
         <div className="space-y-1">
@@ -96,7 +99,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           <div className="p-2 bg-white rounded border border-emerald-200 shadow-sm">
             <div className="flex items-center space-x-2 mb-2">
               <Clock className="w-3 h-3 text-emerald-600" />
-              <label className="text-xs font-semibold text-emerald-700">Initial Delay</label>
+              <Label className="text-xs font-semibold text-emerald-700">Initial Delay</Label>
             </div>
 
             <div className="space-y-1">
@@ -132,7 +135,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           <div className="p-2 bg-white rounded border border-emerald-200 shadow-sm">
             <div className="flex items-center space-x-2 mb-2">
               <Timer className="w-3 h-3 text-emerald-600" />
-              <label className="text-xs font-semibold text-emerald-700">Inter-field Delay</label>
+              <Label className="text-xs font-semibold text-emerald-700">Inter-field Delay</Label>
             </div>
 
             <div className="space-y-1">
@@ -169,24 +172,16 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
             <div className="flex items-center space-x-2">
               <EyeOff className="w-3 h-3 text-emerald-600" />
               <div>
-                <label className="text-xs font-semibold text-emerald-700">Hide Extension</label>
+                <Label className="text-xs font-semibold text-emerald-700">Hide Extension</Label>
                 <p className="text-xs text-emerald-500">Close during typing</p>
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => updateAdvancedConfig({ hideExtension: !advancedConfig.hideExtension })}
+            <Switch
+              checked={advancedConfig.hideExtension}
+              onCheckedChange={(checked) => updateAdvancedConfig({ hideExtension: checked })}
               disabled={disabled}
-              className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
-                         focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:ring-offset-1
-                         ${advancedConfig.hideExtension ? 'bg-emerald-500' : 'bg-emerald-200'}`}
-            >
-              <span
-                className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform
-                           ${advancedConfig.hideExtension ? 'translate-x-5' : 'translate-x-1'}`}
-              />
-            </button>
+            />
           </div>
         </>
       )}
@@ -202,45 +197,35 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
             )}
           </div>
           <div>
-            <label className="text-xs font-semibold text-emerald-700">Typing Sounds</label>
+            <Label className="text-xs font-semibold text-emerald-700">Typing Sounds</Label>
             <p className="text-xs text-emerald-500">Audio feedback</p>
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => updateTypingConfig({ soundEnabled: !typingConfig.soundEnabled })}
+        <Switch
+          checked={typingConfig.soundEnabled}
+          onCheckedChange={(checked) => updateTypingConfig({ soundEnabled: checked })}
           disabled={disabled}
-          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
-                     focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:ring-offset-1
-                     ${typingConfig.soundEnabled ? 'bg-emerald-500' : 'bg-emerald-200'}`}
-        >
-          <span
-            className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform
-                       ${typingConfig.soundEnabled ? 'translate-x-5' : 'translate-x-1'}`}
-          />
-        </button>
+        />
       </div>
 
       {/* Typing Style */}
       <div className="space-y-1 p-2 bg-white rounded border border-emerald-200 shadow-sm">
         <div className="flex items-center space-x-2">
           <Zap className="w-3 h-3 text-emerald-600" />
-          <label className="text-xs font-semibold text-emerald-700">Typing Style</label>
+          <Label className="text-xs font-semibold text-emerald-700">Typing Style</Label>
         </div>
 
-        <select
+        <Select
           value={typingConfig.typingStyle}
           onChange={(e) => updateTypingConfig({ typingStyle: e.target.value as TypingStyle })}
-          className="w-full px-2 py-1 border border-emerald-200 rounded focus:ring-1 
-                   focus:ring-emerald-500 focus:border-transparent transition-all duration-200
-                   bg-white text-xs"
+          className="h-8 text-xs"
           disabled={disabled}
         >
           <option value="normal">Normal</option>
           <option value="random">Random Delay</option>
           <option value="word-by-word">Word-by-Word</option>
-        </select>
+        </Select>
 
         <p className="text-xs text-emerald-500">{getTypingStyleDescription(typingConfig.typingStyle)}</p>
       </div>
@@ -252,24 +237,16 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
             <Settings className="w-3 h-3" />
           </div>
           <div>
-            <label className="text-xs font-semibold text-emerald-700">Include Mistakes</label>
+            <Label className="text-xs font-semibold text-emerald-700">Include Mistakes</Label>
             <p className="text-xs text-emerald-500">Typos & corrections</p>
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => updateTypingConfig({ includeMistakes: !typingConfig.includeMistakes })}
+        <Switch
+          checked={typingConfig.includeMistakes}
+          onCheckedChange={(checked) => updateTypingConfig({ includeMistakes: checked })}
           disabled={disabled}
-          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
-                     focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:ring-offset-1
-                     ${typingConfig.includeMistakes ? 'bg-emerald-500' : 'bg-emerald-200'}`}
-        >
-          <span
-            className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform
-                       ${typingConfig.includeMistakes ? 'translate-x-5' : 'translate-x-1'}`}
-          />
-        </button>
+        />
       </div>
 
     </div>
