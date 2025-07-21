@@ -216,7 +216,7 @@ const FieldList: React.FC<FieldListProps> = ({
 
       <div 
         ref={containerRef}
-        className="max-h-80 overflow-y-auto space-y-2 relative"
+        className="max-h-[170px] overflow-y-auto space-y-2 relative"
         style={{
           scrollBehavior: 'smooth'
         }}
