@@ -207,16 +207,16 @@ const FieldList: React.FC<FieldListProps> = ({
   };
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center space-x-2 mb-3">
-        <Type className="w-4 h-4 text-gray-600" />
-        <h3 className="text-sm font-semibold text-gray-700">Detected Fields</h3>
-        <span className="text-xs text-gray-500">({fields.length})</span>
+    <div className="h-full flex flex-col">
+      <div className="flex items-center space-x-2 p-3 border-b border-emerald-200 bg-emerald-50/30 shrink-0">
+        <Type className="w-4 h-4 text-emerald-600" />
+        <h3 className="text-sm font-semibold text-emerald-700">Detected Fields</h3>
+        <span className="text-xs text-emerald-500">({fields.length})</span>
       </div>
 
       <div 
         ref={containerRef}
-        className="max-h-[170px] overflow-y-auto space-y-2 relative"
+        className="flex-1 overflow-y-auto p-2 space-y-2"
         style={{
           scrollBehavior: 'smooth'
         }}
@@ -231,23 +231,22 @@ const FieldList: React.FC<FieldListProps> = ({
             onDrop={(e) => handleDrop(e, field.id)}
             onDragEnd={handleDragEnd}
             className={`
-              p-3 bg-white rounded-lg border border-gray-200 shadow-sm
-              ${dragOverItem === field.id ? 'border-blue-400 bg-blue-50 scale-[1.02] shadow-md ring-2 ring-blue-200' : ''}
+              p-2 bg-white rounded border border-emerald-200 shadow-sm
+              ${dragOverItem === field.id ? 'border-emerald-400 bg-emerald-50 scale-[1.01] shadow-md ring-1 ring-emerald-200' : ''}
               ${draggedItem === field.id ? 'opacity-60 rotate-1 scale-95 shadow-lg' : ''}
-              ${!disabled ? 'cursor-move hover:border-gray-300 hover:shadow-md' : ''}
+              ${!disabled ? 'cursor-move hover:border-emerald-300 hover:shadow-md' : ''}
               transition-all duration-200 ease-in-out transform
             `}
           >
-            <div className="flex items-start space-x-3">
+            {/* Compact Header Row */}
+            <div className="flex items-center space-x-2 mb-2">
               {/* Drag Handle & Priority */}
-              <div className="flex items-center space-x-2 mt-1">
+              <div className="flex items-center space-x-1 shrink-0">
                 {!disabled && (
-                  <div className="group">
-                    <GripVertical className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                  </div>
+                  <GripVertical className="w-3 h-3 text-emerald-400" />
                 )}
                 <div className="flex items-center space-x-1">
-                  <Hash className="w-3 h-3 text-gray-400" />
+                  <Hash className="w-2 h-2 text-emerald-400" />
                   {editingPriority === field.id ? (
                     <input
                       type="number"
@@ -255,7 +254,7 @@ const FieldList: React.FC<FieldListProps> = ({
                       onChange={(e) => setTempPriority(e.target.value)}
                       onBlur={() => handlePrioritySubmit(field.id)}
                       onKeyDown={(e) => handlePriorityKeyDown(e, field.id)}
-                      className="w-8 h-5 text-xs font-mono text-center border border-blue-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-6 h-4 text-xs font-mono text-center border border-emerald-300 rounded focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
                       min="1"
                       max={fields.length}
                       autoFocus
@@ -265,7 +264,7 @@ const FieldList: React.FC<FieldListProps> = ({
                       type="button"
                       onClick={() => handlePriorityClick(field.id, field.priority)}
                       disabled={disabled}
-                      className="text-xs font-mono text-gray-600 min-w-[1.5rem] text-center hover:bg-gray-100 hover:text-gray-800 px-1 py-0.5 rounded transition-colors"
+                      className="text-xs font-mono text-emerald-600 min-w-[1rem] text-center hover:bg-emerald-100 hover:text-emerald-800 px-1 py-0.5 rounded transition-colors"
                       title="Click to edit priority"
                     >
                       {field.priority}
@@ -274,62 +273,58 @@ const FieldList: React.FC<FieldListProps> = ({
                 </div>
               </div>
 
-              {/* Field Info */}
-              <div className="flex-1 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-lg">{getElementTypeIcon(field.elementType)}</span>
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">{field.label}</div>
-                      <div className="text-xs text-gray-500">
-                        {getElementTypeLabel(field.elementType)}
-                        {field.placeholder && ` • ${field.placeholder}`}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Enable/Disable Toggle */}
-                  <button
-                    type="button"
-                    onClick={() => onUpdateField(field.id, { enabled: !field.enabled })}
-                    disabled={disabled}
-                    className="flex items-center space-x-1 text-sm text-gray-600 hover:text-gray-800 transition-all p-1 rounded hover:bg-gray-50"
-                  >
-                    {field.enabled ? (
-                      <>
-                        <ToggleRight className="w-4 h-4 text-green-500" />
-                        <span className="text-green-600 text-xs font-medium">On</span>
-                      </>
-                    ) : (
-                      <>
-                        <ToggleLeft className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-400 text-xs">Off</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-
-                {/* Text Input */}
-                <div className="space-y-1">
-                  <textarea
-                    value={field.text}
-                    onChange={(e) => onUpdateField(field.id, { text: e.target.value })}
-                    placeholder="Text to type into this field..."
-                    className="w-full h-14 px-3 py-2 text-sm border border-gray-200 rounded-md
-                             focus:ring-2 focus:ring-primary-500 focus:border-transparent
-                             transition-all duration-200 resize-none
-                             disabled:bg-gray-50 disabled:text-gray-500"
-                    disabled={disabled || !field.enabled}
-                  />
-
-                  {/* Character Count & Selector Info */}
-                  <div className="flex justify-between text-xs text-gray-500">
-                    <span>{field.text.length} characters</span>
-                    <span className="text-xs text-gray-400 font-mono truncate max-w-[150px]">
-                      {field.selector}
-                    </span>
+              {/* Field Type & Label */}
+              <div className="flex items-center space-x-2 flex-1 min-w-0">
+                <span className="text-sm">{getElementTypeIcon(field.elementType)}</span>
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-medium text-gray-900 truncate">{field.label}</div>
+                  <div className="text-xs text-emerald-600 truncate">
+                    {getElementTypeLabel(field.elementType)}
+                    {field.placeholder && ` • ${field.placeholder}`}
                   </div>
                 </div>
+              </div>
+
+              {/* Enable/Disable Toggle */}
+              <button
+                type="button"
+                onClick={() => onUpdateField(field.id, { enabled: !field.enabled })}
+                disabled={disabled}
+                className="flex items-center space-x-1 text-xs text-emerald-600 hover:text-emerald-800 transition-all p-1 rounded hover:bg-emerald-50 shrink-0"
+              >
+                {field.enabled ? (
+                  <>
+                    <ToggleRight className="w-4 h-4 text-emerald-500" />
+                    <span className="text-emerald-600 font-medium">On</span>
+                  </>
+                ) : (
+                  <>
+                    <ToggleLeft className="w-4 h-4 text-gray-400" />
+                    <span className="text-gray-400">Off</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Text Input - Compact */}
+            <div className="space-y-1">
+              <textarea
+                value={field.text}
+                onChange={(e) => onUpdateField(field.id, { text: e.target.value })}
+                placeholder="Text to type into this field..."
+                className="w-full h-8 px-2 py-1 text-xs border border-emerald-200 rounded
+                         focus:ring-1 focus:ring-emerald-500 focus:border-transparent
+                         transition-all duration-200 resize-none
+                         disabled:bg-gray-50 disabled:text-gray-500"
+                disabled={disabled || !field.enabled}
+              />
+
+              {/* Character Count & Selector Info - Compact Row */}
+              <div className="flex justify-between items-center text-xs text-emerald-500">
+                <span>{field.text.length} chars</span>
+                <span className="text-xs text-emerald-400 font-mono truncate max-w-[120px]">
+                  {field.selector}
+                </span>
               </div>
             </div>
           </div>
@@ -337,21 +332,21 @@ const FieldList: React.FC<FieldListProps> = ({
       </div>
 
       {fields.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
-          <Type className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-          <p className="text-sm">No fields detected yet.</p>
-          <p className="text-xs">Click "Scan Page" to detect input fields.</p>
+        <div className="flex-1 flex items-center justify-center text-emerald-500">
+          <div className="text-center py-8">
+            <Type className="w-8 h-8 mx-auto mb-2 text-emerald-300" />
+            <p className="text-sm">No fields detected yet.</p>
+            <p className="text-xs">Click "Scan Page" to detect input fields.</p>
+          </div>
         </div>
       )}
 
       {/* Enhanced Drag and Drop Instructions */}
       {fields.length > 1 && !disabled && (
-        <div className="text-xs text-gray-500 text-center py-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
-          <div className="space-y-1">
-            <div className="flex items-center justify-center space-x-2">
-              <GripVertical className="w-3 h-3" />
-              <span>Drag to reorder • Click priority # to edit</span>
-            </div>
+        <div className="text-xs text-emerald-600 text-center py-2 bg-emerald-50 border-t border-emerald-200 shrink-0">
+          <div className="flex items-center justify-center space-x-2">
+            <GripVertical className="w-3 h-3" />
+            <span>Drag to reorder • Click # to edit priority</span>
           </div>
         </div>
       )}

@@ -30,7 +30,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
   const getDelayColor = (delayValue: number): string => {
     if (delayValue <= 20) return 'text-red-500';
     if (delayValue <= 50) return 'text-orange-500';
-    if (delayValue <= 100) return 'text-green-500';
+    if (delayValue <= 100) return 'text-emerald-600';
     if (delayValue <= 200) return 'text-blue-500';
     return 'text-purple-500';
   };
@@ -49,25 +49,25 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
   };
 
   return (
-    <div className="w-64 bg-gray-50 border-l border-gray-200 p-4 space-y-3 overflow-y-auto">
-      <div className="flex items-center space-x-2 mb-4">
-        <Settings className="w-4 h-4 text-gray-600" />
-        <h3 className="text-sm font-semibold text-gray-700">Settings</h3>
+    <div className="w-56 bg-emerald-50 border-l border-emerald-200 p-3 space-y-2 overflow-y-auto">
+      <div className="flex items-center space-x-2 mb-3">
+        <Settings className="w-4 h-4 text-emerald-600" />
+        <h3 className="text-sm font-semibold text-emerald-700">Settings</h3>
       </div>
 
       {/* Typing Speed */}
-      <div className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+      <div className="p-2 bg-white rounded border border-emerald-200 shadow-sm">
         <div className="flex items-center space-x-2 mb-2">
-          <Clock className="w-3 h-3 text-gray-600" />
-          <label className="text-xs font-semibold text-gray-700">Typing Speed</label>
+          <Clock className="w-3 h-3 text-emerald-600" />
+          <label className="text-xs font-semibold text-emerald-700">Typing Speed</label>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1">
           <div className="flex items-center justify-between">
             <span className={`text-xs font-medium ${getDelayColor(typingConfig.delay)}`}>
               {getDelayLabel(typingConfig.delay)}
             </span>
-            <span className="text-xs text-gray-500">{typingConfig.delay}ms</span>
+            <span className="text-xs text-emerald-500">{typingConfig.delay}ms</span>
           </div>
 
           <input
@@ -76,13 +76,13 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
             max="300"
             value={typingConfig.delay}
             onChange={(e) => updateTypingConfig({ delay: Number(e.target.value) })}
-            className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer
+            className="w-full h-1.5 bg-emerald-200 rounded-lg appearance-none cursor-pointer
                      slider-thumb:appearance-none slider-thumb:w-3 slider-thumb:h-3
-                     slider-thumb:rounded-full slider-thumb:bg-primary-500
+                     slider-thumb:rounded-full slider-thumb:bg-emerald-500
                      slider-thumb:cursor-pointer"
             disabled={disabled}
           />
-          <div className="flex justify-between text-xs text-gray-400">
+          <div className="flex justify-between text-xs text-emerald-400">
             <span>Fast</span>
             <span>Slow</span>
           </div>
@@ -92,19 +92,16 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
  {/* Advanced Settings (only for Advanced Typing) */}
       {showAdvancedSettings && advancedConfig && updateAdvancedConfig && (
         <>
-          {/* Separator */}
-          <div className="border-t border-gray-300 my-4"></div>
-          
           {/* Initial Delay */}
-          <div className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+          <div className="p-2 bg-white rounded border border-emerald-200 shadow-sm">
             <div className="flex items-center space-x-2 mb-2">
-              <Clock className="w-3 h-3 text-gray-600" />
-              <label className="text-xs font-semibold text-gray-700">Initial Delay</label>
+              <Clock className="w-3 h-3 text-emerald-600" />
+              <label className="text-xs font-semibold text-emerald-700">Initial Delay</label>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-600">
+                <span className="text-xs text-emerald-600">
                   {advancedConfig.initialDelay === 0
                     ? 'No delay'
                     : `${advancedConfig.initialDelay}s`}
@@ -118,13 +115,13 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                 step="0.5"
                 value={advancedConfig.initialDelay}
                 onChange={(e) => updateAdvancedConfig({ initialDelay: Number(e.target.value) })}
-                className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer
+                className="w-full h-1.5 bg-emerald-200 rounded-lg appearance-none cursor-pointer
                          slider-thumb:appearance-none slider-thumb:w-3 slider-thumb:h-3
-                         slider-thumb:rounded-full slider-thumb:bg-primary-500
+                         slider-thumb:rounded-full slider-thumb:bg-emerald-500
                          slider-thumb:cursor-pointer"
                 disabled={disabled}
               />
-              <div className="flex justify-between text-xs text-gray-400">
+              <div className="flex justify-between text-xs text-emerald-400">
                 <span>0s</span>
                 <span>10s</span>
               </div>
@@ -132,15 +129,15 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           </div>
 
           {/* Inter-field Delay */}
-          <div className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+          <div className="p-2 bg-white rounded border border-emerald-200 shadow-sm">
             <div className="flex items-center space-x-2 mb-2">
-              <Timer className="w-3 h-3 text-gray-600" />
-              <label className="text-xs font-semibold text-gray-700">Inter-field Delay</label>
+              <Timer className="w-3 h-3 text-emerald-600" />
+              <label className="text-xs font-semibold text-emerald-700">Inter-field Delay</label>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-600">
+                <span className="text-xs text-emerald-600">
                   {advancedConfig.interFieldDelay === 0
                     ? 'No delay'
                     : `${advancedConfig.interFieldDelay}s`}
@@ -154,13 +151,13 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                 step="0.5"
                 value={advancedConfig.interFieldDelay}
                 onChange={(e) => updateAdvancedConfig({ interFieldDelay: Number(e.target.value) })}
-                className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer
+                className="w-full h-1.5 bg-emerald-200 rounded-lg appearance-none cursor-pointer
                          slider-thumb:appearance-none slider-thumb:w-3 slider-thumb:h-3
-                         slider-thumb:rounded-full slider-thumb:bg-primary-500
+                         slider-thumb:rounded-full slider-thumb:bg-emerald-500
                          slider-thumb:cursor-pointer"
                 disabled={disabled}
               />
-              <div className="flex justify-between text-xs text-gray-400">
+              <div className="flex justify-between text-xs text-emerald-400">
                 <span>0s</span>
                 <span>5s</span>
               </div>
@@ -168,21 +165,22 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           </div>
 
           {/* Hide Extension */}
-          <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between p-2 bg-white rounded border border-emerald-200 shadow-sm">
             <div className="flex items-center space-x-2">
-              <EyeOff className="w-3 h-3 text-gray-600" />
+              <EyeOff className="w-3 h-3 text-emerald-600" />
               <div>
-                <label className="text-xs font-semibold text-gray-700">Hide Extension</label>
-                <p className="text-xs text-gray-500">Close during typing</p>
+                <label className="text-xs font-semibold text-emerald-700">Hide Extension</label>
+                <p className="text-xs text-emerald-500">Close during typing</p>
               </div>
             </div>
 
             <button
+              type="button"
               onClick={() => updateAdvancedConfig({ hideExtension: !advancedConfig.hideExtension })}
               disabled={disabled}
               className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
-                         focus:outline-none focus:ring-1 focus:ring-primary-500 focus:ring-offset-1
-                         ${advancedConfig.hideExtension ? 'bg-primary-500' : 'bg-gray-200'}`}
+                         focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:ring-offset-1
+                         ${advancedConfig.hideExtension ? 'bg-emerald-500' : 'bg-emerald-200'}`}
             >
               <span
                 className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform
@@ -192,10 +190,11 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           </div>
         </>
       )}
+      
       {/* Typing Sounds */}
-      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+      <div className="flex items-center justify-between p-2 bg-white rounded border border-emerald-200 shadow-sm">
         <div className="flex items-center space-x-2">
-          <div className="text-gray-600">
+          <div className="text-emerald-600">
             {typingConfig.soundEnabled ? (
               <Volume2 className="w-3 h-3" />
             ) : (
@@ -203,17 +202,18 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
             )}
           </div>
           <div>
-            <label className="text-xs font-semibold text-gray-700">Typing Sounds</label>
-            <p className="text-xs text-gray-500">Audio feedback</p>
+            <label className="text-xs font-semibold text-emerald-700">Typing Sounds</label>
+            <p className="text-xs text-emerald-500">Audio feedback</p>
           </div>
         </div>
 
         <button
+          type="button"
           onClick={() => updateTypingConfig({ soundEnabled: !typingConfig.soundEnabled })}
           disabled={disabled}
           className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
-                     focus:outline-none focus:ring-1 focus:ring-primary-500 focus:ring-offset-1
-                     ${typingConfig.soundEnabled ? 'bg-primary-500' : 'bg-gray-200'}`}
+                     focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:ring-offset-1
+                     ${typingConfig.soundEnabled ? 'bg-emerald-500' : 'bg-emerald-200'}`}
         >
           <span
             className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform
@@ -223,17 +223,17 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
       </div>
 
       {/* Typing Style */}
-      <div className="space-y-2 p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+      <div className="space-y-1 p-2 bg-white rounded border border-emerald-200 shadow-sm">
         <div className="flex items-center space-x-2">
-          <Zap className="w-3 h-3 text-gray-600" />
-          <label className="text-xs font-semibold text-gray-700">Typing Style</label>
+          <Zap className="w-3 h-3 text-emerald-600" />
+          <label className="text-xs font-semibold text-emerald-700">Typing Style</label>
         </div>
 
         <select
           value={typingConfig.typingStyle}
           onChange={(e) => updateTypingConfig({ typingStyle: e.target.value as TypingStyle })}
-          className="w-full px-2 py-1.5 border border-gray-200 rounded-md focus:ring-1 
-                   focus:ring-primary-500 focus:border-transparent transition-all duration-200
+          className="w-full px-2 py-1 border border-emerald-200 rounded focus:ring-1 
+                   focus:ring-emerald-500 focus:border-transparent transition-all duration-200
                    bg-white text-xs"
           disabled={disabled}
         >
@@ -242,27 +242,28 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           <option value="word-by-word">Word-by-Word</option>
         </select>
 
-        <p className="text-xs text-gray-500">{getTypingStyleDescription(typingConfig.typingStyle)}</p>
+        <p className="text-xs text-emerald-500">{getTypingStyleDescription(typingConfig.typingStyle)}</p>
       </div>
 
       {/* Include Mistakes */}
-      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+      <div className="flex items-center justify-between p-2 bg-white rounded border border-emerald-200 shadow-sm">
         <div className="flex items-center space-x-2">
-          <div className="text-gray-600">
+          <div className="text-emerald-600">
             <Settings className="w-3 h-3" />
           </div>
           <div>
-            <label className="text-xs font-semibold text-gray-700">Include Mistakes</label>
-            <p className="text-xs text-gray-500">Typos & corrections</p>
+            <label className="text-xs font-semibold text-emerald-700">Include Mistakes</label>
+            <p className="text-xs text-emerald-500">Typos & corrections</p>
           </div>
         </div>
 
         <button
+          type="button"
           onClick={() => updateTypingConfig({ includeMistakes: !typingConfig.includeMistakes })}
           disabled={disabled}
           className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
-                     focus:outline-none focus:ring-1 focus:ring-primary-500 focus:ring-offset-1
-                     ${typingConfig.includeMistakes ? 'bg-primary-500' : 'bg-gray-200'}`}
+                     focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:ring-offset-1
+                     ${typingConfig.includeMistakes ? 'bg-emerald-500' : 'bg-emerald-200'}`}
         >
           <span
             className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform

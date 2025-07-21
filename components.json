@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "default",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "tailwind.config.js",
+    "css": "./entrypoints/popup/main.css",
+    "baseColor": "emerald",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "aliases": {
+    "components": "./entrypoints/popup/components/ui",
+    "utils": "./entrypoints/popup/lib/utils",
+    "ui": "./entrypoints/popup/components/ui"
+  }
+}

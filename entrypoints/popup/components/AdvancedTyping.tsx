@@ -128,59 +128,76 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
   };
 
   return (
-    <div className="p-4 space-y-4">
-      {/* Scan Page Section */}
-      <div className="space-y-3">
-        <button
-          type="button"
-          onClick={handleScanPage}
-          disabled={disabled || isScanning || isTyping}
-          className="w-full py-2.5 px-4 bg-blue-500 hover:bg-blue-600 
-                   disabled:bg-gray-300 disabled:cursor-not-allowed
-                   text-white font-semibold rounded-lg transition-all duration-200
-                   transform hover:scale-[1.02] active:scale-[0.98]
-                   shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
-        >
-          <Scan className={`w-4 h-4 ${isScanning ? 'animate-spin' : ''}`} />
-          <span>{isScanning ? 'Scanning...' : 'Scan Page'}</span>
-        </button>
+    <div className="h-full flex flex-col overflow-hidden">
+      {/* Scan Page Section - Compact */}
+      <div className="p-3 border-b border-emerald-200 bg-emerald-50/50 shrink-0">
+        <div className="flex items-center space-x-3">
+          <button
+            type="button"
+            onClick={handleScanPage}
+            disabled={disabled || isScanning || isTyping}
+            className="flex-1 py-2 px-4 bg-emerald-500 hover:bg-emerald-600 
+                     disabled:bg-gray-300 disabled:cursor-not-allowed
+                     text-white font-semibold rounded-md transition-all duration-200
+                     transform hover:scale-[1.02] active:scale-[0.98]
+                     shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
+          >
+            <Scan className={`w-4 h-4 ${isScanning ? 'animate-spin' : ''}`} />
+            <span>{isScanning ? 'Scanning...' : 'Scan Page'}</span>
+          </button>
 
-        {detectedFields.length > 0 && (
-          <div className="text-sm text-gray-600 text-center">
-            Found {detectedFields.length} input field{detectedFields.length !== 1 ? 's' : ''}
-          </div>
-        )}
+          {detectedFields.length > 0 && (
+            <div className="text-sm text-emerald-700 font-medium px-3 py-2 bg-emerald-100 rounded-md">
+              {detectedFields.length} field{detectedFields.length !== 1 ? 's' : ''}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Detected Fields */}
+      {/* Detected Fields - Main Content Area */}
       {detectedFields.length > 0 && (
-        <FieldList
-          fields={detectedFields}
-          onUpdateField={updateField}
-          onReorderFields={reorderFields}
-          disabled={disabled || isTyping}
-        />
+        <div className="flex-1 overflow-hidden">
+          <FieldList
+            fields={detectedFields}
+            onUpdateField={updateField}
+            onReorderFields={reorderFields}
+            disabled={disabled || isTyping}
+          />
+        </div>
       )}
 
-      {/* Start Typing Button */}
+      {/* Start Typing Button - Fixed at bottom */}
       {detectedFields.length > 0 && (
-        <button
-          type="button"
-          onClick={handleStartTyping}
-          disabled={
-            disabled ||
-            isTyping ||
-            detectedFields.filter((f) => f.enabled && f.text.trim()).length === 0
-          }
-          className="w-full py-2.5 px-4 bg-green-500 hover:bg-green-600 
-                   disabled:bg-gray-300 disabled:cursor-not-allowed
-                   text-white font-semibold rounded-lg transition-all duration-200
-                   transform hover:scale-[1.02] active:scale-[0.98]
-                   shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
-        >
-          <Play className="w-4 h-4" />
-          <span>{isTyping ? 'Typing...' : 'Start Typing'}</span>
-        </button>
+        <div className="p-3 border-t border-emerald-200 bg-emerald-50/50 shrink-0">
+          <button
+            type="button"
+            onClick={handleStartTyping}
+            disabled={
+              disabled ||
+              isTyping ||
+              detectedFields.filter((f) => f.enabled && f.text.trim()).length === 0
+            }
+            className="w-full py-2 px-4 bg-emerald-600 hover:bg-emerald-700 
+                     disabled:bg-gray-300 disabled:cursor-not-allowed
+                     text-white font-semibold rounded-md transition-all duration-200
+                     transform hover:scale-[1.02] active:scale-[0.98]
+                     shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
+          >
+            <Play className="w-4 h-4" />
+            <span>{isTyping ? 'Typing...' : 'Start Typing'}</span>
+          </button>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {detectedFields.length === 0 && (
+        <div className="flex-1 flex items-center justify-center text-emerald-600">
+          <div className="text-center">
+            <Scan className="w-12 h-12 mx-auto mb-4 text-emerald-300" />
+            <p className="text-sm font-medium">No fields detected yet</p>
+            <p className="text-xs text-emerald-500 mt-1">Click "Scan Page" to detect input fields</p>
+          </div>
+        </div>
       )}
     </div>
   );

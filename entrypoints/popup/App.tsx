@@ -33,22 +33,22 @@ const App: React.FC = () => {
   const isTypingInProgress = false; // This would need to be tracked properly
 
   return (
-    <div className="w-full h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col">
+    <div className="w-[790px] h-[600px] bg-gradient-to-br from-emerald-50 to-teal-50 flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="text-center p-4 border-b border-gray-200 bg-white/80 backdrop-blur-sm">
+      <div className="text-center p-3 border-b border-emerald-200 bg-white/80 backdrop-blur-sm shrink-0">
         <div className="flex items-center justify-center space-x-2 mb-1">
-          <div className="p-1.5 bg-primary-500 rounded-lg">
+          <div className="p-1.5 bg-primary rounded-lg">
             <Keyboard className="w-5 h-5 text-white" />
           </div>
-          <h1 className="text-xl font-bold text-gray-800">Type Simulator</h1>
+          <h1 className="text-xl font-bold text-emerald-800">Type Simulator</h1>
         </div>
-        <p className="text-xs text-gray-600">
+        <p className="text-xs text-emerald-600">
           Advanced typing simulation with realistic features
         </p>
       </div>
 
       {/* Tab Navigation */}
-      <div className="px-4 pt-3 pb-2 bg-white border-b border-gray-200">
+      <div className="px-4 pt-2 pb-1 bg-white border-b border-emerald-200 shrink-0">
         <TabNavigation
           activeTab={activeTab}
           onTabChange={setActiveTab}
@@ -57,9 +57,9 @@ const App: React.FC = () => {
       </div>
 
       {/* Main Content Area with Horizontal Layout */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden min-h-0">
         {/* Main Content */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-hidden">
           {activeTab === 'basic' ? (
             <BasicTyping config={typingConfig} updateConfig={updateTypingConfig} />
           ) : (
@@ -85,8 +85,8 @@ const App: React.FC = () => {
       </div>
 
       {/* Footer */}
-      <div className="text-center py-2 px-4 bg-white border-t border-gray-200">
-        <p className="text-xs text-gray-500">
+      <div className="text-center py-1 px-4 bg-white border-t border-emerald-200 shrink-0">
+        <p className="text-xs text-emerald-500">
           v2.1.0 • Advanced typing simulation for developers
         </p>
       </div>
