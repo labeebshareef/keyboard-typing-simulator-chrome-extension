@@ -1,4 +1,7 @@
 import type React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Label } from './ui/label';
+import { Textarea } from './ui/textarea';
 
 interface TypingAreaProps {
   text: string;
@@ -8,26 +11,24 @@ interface TypingAreaProps {
 
 const TypingArea: React.FC<TypingAreaProps> = ({ text, setText, disabled }) => {
   return (
-    <div className="space-y-2">
-      <label htmlFor="text-input" className="block text-sm font-semibold text-gray-700">
-        Text to Type
-      </label>
-      <textarea
-        id="text-input"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder="Enter the text you want to simulate typing..."
-        className="w-full h-20 px-3 py-2 border border-gray-200 rounded-lg resize-none 
-                 focus:ring-2 focus:ring-primary-500 focus:border-transparent
-                 transition-all duration-200 text-sm
-                 placeholder-gray-400 bg-white shadow-sm"
-        disabled={disabled}
-      />
-      <div className="flex justify-between text-xs text-gray-500">
-        <span>{text.length} characters</span>
-        <span>{text.split(' ').filter((word) => word.length > 0).length} words</span>
-      </div>
-    </div>
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm">Text to Type</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <Textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Enter the text you want to simulate typing..."
+          className="h-20 resize-none"
+          disabled={disabled}
+        />
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>{text.length} characters</span>
+          <span>{text.split(' ').filter((word) => word.length > 0).length} words</span>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

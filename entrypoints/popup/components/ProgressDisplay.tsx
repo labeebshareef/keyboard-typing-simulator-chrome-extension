@@ -1,4 +1,6 @@
 import type React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Badge } from './ui/badge';
 
 interface ProgressDisplayProps {
   progress: number;
@@ -6,18 +8,22 @@ interface ProgressDisplayProps {
 
 const ProgressDisplay: React.FC<ProgressDisplayProps> = ({ progress }) => {
   return (
-    <div className="space-y-1 animate-slide-up">
-      <div className="flex justify-between text-xs text-gray-600">
-        <span>Progress</span>
-        <span>{Math.round(progress)}%</span>
-      </div>
-      <div className="w-full bg-gray-200 rounded-full h-1.5">
-        <div
-          className="bg-primary-500 h-1.5 rounded-full transition-all duration-300"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-    </div>
+    <Card className="animate-in slide-in-from-top-2">
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center justify-between text-sm">
+          <span>Progress</span>
+          <Badge variant="outline">{Math.round(progress)}%</Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="w-full bg-secondary rounded-full h-2">
+          <div
+            className="bg-primary h-2 rounded-full transition-all duration-300 ease-out"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

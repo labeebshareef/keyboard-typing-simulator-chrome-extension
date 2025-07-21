@@ -6,6 +6,7 @@ import Instructions from './Instructions';
 import ProgressDisplay from './ProgressDisplay';
 import TypingArea from './TypingArea';
 import TypingControls from './TypingControls';
+import { ScrollArea } from './ui/scroll-area';
 
 interface BasicTypingProps {
   config: TypingConfig;
@@ -27,28 +28,30 @@ const BasicTyping: React.FC<BasicTypingProps> = ({ config, updateConfig }) => {
   };
 
   return (
-    <div className="p-4 space-y-4">
-      {/* Typing Area */}
-      <TypingArea text={text} setText={setText} disabled={typingState.isTyping} />
+    <ScrollArea className="h-full">
+      <div className="p-4 space-y-4">
+        {/* Typing Area */}
+        <TypingArea text={text} setText={setText} disabled={typingState.isTyping} />
 
-      {/* Typing Controls */}
-      <TypingControls
-        config={config}
-        updateConfig={updateConfig}
-        buttonState={getButtonState()}
-        onStart={handleStartTyping}
-        onPauseResume={handlePauseResume}
-        onStop={handleStop}
-        disabled={!text.trim()}
-        isTyping={typingState.isTyping}
-      />
+        {/* Typing Controls */}
+        <TypingControls
+          config={config}
+          updateConfig={updateConfig}
+          buttonState={getButtonState()}
+          onStart={handleStartTyping}
+          onPauseResume={handlePauseResume}
+          onStop={handleStop}
+          disabled={!text.trim()}
+          isTyping={typingState.isTyping}
+        />
 
-      {/* Progress Display */}
-      {typingState.isTyping && <ProgressDisplay progress={typingState.progress} />}
+        {/* Progress Display */}
+        {typingState.isTyping && <ProgressDisplay progress={typingState.progress} />}
 
-      {/* Instructions */}
-      <Instructions />
-    </div>
+        {/* Instructions */}
+        <Instructions />
+      </div>
+    </ScrollArea>
   );
 };
 

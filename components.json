@@ -5,8 +5,8 @@
   "tsx": true,
   "tailwind": {
     "config": "tailwind.config.js",
-    "css": "./entrypoints/popup/main.css",
-    "baseColor": "emerald",
+    "css": "./entrypoints/popup/style.css",
+    "baseColor": "blue",
     "cssVariables": true,
     "prefix": ""
   },
