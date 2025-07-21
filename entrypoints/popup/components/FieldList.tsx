@@ -1,4 +1,4 @@
-import { GripVertical, Hash, ToggleLeft, ToggleRight, Type } from 'lucide-react';
+import { GripVertical, Hash, Type } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type React from 'react';
 import { cn } from '../lib/utils';
@@ -7,6 +7,9 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Switch } from './ui/switch';
 import { Textarea } from './ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Badge } from './ui/badge';
+import { ScrollArea } from './ui/scroll-area';
 
 interface FieldListProps {
   fields: DetectedField[];
@@ -189,17 +192,6 @@ const FieldList: React.FC<FieldListProps> = ({
     }
   };
 
-  const getElementTypeIcon = (type: DetectedField['elementType']) => {
-    switch (type) {
-      case 'textarea':
-        return '📝';
-      case 'contenteditable':
-        return '✏️';
-      default:
-        return '📄';
-    }
-  };
-
   const getElementTypeLabel = (type: DetectedField['elementType']) => {
     switch (type) {
       case 'textarea':
@@ -212,143 +204,141 @@ const FieldList: React.FC<FieldListProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex items-center space-x-2 p-2 border-b border-emerald-200 bg-emerald-50/30 shrink-0">
-        <Type className="w-3 h-3 text-emerald-600" />
-        <h3 className="text-xs font-semibold text-emerald-700">Detected Fields</h3>
-        <span className="text-xs text-emerald-500">({fields.length})</span>
-      </div>
+    <Card className="h-full rounded-none border-0">
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center space-x-2 text-sm">
+          <Type className="w-4 h-4 text-primary" />
+          <span>Detected Fields</span>
+          <Badge variant="outline">({fields.length})</Badge>
+        </CardTitle>
+      </CardHeader>
 
-      <div
-        ref={containerRef}
-        className="flex-1 overflow-y-auto p-1.5 space-y-1.5"
-        style={{
-          scrollBehavior: 'smooth',
-        }}
-      >
-        {fields.map((field, index) => (
-          <div
-            key={field.id}
-            draggable={!disabled}
-            onDragStart={(e) => handleDragStart(e, field.id)}
-            onDragOver={(e) => handleDragOver(e, field.id)}
-            onDragLeave={handleDragLeave}
-            onDrop={(e) => handleDrop(e, field.id)}
-            onDragEnd={handleDragEnd}
-            className={`
-              p-1.5 bg-white rounded border border-emerald-200 shadow-sm
-              ${dragOverItem === field.id ? 'border-emerald-400 bg-emerald-50 scale-[1.01] shadow-md ring-1 ring-emerald-200' : ''}
-              ${draggedItem === field.id ? 'opacity-60 rotate-1 scale-95 shadow-lg' : ''}
-              ${!disabled ? 'cursor-move hover:border-emerald-300 hover:shadow-md' : ''}
-              transition-all duration-200 ease-in-out transform
-            `}
-          >
-            {/* Compact Header Row */}
-            <div className="flex items-center space-x-1.5 mb-1">
-              {/* Drag Handle & Priority */}
-              <div className="flex items-center space-x-1 shrink-0">
-                {!disabled && <GripVertical className="w-3 h-3 text-emerald-400" />}
-                <div className="flex items-center space-x-0.5">
-                  <Hash className="w-2 h-2 text-emerald-400" />
-                  {editingPriority === field.id ? (
-                    <Input
-                      type="number"
-                      value={tempPriority}
-                      onChange={(e) => setTempPriority(e.target.value)}
-                      onBlur={() => handlePrioritySubmit(field.id)}
-                      onKeyDown={(e) => handlePriorityKeyDown(e, field.id)}
-                      className="w-5 h-3 text-xs font-mono text-center p-0 border-emerald-300"
-                      min="1"
-                      max={fields.length}
-                      autoFocus
-                    />
-                  ) : (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handlePriorityClick(field.id, field.priority)}
-                      disabled={disabled}
-                      className="h-3 w-3 p-0 text-xs font-mono text-emerald-600 hover:bg-emerald-100 hover:text-emerald-800"
-                      title="Click to edit priority"
-                    >
-                      {field.priority}
-                    </Button>
-                  )}
-                </div>
-              </div>
+      <CardContent className="flex-1 overflow-hidden p-0">
+        <ScrollArea className="h-full">
+          <div className="p-3 space-y-3">
+            {fields.map((field, index) => (
+              <Card
+                key={field.id}
+                draggable={!disabled}
+                onDragStart={(e) => handleDragStart(e, field.id)}
+                onDragOver={(e) => handleDragOver(e, field.id)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, field.id)}
+                onDragEnd={handleDragEnd}
+                className={`
+                  transition-all duration-200 ease-in-out transform
+                  ${dragOverItem === field.id ? 'border-primary bg-accent scale-[1.01] shadow-md ring-1 ring-primary/20' : ''}
+                  ${draggedItem === field.id ? 'opacity-60 rotate-1 scale-95 shadow-lg' : ''}
+                  ${!disabled ? 'cursor-move hover:border-primary/50 hover:shadow-md' : ''}
+                `}
+              >
+                <CardContent className="p-3">
+                  {/* Compact Header Row */}
+                  <div className="flex items-center space-x-2 mb-2">
+                    {/* Drag Handle & Priority */}
+                    <div className="flex items-center space-x-1 shrink-0">
+                      {!disabled && <GripVertical className="w-3 h-3 text-muted-foreground" />}
+                      <div className="flex items-center space-x-1">
+                        <Hash className="w-3 h-3 text-muted-foreground" />
+                        {editingPriority === field.id ? (
+                          <Input
+                            type="number"
+                            value={tempPriority}
+                            onChange={(e) => setTempPriority(e.target.value)}
+                            onBlur={() => handlePrioritySubmit(field.id)}
+                            onKeyDown={(e) => handlePriorityKeyDown(e, field.id)}
+                            className="w-8 h-6 text-xs text-center p-1"
+                            min="1"
+                            max={fields.length}
+                            autoFocus
+                          />
+                        ) : (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handlePriorityClick(field.id, field.priority)}
+                            disabled={disabled}
+                            className="h-6 w-6 p-0 text-xs font-mono hover:bg-accent"
+                            title="Click to edit priority"
+                          >
+                            {field.priority}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
 
-              {/* Field Type & Label */}
-              <div className="flex items-center space-x-1.5 flex-1 min-w-0">
-                <span className="text-xs">{getElementTypeIcon(field.elementType)}</span>
-                <div className="min-w-0 flex-1">
-                  <div className="text-xs font-medium text-gray-900 truncate">{field.label}</div>
-                  <div className="text-xs text-emerald-600 truncate">
-                    {getElementTypeLabel(field.elementType)}
-                    {field.placeholder && ` • ${field.placeholder}`}
+                    {/* Field Type & Label */}
+                    <div className="flex items-center space-x-2 flex-1 min-w-0">
+                      <Badge variant="outline" className="text-xs shrink-0">
+                        {getElementTypeLabel(field.elementType)}
+                      </Badge>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium truncate">{field.label}</div>
+                        {field.placeholder && (
+                          <div className="text-xs text-muted-foreground truncate">
+                            {field.placeholder}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Enable/Disable Toggle */}
+                    <div className="flex items-center space-x-2 shrink-0">
+                      <Switch
+                        checked={field.enabled}
+                        onCheckedChange={(checked) => onUpdateField(field.id, { enabled: checked })}
+                        disabled={disabled}
+                      />
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Enable/Disable Toggle */}
-              <div className="flex items-center space-x-1 shrink-0">
-                <Switch
-                  checked={field.enabled}
-                  onCheckedChange={(checked) => onUpdateField(field.id, { enabled: checked })}
-                  disabled={disabled}
-                />
-                <span
-                  className={cn(
-                    'text-xs font-medium',
-                    field.enabled ? 'text-emerald-600' : 'text-gray-400'
-                  )}
-                >
-                  {field.enabled ? 'On' : 'Off'}
-                </span>
-              </div>
-            </div>
+                  {/* Text Input */}
+                  <div className="space-y-2">
+                    <Textarea
+                      value={field.text}
+                      onChange={(e) => onUpdateField(field.id, { text: e.target.value })}
+                      placeholder="Text to type into this field..."
+                      className="min-h-[2.5rem] text-sm resize-none"
+                      disabled={disabled || !field.enabled}
+                    />
 
-            {/* Text Input - Ultra Compact */}
-            <div className="space-y-0.5">
-              <Textarea
-                value={field.text}
-                onChange={(e) => onUpdateField(field.id, { text: e.target.value })}
-                placeholder="Text to type into this field..."
-                className="min-h-[1.5rem] h-6 text-xs resize-none py-1 px-2"
-                disabled={disabled || !field.enabled}
-              />
-
-              {/* Character Count & Selector Info - Compact Row */}
-              <div className="flex justify-between items-center text-xs text-emerald-500">
-                <span>{field.text.length} chars</span>
-                <span className="text-xs text-emerald-400 font-mono truncate max-w-[100px]">
-                  {field.selector}
-                </span>
-              </div>
-            </div>
+                    {/* Character Count & Selector Info */}
+                    <div className="flex justify-between items-center text-xs text-muted-foreground">
+                      <Badge variant="outline" className="text-xs">
+                        {field.text.length} chars
+                      </Badge>
+                      <span className="font-mono truncate max-w-[150px]">
+                        {field.selector}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-        ))}
-      </div>
+        </ScrollArea>
+      </CardContent>
 
       {fields.length === 0 && (
-        <div className="flex-1 flex items-center justify-center text-emerald-500">
+        <CardContent className="flex-1 flex items-center justify-center">
           <div className="text-center py-8">
-            <Type className="w-8 h-8 mx-auto mb-2 text-emerald-300" />
-            <p className="text-sm">No fields detected yet.</p>
-            <p className="text-xs">Click "Scan Page" to detect input fields.</p>
+            <Type className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+            <p className="text-sm text-foreground">No fields detected yet.</p>
+            <p className="text-xs text-muted-foreground">Click "Scan Page" to detect input fields.</p>
           </div>
-        </div>
+        </CardContent>
       )}
 
       {/* Enhanced Drag and Drop Instructions */}
       {fields.length > 1 && !disabled && (
-        <div className="text-xs text-emerald-600 text-center py-1 bg-emerald-50 border-t border-emerald-200 shrink-0">
+        <div className="text-xs text-muted-foreground text-center py-2 border-t bg-muted/30">
           <div className="flex items-center justify-center space-x-2">
-            <GripVertical className="w-2 h-2" />
+            <GripVertical className="w-3 h-3" />
             <span>Drag to reorder • Click # to edit priority</span>
           </div>
         </div>
       )}
-    </div>
+    </Card>
   );
 };
 

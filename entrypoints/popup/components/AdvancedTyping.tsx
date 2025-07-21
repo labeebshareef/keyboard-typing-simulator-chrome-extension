@@ -4,6 +4,9 @@ import type React from 'react';
 import type { AdvancedTypingConfig, DetectedField, TypingConfig } from '../types';
 import FieldList from './FieldList';
 import { Button } from './ui/button';
+import { Card, CardContent } from './ui/card';
+import { Badge } from './ui/badge';
+import { ScrollArea } from './ui/scroll-area';
 
 interface AdvancedTypingProps {
   config: AdvancedTypingConfig;
@@ -131,25 +134,27 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
   return (
     <div className="h-full flex flex-col overflow-hidden">
       {/* Scan Page Section - Compact */}
-      <div className="p-3 border-b border-emerald-200 bg-emerald-50/50 shrink-0">
-        <div className="flex items-center space-x-3">
-          <Button
-            onClick={handleScanPage}
-            disabled={disabled || isScanning || isTyping}
-            className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white"
-            variant="default"
-          >
-            <Scan className={`w-4 h-4 mr-2 ${isScanning ? 'animate-spin' : ''}`} />
-            {isScanning ? 'Scanning...' : 'Scan Page'}
-          </Button>
+      <Card className="rounded-none border-0 border-b">
+        <CardContent className="p-3">
+          <div className="flex items-center space-x-3">
+            <Button
+              onClick={handleScanPage}
+              disabled={disabled || isScanning || isTyping}
+              className="flex-1"
+              variant="default"
+            >
+              <Scan className={`w-4 h-4 mr-2 ${isScanning ? 'animate-spin' : ''}`} />
+              {isScanning ? 'Scanning...' : 'Scan Page'}
+            </Button>
 
-          {detectedFields.length > 0 && (
-            <div className="text-sm text-emerald-700 font-medium px-3 py-2 bg-emerald-100 rounded-md">
-              {detectedFields.length} field{detectedFields.length !== 1 ? 's' : ''}
-            </div>
-          )}
-        </div>
-      </div>
+            {detectedFields.length > 0 && (
+              <Badge variant="secondary">
+                {detectedFields.length} field{detectedFields.length !== 1 ? 's' : ''}
+              </Badge>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Detected Fields - Main Content Area */}
       {detectedFields.length > 0 && (
@@ -165,30 +170,32 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
 
       {/* Start Typing Button - Fixed at bottom */}
       {detectedFields.length > 0 && (
-        <div className="p-3 border-t border-emerald-200 bg-emerald-50/50 shrink-0">
-          <Button
-            onClick={handleStartTyping}
-            disabled={
-              disabled ||
-              isTyping ||
-              detectedFields.filter((f) => f.enabled && f.text.trim()).length === 0
-            }
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
-            variant="default"
-          >
-            <Play className="w-4 h-4 mr-2" />
-            {isTyping ? 'Typing...' : 'Start Typing'}
-          </Button>
-        </div>
+        <Card className="rounded-none border-0 border-t">
+          <CardContent className="p-3">
+            <Button
+              onClick={handleStartTyping}
+              disabled={
+                disabled ||
+                isTyping ||
+                detectedFields.filter((f) => f.enabled && f.text.trim()).length === 0
+              }
+              className="w-full"
+              variant="default"
+            >
+              <Play className="w-4 h-4 mr-2" />
+              {isTyping ? 'Typing...' : 'Start Typing'}
+            </Button>
+          </CardContent>
+        </Card>
       )}
 
       {/* Empty State */}
       {detectedFields.length === 0 && (
-        <div className="flex-1 flex items-center justify-center text-emerald-600">
+        <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <Scan className="w-12 h-12 mx-auto mb-4 text-emerald-300" />
-            <p className="text-sm font-medium">No fields detected yet</p>
-            <p className="text-xs text-emerald-500 mt-1">
+            <Scan className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+            <p className="text-sm font-medium text-foreground">No fields detected yet</p>
+            <p className="text-xs text-muted-foreground mt-1">
               Click "Scan Page" to detect input fields
             </p>
           </div>
