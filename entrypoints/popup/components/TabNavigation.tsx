@@ -12,12 +12,12 @@ const TabNavigation: React.FC<TabNavigationProps> = ({
   disabled = false,
 }) => {
   return (
-    <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
+    <div className="flex bg-gray-100 rounded-lg p-1">
       <button
         type="button"
         onClick={() => onTabChange('basic')}
         disabled={disabled}
-        className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all duration-200 ${
+        className={`flex-1 py-1.5 px-3 text-sm font-medium rounded-md transition-all duration-200 ${
           activeTab === 'basic'
             ? 'bg-white text-gray-900 shadow-sm'
             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -29,7 +29,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({
         type="button"
         onClick={() => onTabChange('advanced')}
         disabled={disabled}
-        className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all duration-200 ${
+        className={`flex-1 py-1.5 px-3 text-sm font-medium rounded-md transition-all duration-200 ${
           activeTab === 'advanced'
             ? 'bg-white text-gray-900 shadow-sm'
             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
