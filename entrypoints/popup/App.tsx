@@ -97,13 +97,11 @@ const App: React.FC = () => {
       </div>
 
       {/* Footer */}
-      <Card className="rounded-none border-0 border-t shadow-sm">
-        <div className="text-center py-2 px-4">
-          <p className="text-xs text-muted-foreground">
-            v2.1.0 • Advanced typing simulation for developers
-          </p>
-        </div>
-      </Card>
+      <div className="text-center py-2 px-4 bg-white border-t border-gray-200">
+        <p className="text-xs text-gray-500">
+          v2.3.0 • Advanced typing simulation for developers and content creators
+        </p>
+      </div>
     </div>
   );
 };

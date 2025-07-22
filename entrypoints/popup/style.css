@@ -2,54 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 210 100% 98%;
-    --foreground: 210 100% 5%;
-    --card: 210 100% 95%;
-    --card-foreground: 210 100% 5%;
-    --popover: 210 100% 95%;
-    --popover-foreground: 210 100% 5%;
-    --primary: 210 100% 50%;
-    --primary-foreground: 210 100% 95%;
-    --secondary: 210 80% 30%;
-    --secondary-foreground: 210 100% 95%;
-    --muted: 210 50% 80%;
-    --muted-foreground: 210 100% 20%;
-    --accent: 210 60% 60%;
-    --accent-foreground: 210 100% 95%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 210 100% 80%;
-    --input: 210 100% 90%;
-    --ring: 210 100% 50%;
-    --radius: 0.75rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 20% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 20% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 142.1 76.2% 36.3%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 142.1 76.2% 36.3%;
-  }
-}
-
-/* @font-face {
+@font-face {
   font-family: "montserrat";
   src: url("./assets/fonts/montserrat/Montserrat-VariableFont_wght.ttf") format("truetype");
   font-weight: 300 900;
@@ -57,7 +10,7 @@
   font-display: swap;
 }
 
-@font-face {
+/* @font-face {
   font-family: "montserrat";
   src: url("./assets/fonts/montserrat/Montserrat-Italic-VariableFont_wght.ttf") format("truetype");
   font-weight: 300 900;
@@ -66,7 +19,7 @@
 } */
 
 body {
-  /* font-family: "montserrat", sans-serif; */
+  font-family: "montserrat", sans-serif;
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
