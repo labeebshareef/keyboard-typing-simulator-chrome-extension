@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import type { TypingConfig, TypingState } from '../types';
+import { analytics, getTypingMode } from '../utils/analytics';
 
 export const useTypingSimulator = (text: string, config: TypingConfig) => {
   const [typingState, setTypingState] = useState<TypingState>({
@@ -106,8 +107,12 @@ export const useTypingSimulator = (text: string, config: TypingConfig) => {
               }));
 
               if (actualProgress >= 100) {
-                setTimeout(() => {
+                setTimeout(async () => {
                   if (typingSessionRef.current.isActive) {
+                    // Track completion
+                    const typingMode = getTypingMode(1);
+                    await analytics.trackTypingCompleted(1, typingMode, textLength, true);
+                    await analytics.trackTypingStopped('completed', 'basic_typing');
                     stopTyping();
                   }
                 }, 500);
@@ -141,6 +146,10 @@ export const useTypingSimulator = (text: string, config: TypingConfig) => {
       alert('Please enter some text to simulate typing!');
       return;
     }
+
+    // Track typing started
+    const typingMode = getTypingMode(1); // Basic typing is always single field
+    await analytics.trackTypingStarted(1, typingMode, text.length);
 
     // Validate minimum delay to prevent issues
     const effectiveDelay = Math.max(config.delay, 10); // Minimum 10ms
@@ -209,6 +218,12 @@ export const useTypingSimulator = (text: string, config: TypingConfig) => {
       }
 
       alert(errorMessage);
+
+      // Track error
+      const typingMode = getTypingMode(1);
+      await analytics.trackTypingCompleted(1, typingMode, text.length, false);
+      await analytics.trackTypingStopped('error', 'basic_typing');
+
       stopTyping();
     }
   }, [text, config, stopTyping, startProgressMonitoring]);
@@ -220,6 +235,10 @@ export const useTypingSimulator = (text: string, config: TypingConfig) => {
 
     try {
       const isPaused = typingState.isPaused;
+      const action = isPaused ? 'resumed' : 'paused';
+
+      // Track pause/resume action
+      await analytics.trackTypingPauseResume(action, 'basic_typing');
 
       await chrome.scripting.executeScript({
         target: { tabId: typingSessionRef.current.tabId },
@@ -253,11 +272,13 @@ export const useTypingSimulator = (text: string, config: TypingConfig) => {
     } catch (error) {
       console.error('Error controlling typing:', error);
       // If we can't control the typing, stop it entirely
+      await analytics.trackTypingStopped('error', 'basic_typing');
       stopTyping();
     }
   }, [typingState.isPaused, text.length, startProgressMonitoring, stopTyping]);
 
-  const handleStop = useCallback(() => {
+  const handleStop = useCallback(async () => {
+    await analytics.trackTypingStopped('manual', 'basic_typing');
     stopTyping();
   }, [stopTyping]);
 

@@ -41,6 +41,7 @@ const BasicTyping: React.FC<BasicTypingProps> = ({ config, updateConfig }) => {
         onStop={handleStop}
         disabled={!text.trim()}
         isTyping={typingState.isTyping}
+        tabType="basic_typing"
       />
 
       {/* Progress Display */}

@@ -2,6 +2,7 @@ import { Play, Scan } from 'lucide-react';
 import { useState } from 'react';
 import type React from 'react';
 import type { AdvancedTypingConfig, DetectedField, TypingConfig } from '../types';
+import { analytics, getTypingMode } from '../utils/analytics';
 import FieldList from './FieldList';
 
 interface AdvancedTypingProps {
@@ -22,6 +23,11 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
   const [detectedFields, setDetectedFields] = useState<DetectedField[]>([]);
   const [isScanning, setIsScanning] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+
+  const handleScanPageClick = async () => {
+    await analytics.trackButtonClick('scan_page', 'advanced_typing');
+    await handleScanPage();
+  };
 
   const handleScanPage = async () => {
     setIsScanning(true);
@@ -50,6 +56,10 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
       if (results?.[0]?.result) {
         const fields = results[0].result as DetectedField[];
         setDetectedFields(fields);
+
+        // Track page scanning
+        await analytics.trackPageScanned(fields.length);
+
         if (fields.length === 0) {
           alert('No input fields found on this page.');
         }
@@ -78,6 +88,12 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
 
     setIsTyping(true);
 
+    // Track typing started
+    const totalTextLength = fieldsWithText.reduce((sum, field) => sum + field.text.length, 0);
+    const typingMode = getTypingMode(fieldsWithText.length);
+    await analytics.trackTypingStarted(fieldsWithText.length, typingMode, totalTextLength);
+    await analytics.trackButtonClick('start_typing', 'advanced_typing');
+
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
@@ -102,9 +118,30 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
           },
         ],
       });
+
+      // Track completion (this may not be reached if extension is hidden)
+      if (!config.hideExtension) {
+        await analytics.trackTypingCompleted(
+          fieldsWithText.length,
+          typingMode,
+          totalTextLength,
+          true
+        );
+      }
     } catch (error) {
       console.error('Error executing advanced typing:', error);
       alert('Failed to execute typing. Please try again.');
+
+      // Track error
+      const totalTextLength = fieldsWithText.reduce((sum, field) => sum + field.text.length, 0);
+      const typingMode = getTypingMode(fieldsWithText.length);
+      await analytics.trackTypingCompleted(
+        fieldsWithText.length,
+        typingMode,
+        totalTextLength,
+        false
+      );
+      await analytics.trackTypingStopped('error', 'advanced_typing');
     } finally {
       if (!config.hideExtension) {
         setIsTyping(false);
@@ -133,7 +170,7 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
       <div className="space-y-3">
         <button
           type="button"
-          onClick={handleScanPage}
+          onClick={handleScanPageClick}
           disabled={disabled || isScanning || isTyping}
           className="w-full py-2.5 px-4 bg-blue-500 hover:bg-blue-600 
                    disabled:bg-gray-300 disabled:cursor-not-allowed

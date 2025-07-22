@@ -1,6 +1,7 @@
 import { Clock, EyeOff, Settings, Timer, Volume2, VolumeX, Zap } from 'lucide-react';
 import type React from 'react';
 import type { AdvancedTypingConfig, TypingConfig, TypingStyle } from '../types';
+import { type TabType, debouncedTrackSetting } from '../utils/analytics';
 
 interface SettingsSidebarProps {
   typingConfig: TypingConfig;
@@ -9,6 +10,7 @@ interface SettingsSidebarProps {
   updateAdvancedConfig?: (updates: Partial<AdvancedTypingConfig>) => void;
   disabled: boolean;
   showAdvancedSettings?: boolean;
+  tabType?: TabType;
 }
 
 const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
@@ -18,6 +20,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
   updateAdvancedConfig,
   disabled,
   showAdvancedSettings = false,
+  tabType = 'basic_typing',
 }) => {
   const getDelayLabel = (delayValue: number): string => {
     if (delayValue <= 20) return 'Lightning Fast';
@@ -48,6 +51,51 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
     }
   };
 
+  // Tracking helpers
+  const handleTypingSpeedChange = (value: number) => {
+    updateTypingConfig({ delay: value });
+    debouncedTrackSetting('typing_speed', value, tabType);
+  };
+
+  const handleSoundToggle = () => {
+    const newValue = !typingConfig.soundEnabled;
+    updateTypingConfig({ soundEnabled: newValue });
+    debouncedTrackSetting('typing_sounds', newValue, tabType);
+  };
+
+  const handleTypingStyleChange = (style: TypingStyle) => {
+    updateTypingConfig({ typingStyle: style });
+    debouncedTrackSetting('typing_style', style, tabType);
+  };
+
+  const handleIncludeMistakesToggle = () => {
+    const newValue = !typingConfig.includeMistakes;
+    updateTypingConfig({ includeMistakes: newValue });
+    debouncedTrackSetting('include_mistakes', newValue, tabType);
+  };
+
+  const handleInitialDelayChange = (value: number) => {
+    if (updateAdvancedConfig) {
+      updateAdvancedConfig({ initialDelay: value });
+      debouncedTrackSetting('initial_delay', value, tabType);
+    }
+  };
+
+  const handleInterFieldDelayChange = (value: number) => {
+    if (updateAdvancedConfig) {
+      updateAdvancedConfig({ interFieldDelay: value });
+      debouncedTrackSetting('inter_field_delay', value, tabType);
+    }
+  };
+
+  const handleHideExtensionToggle = () => {
+    if (updateAdvancedConfig && advancedConfig) {
+      const newValue = !advancedConfig.hideExtension;
+      updateAdvancedConfig({ hideExtension: newValue });
+      debouncedTrackSetting('hide_extension', newValue, tabType);
+    }
+  };
+
   return (
     <div className="w-64 bg-gray-50 border-l border-gray-200 p-4 space-y-3 overflow-y-auto">
       <div className="flex items-center space-x-2 mb-4">
@@ -75,7 +123,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
             min="1"
             max="300"
             value={typingConfig.delay}
-            onChange={(e) => updateTypingConfig({ delay: Number(e.target.value) })}
+            onChange={(e) => handleTypingSpeedChange(Number(e.target.value))}
             className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer
                      slider-thumb:appearance-none slider-thumb:w-3 slider-thumb:h-3
                      slider-thumb:rounded-full slider-thumb:bg-primary-500
@@ -89,12 +137,12 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
         </div>
       </div>
 
- {/* Advanced Settings (only for Advanced Typing) */}
+      {/* Advanced Settings (only for Advanced Typing) */}
       {showAdvancedSettings && advancedConfig && updateAdvancedConfig && (
         <>
           {/* Separator */}
           <div className="border-t border-gray-300 my-4"></div>
-          
+
           {/* Initial Delay */}
           <div className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
             <div className="flex items-center space-x-2 mb-2">
@@ -117,7 +165,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                 max="10"
                 step="0.5"
                 value={advancedConfig.initialDelay}
-                onChange={(e) => updateAdvancedConfig({ initialDelay: Number(e.target.value) })}
+                onChange={(e) => handleInitialDelayChange(Number(e.target.value))}
                 className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer
                          slider-thumb:appearance-none slider-thumb:w-3 slider-thumb:h-3
                          slider-thumb:rounded-full slider-thumb:bg-primary-500
@@ -153,7 +201,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                 max="5"
                 step="0.5"
                 value={advancedConfig.interFieldDelay}
-                onChange={(e) => updateAdvancedConfig({ interFieldDelay: Number(e.target.value) })}
+                onChange={(e) => handleInterFieldDelayChange(Number(e.target.value))}
                 className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer
                          slider-thumb:appearance-none slider-thumb:w-3 slider-thumb:h-3
                          slider-thumb:rounded-full slider-thumb:bg-primary-500
@@ -178,7 +226,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
             </div>
 
             <button
-              onClick={() => updateAdvancedConfig({ hideExtension: !advancedConfig.hideExtension })}
+              onClick={handleHideExtensionToggle}
               disabled={disabled}
               className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
                          focus:outline-none focus:ring-1 focus:ring-primary-500 focus:ring-offset-1
@@ -209,7 +257,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
         </div>
 
         <button
-          onClick={() => updateTypingConfig({ soundEnabled: !typingConfig.soundEnabled })}
+          onClick={handleSoundToggle}
           disabled={disabled}
           className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
                      focus:outline-none focus:ring-1 focus:ring-primary-500 focus:ring-offset-1
@@ -231,7 +279,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
 
         <select
           value={typingConfig.typingStyle}
-          onChange={(e) => updateTypingConfig({ typingStyle: e.target.value as TypingStyle })}
+          onChange={(e) => handleTypingStyleChange(e.target.value as TypingStyle)}
           className="w-full px-2 py-1.5 border border-gray-200 rounded-md focus:ring-1 
                    focus:ring-primary-500 focus:border-transparent transition-all duration-200
                    bg-white text-xs"
@@ -242,7 +290,9 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           <option value="word-by-word">Word-by-Word</option>
         </select>
 
-        <p className="text-xs text-gray-500">{getTypingStyleDescription(typingConfig.typingStyle)}</p>
+        <p className="text-xs text-gray-500">
+          {getTypingStyleDescription(typingConfig.typingStyle)}
+        </p>
       </div>
 
       {/* Include Mistakes */}
@@ -258,7 +308,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
         </div>
 
         <button
-          onClick={() => updateTypingConfig({ includeMistakes: !typingConfig.includeMistakes })}
+          onClick={handleIncludeMistakesToggle}
           disabled={disabled}
           className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
                      focus:outline-none focus:ring-1 focus:ring-primary-500 focus:ring-offset-1
@@ -270,7 +320,6 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           />
         </button>
       </div>
-
     </div>
   );
 };

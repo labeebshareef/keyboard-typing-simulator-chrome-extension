@@ -1,11 +1,12 @@
 import { Keyboard } from 'lucide-react';
 import type React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import AdvancedTyping from './components/AdvancedTyping';
 import BasicTyping from './components/BasicTyping';
 import SettingsSidebar from './components/SettingsSidebar';
 import TabNavigation from './components/TabNavigation';
 import type { AdvancedTypingConfig, TypingConfig } from './types';
+import { initializeAnalytics } from './utils/analytics';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'basic' | 'advanced'>('basic');
@@ -32,6 +33,11 @@ const App: React.FC = () => {
   // Check if any typing is in progress to disable tab switching
   const isTypingInProgress = false; // This would need to be tracked properly
 
+  // Initialize analytics on component mount
+  useEffect(() => {
+    initializeAnalytics();
+  }, []);
+
   return (
     <div className="w-full h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col">
       {/* Header */}
@@ -42,9 +48,7 @@ const App: React.FC = () => {
           </div>
           <h1 className="text-xl font-bold text-gray-800">Type Simulator</h1>
         </div>
-        <p className="text-xs text-gray-600">
-          Advanced typing simulation with realistic features
-        </p>
+        <p className="text-xs text-gray-600">Advanced typing simulation with realistic features</p>
       </div>
 
       {/* Tab Navigation */}
@@ -81,6 +85,7 @@ const App: React.FC = () => {
           updateAdvancedConfig={activeTab === 'advanced' ? updateAdvancedConfig : undefined}
           disabled={isTypingInProgress}
           showAdvancedSettings={activeTab === 'advanced'}
+          tabType={activeTab === 'advanced' ? 'advanced_typing' : 'basic_typing'}
         />
       </div>
 

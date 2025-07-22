@@ -1,6 +1,7 @@
 import { Pause, Play, Square } from 'lucide-react';
 import type React from 'react';
 import type { TypingConfig } from '../types';
+import { type TabType, analytics } from '../utils/analytics';
 
 interface TypingControlsProps {
   config: TypingConfig;
@@ -11,6 +12,7 @@ interface TypingControlsProps {
   onStop: () => void;
   disabled: boolean;
   isTyping: boolean;
+  tabType?: TabType;
 }
 
 const TypingControls: React.FC<TypingControlsProps> = ({
@@ -20,13 +22,22 @@ const TypingControls: React.FC<TypingControlsProps> = ({
   onStop,
   disabled,
   isTyping,
+  tabType = 'basic_typing',
 }) => {
-  const handleMainAction = () => {
+  const handleMainAction = async () => {
     if (buttonState === 'start') {
+      await analytics.trackButtonClick('start_typing', tabType);
       onStart();
     } else {
+      const action = buttonState === 'pause' ? 'pause_typing' : 'resume_typing';
+      await analytics.trackButtonClick(action, tabType);
       onPauseResume();
     }
+  };
+
+  const handleStop = async () => {
+    await analytics.trackButtonClick('stop_typing', tabType);
+    onStop();
   };
 
   return (
@@ -62,7 +73,7 @@ const TypingControls: React.FC<TypingControlsProps> = ({
 
       {isTyping && (
         <button
-          onClick={onStop}
+          onClick={handleStop}
           className="py-2.5 px-4 bg-red-500 hover:bg-red-600 
                    text-white font-semibold rounded-lg transition-all duration-200
                    transform hover:scale-[1.02] active:scale-[0.98]
