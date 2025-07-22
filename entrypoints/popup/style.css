@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* @font-face {
+@font-face {
   font-family: "montserrat";
   src: url("./assets/fonts/montserrat/Montserrat-VariableFont_wght.ttf") format("truetype");
   font-weight: 300 900;
@@ -10,7 +10,7 @@
   font-display: swap;
 }
 
-@font-face {
+/* @font-face {
   font-family: "montserrat";
   src: url("./assets/fonts/montserrat/Montserrat-Italic-VariableFont_wght.ttf") format("truetype");
   font-weight: 300 900;
@@ -19,7 +19,7 @@
 } */
 
 body {
-  /* font-family: "montserrat", sans-serif; */
+  font-family: "montserrat", sans-serif;
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

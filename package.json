@@ -2,7 +2,7 @@
   "name": "keyboard-typing-simulator",
   "description": "Intelligent typing simulator extension for web developers with adjustable speed controls",
   "private": true,
-  "version": "2.1.0",
+  "version": "2.3.0",
   "type": "module",
   "scripts": {
     "dev": "wxt",

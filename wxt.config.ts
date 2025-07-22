@@ -7,7 +7,7 @@ export default defineConfig({
     name: 'Keyboard Typing Simulator',
     description:
       'Intelligent typing simulator extension for web developers with adjustable speed controls',
-    version: '2.1.0',
+    version: '2.3.0',
     permissions: ['scripting', 'activeTab'],
     icons: {
       16: '/icons/icon16.png',

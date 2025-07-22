@@ -87,7 +87,7 @@ const App: React.FC = () => {
       {/* Footer */}
       <div className="text-center py-2 px-4 bg-white border-t border-gray-200">
         <p className="text-xs text-gray-500">
-          v2.1.0 • Advanced typing simulation for developers
+          v2.3.0 • Advanced typing simulation for developers and content creators
         </p>
       </div>
     </div>
