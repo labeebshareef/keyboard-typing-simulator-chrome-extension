@@ -89,12 +89,34 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
         </div>
       </div>
 
- {/* Advanced Settings (only for Advanced Typing) */}
+      {/* Advanced Settings (only for Advanced Typing) */}
       {showAdvancedSettings && advancedConfig && updateAdvancedConfig && (
         <>
           {/* Separator */}
           <div className="border-t border-gray-300 my-4"></div>
-          
+          {/* Hide Extension */}
+          <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+            <div className="flex items-center space-x-2">
+              <EyeOff className="w-3 h-3 text-gray-600" />
+              <div>
+                <label className="text-xs font-semibold text-gray-700">Hide Extension</label>
+                <p className="text-xs text-gray-500">Close during typing</p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => updateAdvancedConfig({ hideExtension: !advancedConfig.hideExtension })}
+              disabled={disabled}
+              className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
+                         focus:outline-none focus:ring-1 focus:ring-primary-500 focus:ring-offset-1
+                         ${advancedConfig.hideExtension ? 'bg-primary-500' : 'bg-gray-200'}`}
+            >
+              <span
+                className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform
+                           ${advancedConfig.hideExtension ? 'translate-x-5' : 'translate-x-1'}`}
+              />
+            </button>
+          </div>
           {/* Initial Delay */}
           <div className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
             <div className="flex items-center space-x-2 mb-2">
@@ -165,30 +187,6 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                 <span>5s</span>
               </div>
             </div>
-          </div>
-
-          {/* Hide Extension */}
-          <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
-            <div className="flex items-center space-x-2">
-              <EyeOff className="w-3 h-3 text-gray-600" />
-              <div>
-                <label className="text-xs font-semibold text-gray-700">Hide Extension</label>
-                <p className="text-xs text-gray-500">Close during typing</p>
-              </div>
-            </div>
-
-            <button
-              onClick={() => updateAdvancedConfig({ hideExtension: !advancedConfig.hideExtension })}
-              disabled={disabled}
-              className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
-                         focus:outline-none focus:ring-1 focus:ring-primary-500 focus:ring-offset-1
-                         ${advancedConfig.hideExtension ? 'bg-primary-500' : 'bg-gray-200'}`}
-            >
-              <span
-                className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform
-                           ${advancedConfig.hideExtension ? 'translate-x-5' : 'translate-x-1'}`}
-              />
-            </button>
           </div>
         </>
       )}
