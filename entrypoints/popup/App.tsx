@@ -6,6 +6,7 @@ import BasicTyping from './components/BasicTyping';
 import SettingsSidebar from './components/SettingsSidebar';
 import TabNavigation from './components/TabNavigation';
 import type { AdvancedTypingConfig, TypingConfig } from './types';
+import logo from './assets/images/ktsLogo.png?url';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'basic' | 'advanced'>('basic');
@@ -37,10 +38,21 @@ const App: React.FC = () => {
       {/* Header */}
       <div className="text-center p-4 border-b border-gray-200 bg-white/80 backdrop-blur-sm">
         <div className="flex items-center justify-center space-x-2 mb-1">
-          <div className="p-1.5 bg-primary-500 rounded-lg">
-            <Keyboard className="w-5 h-5 text-white" />
+          <div className="p-1.5 bg-primary-100 rounded-lg">
+            {/* <Keyboard className="w-5 h-5 text-white" /> */}
+            <img
+              src={logo}
+              alt="KTS Logo"
+              className="w-8 rounded-full"
+            />
           </div>
-          <h1 className="text-xl font-bold text-gray-800">Type Simulator</h1>
+          {/* <h1 className="text-2xl font-bold text-gray-600 tracking-wider">TYPE SIMULATOR</h1> */}
+          {/* first letter of each word 2xl other letter xl */}
+          <h1 className="text-2xl font-bold text-gray-600 tracking-wider">
+            T<span className="text-xl">YPE</span> S<span className="text-xl">IMULATOR</span>
+          </h1>
+          {/* cursor animation */}
+          <span className="ml-2 mb-1 animate-blink text-xl font-extrabold text-gray-600">|</span>
         </div>
         <p className="text-xs text-gray-600">
           Advanced typing simulation with realistic features
