@@ -20,6 +20,8 @@ const App: React.FC = () => {
     initialDelay: 2,
     hideExtension: false,
     interFieldDelay: 1,
+    aiEnabled: true,
+    aiTemperature: 0.7,
   });
 
   const updateTypingConfig = (updates: Partial<TypingConfig>) => {

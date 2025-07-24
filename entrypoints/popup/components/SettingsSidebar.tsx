@@ -1,4 +1,4 @@
-import { Clock, EyeOff, Settings, Timer, Volume2, VolumeX, Zap } from 'lucide-react';
+import { Clock, EyeOff, Settings, Timer, Volume2, VolumeX, Zap, Bot, Sparkles } from 'lucide-react';
 import type React from 'react';
 import type { AdvancedTypingConfig, TypingConfig, TypingStyle } from '../types';
 
@@ -192,6 +192,90 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           </div>
         </>
       )}
+      
+      {/* AI Auto-Fill Settings */}
+      {showAdvancedSettings && advancedConfig && updateAdvancedConfig && (
+        <>
+          <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200 p-3 space-y-3">
+            <div className="flex items-center space-x-2 mb-2">
+              <Bot className="w-4 h-4 text-purple-600" />
+              <h3 className="text-sm font-bold text-purple-700">AI Auto-Fill</h3>
+              <Sparkles className="w-3 h-3 text-purple-500" />
+            </div>
+
+            {/* AI Enable/Disable */}
+            <div className="flex items-center justify-between p-2 bg-white rounded-lg border border-purple-100">
+              <div className="flex items-center space-x-2">
+                <Bot className="w-3 h-3 text-purple-600" />
+                <div>
+                  <label className="text-xs font-semibold text-gray-700">Enable AI</label>
+                  <p className="text-xs text-gray-500">Smart field filling</p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => updateAdvancedConfig({ aiEnabled: !advancedConfig.aiEnabled })}
+                disabled={disabled}
+                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
+                           focus:outline-none focus:ring-1 focus:ring-purple-500 focus:ring-offset-1
+                           ${advancedConfig.aiEnabled ? 'bg-purple-500' : 'bg-gray-200'}`}
+              >
+                <span
+                  className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform
+                             ${advancedConfig.aiEnabled ? 'translate-x-5' : 'translate-x-1'}`}
+                />
+              </button>
+            </div>
+
+            {/* AI Creativity Level */}
+            {advancedConfig.aiEnabled && (
+              <div className="space-y-2 p-2 bg-white rounded-lg border border-purple-100">
+                <div className="flex items-center space-x-2">
+                  <Sparkles className="w-3 h-3 text-purple-600" />
+                  <label className="text-xs font-semibold text-gray-700">Creativity Level</label>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-600">
+                      {advancedConfig.aiTemperature <= 0.3 ? 'Conservative' :
+                       advancedConfig.aiTemperature <= 0.7 ? 'Balanced' : 'Creative'}
+                    </span>
+                    <span className="text-xs text-purple-600 font-mono">
+                      {advancedConfig.aiTemperature.toFixed(1)}
+                    </span>
+                  </div>
+
+                  <input
+                    type="range"
+                    min="0.1"
+                    max="1.0"
+                    step="0.1"
+                    value={advancedConfig.aiTemperature}
+                    onChange={(e) => updateAdvancedConfig({ aiTemperature: Number(e.target.value) })}
+                    className="w-full h-1.5 bg-gradient-to-r from-blue-200 to-purple-200 rounded-lg appearance-none cursor-pointer
+                             slider-thumb:appearance-none slider-thumb:w-3 slider-thumb:h-3
+                             slider-thumb:rounded-full slider-thumb:bg-purple-500
+                             slider-thumb:cursor-pointer"
+                    disabled={disabled}
+                  />
+                  <div className="flex justify-between text-xs text-gray-400">
+                    <span>Conservative</span>
+                    <span>Creative</span>
+                  </div>
+                </div>
+
+                <p className="text-xs text-purple-600 text-center bg-purple-50 p-1 rounded">
+                  {advancedConfig.aiTemperature <= 0.3 ? 'More predictable, factual content' :
+                   advancedConfig.aiTemperature <= 0.7 ? 'Balanced creativity and accuracy' : 
+                   'More creative and varied content'}
+                </p>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+      
       {/* Typing Sounds */}
       <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
         <div className="flex items-center space-x-2">

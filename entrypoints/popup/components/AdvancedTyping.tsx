@@ -1,8 +1,9 @@
-import { Play, Scan } from 'lucide-react';
+import { Play, Scan, Bot, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import type React from 'react';
 import type { AdvancedTypingConfig, DetectedField, TypingConfig } from '../types';
 import FieldList from './FieldList';
+import GeminiNanoAI from '../utils/GeminiNanoAI';
 
 interface AdvancedTypingProps {
   config: AdvancedTypingConfig;
@@ -22,6 +23,8 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
   const [detectedFields, setDetectedFields] = useState<DetectedField[]>([]);
   const [isScanning, setIsScanning] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [isAIFilling, setIsAIFilling] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   const handleScanPage = async () => {
     setIsScanning(true);
@@ -59,6 +62,85 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
       alert('Failed to scan the page. Please try again.');
     } finally {
       setIsScanning(false);
+    }
+  };
+
+  const handleAIFillAll = async () => {
+    if (!config.aiEnabled) {
+      alert('AI auto-fill is disabled. Enable it in settings.');
+      return;
+    }
+
+    const enabledFields = detectedFields.filter((field) => field.enabled);
+    if (enabledFields.length === 0) {
+      alert('Please enable at least one field for AI filling.');
+      return;
+    }
+
+    setIsAIFilling(true);
+    setAiError(null);
+
+    try {
+      const ai = new GeminiNanoAI(config.aiTemperature);
+      
+      // Check if AI is available
+      if (!(await ai.isAvailable())) {
+        throw new Error('AI is not available in this browser. Please use Chrome 127+ with AI features enabled.');
+      }
+
+      const updatedFields = await ai.fillAllFields(detectedFields);
+      setDetectedFields(updatedFields);
+      
+      // Clean up AI session
+      ai.destroy();
+      
+      // Show success message
+      const filledCount = updatedFields.filter(f => f.enabled && f.text.trim()).length;
+      alert(`Successfully filled ${filledCount} field(s) with AI-generated content.`);
+      
+    } catch (error) {
+      console.error('AI fill all failed:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown AI error occurred';
+      setAiError(errorMessage);
+      alert(`AI auto-fill failed: ${errorMessage}`);
+    } finally {
+      setIsAIFilling(false);
+    }
+  };
+
+  const handleAIFillField = async (fieldId: string) => {
+    if (!config.aiEnabled) {
+      alert('AI auto-fill is disabled. Enable it in settings.');
+      return;
+    }
+
+    const field = detectedFields.find(f => f.id === fieldId);
+    if (!field) return;
+
+    setIsAIFilling(true);
+    setAiError(null);
+
+    try {
+      const ai = new GeminiNanoAI(config.aiTemperature);
+      
+      // Check if AI is available
+      if (!(await ai.isAvailable())) {
+        throw new Error('AI is not available in this browser. Please use Chrome 127+ with AI features enabled.');
+      }
+
+      const content = await ai.generateFieldContent(field);
+      updateField(fieldId, { text: content });
+      
+      // Clean up AI session
+      ai.destroy();
+      
+    } catch (error) {
+      console.error('AI fill field failed:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown AI error occurred';
+      setAiError(errorMessage);
+      alert(`AI auto-fill failed for "${field.label}": ${errorMessage}`);
+    } finally {
+      setIsAIFilling(false);
     }
   };
 
@@ -152,13 +234,42 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
         )}
       </div>
 
+      {/* AI Fill All Button */}
+      {detectedFields.length > 0 && config.aiEnabled && (
+        <div className="space-y-2">
+          <button
+            type="button"
+            onClick={handleAIFillAll}
+            disabled={disabled || isScanning || isTyping || isAIFilling}
+            className="w-full py-2.5 px-4 bg-gradient-to-r from-purple-500 to-blue-500 
+                     hover:from-purple-600 hover:to-blue-600
+                     disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed
+                     text-white font-semibold rounded-lg transition-all duration-200
+                     transform hover:scale-[1.02] active:scale-[0.98]
+                     shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
+          >
+            <Bot className={`w-4 h-4 ${isAIFilling ? 'animate-pulse' : ''}`} />
+            <Sparkles className="w-4 h-4" />
+            <span>{isAIFilling ? 'AI Filling...' : '🤖 Fill All Fields'}</span>
+          </button>
+          
+          {aiError && (
+            <div className="text-xs text-red-600 text-center bg-red-50 p-2 rounded border border-red-200">
+              {aiError}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Detected Fields */}
       {detectedFields.length > 0 && (
         <FieldList
           fields={detectedFields}
           onUpdateField={updateField}
           onReorderFields={reorderFields}
+          onAIFillField={config.aiEnabled ? handleAIFillField : undefined}
           disabled={disabled || isTyping}
+          isAIFilling={isAIFilling}
         />
       )}
 
@@ -322,6 +433,82 @@ function scanPageForFields(): DetectedField[] {
         return `Field ${idCounter}`;
       };
 
+      // Get form context for better AI understanding
+      const getFormContext = (el: Element): string => {
+        const form = el.closest('form');
+        if (!form) return '';
+
+        // Try to get form title/heading
+        const formTitle = form.querySelector('h1, h2, h3, h4, h5, h6, legend');
+        if (formTitle?.textContent) {
+          return formTitle.textContent.trim();
+        }
+
+        // Try form name or id
+        if (form.getAttribute('name')) {
+          return form.getAttribute('name')!;
+        }
+        if (form.id) {
+          return form.id;
+        }
+
+        // Look for nearby headings
+        let current = form.previousElementSibling;
+        while (current) {
+          if (current.matches('h1, h2, h3, h4, h5, h6') && current.textContent) {
+            return current.textContent.trim();
+          }
+          current = current.previousElementSibling;
+        }
+
+        return '';
+      };
+
+      // Get field context (surrounding text, nearby elements)
+      const getFieldContext = (el: Element): string => {
+        const contextParts: string[] = [];
+
+        // Check nearby text nodes and elements
+        const parent = el.parentElement;
+        if (parent) {
+          // Look for nearby text content
+          const walker = document.createTreeWalker(
+            parent,
+            NodeFilter.SHOW_TEXT,
+            {
+              acceptNode: (node) => {
+                const text = node.textContent?.trim();
+                return text && text.length > 2 && text.length < 100
+                  ? NodeFilter.FILTER_ACCEPT
+                  : NodeFilter.FILTER_REJECT;
+              }
+            }
+          );
+
+          let textNode = walker.nextNode();
+          while (textNode && contextParts.length < 3) {
+            const text = textNode.textContent?.trim();
+            if (text && !contextParts.includes(text)) {
+              contextParts.push(text);
+            }
+            textNode = walker.nextNode();
+          }
+        }
+
+        // Look for help text or instructions
+        const helpTexts = el.parentElement?.querySelectorAll('.help-text, .hint, .instruction, [role="tooltip"]');
+        helpTexts?.forEach(helpEl => {
+          if (helpEl.textContent && contextParts.length < 5) {
+            const helpText = helpEl.textContent.trim();
+            if (helpText.length > 5 && helpText.length < 200) {
+              contextParts.push(helpText);
+            }
+          }
+        });
+
+        return contextParts.join(' | ').substring(0, 300);
+      };
+
       const elementType: DetectedField['elementType'] =
         element.tagName.toLowerCase() === 'textarea'
           ? 'textarea'
@@ -342,6 +529,11 @@ function scanPageForFields(): DetectedField[] {
           element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement
             ? element.placeholder
             : undefined,
+        // Enhanced metadata for AI context
+        name: (element as HTMLInputElement).name || undefined,
+        type: element instanceof HTMLInputElement ? element.type : undefined,
+        formContext: getFormContext(element),
+        fieldContext: getFieldContext(element),
       };
 
       fields.push(field);

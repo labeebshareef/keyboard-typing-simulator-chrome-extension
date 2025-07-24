@@ -1,4 +1,4 @@
-import { GripVertical, Hash, ToggleLeft, ToggleRight, Type } from 'lucide-react';
+import { GripVertical, Hash, ToggleLeft, ToggleRight, Type, Bot } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type React from 'react';
 import type { DetectedField } from '../types';
@@ -7,14 +7,18 @@ interface FieldListProps {
   fields: DetectedField[];
   onUpdateField: (id: string, updates: Partial<DetectedField>) => void;
   onReorderFields: (newFields: DetectedField[]) => void;
+  onAIFillField?: (fieldId: string) => void;
   disabled: boolean;
+  isAIFilling?: boolean;
 }
 
 const FieldList: React.FC<FieldListProps> = ({
   fields,
   onUpdateField,
   onReorderFields,
+  onAIFillField,
   disabled,
+  isAIFilling = false,
 }) => {
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
   const [dragOverItem, setDragOverItem] = useState<string | null>(null);
@@ -311,16 +315,36 @@ const FieldList: React.FC<FieldListProps> = ({
 
                 {/* Text Input */}
                 <div className="space-y-1">
-                  <textarea
-                    value={field.text}
-                    onChange={(e) => onUpdateField(field.id, { text: e.target.value })}
-                    placeholder="Text to type into this field..."
-                    className="w-full h-14 px-3 py-2 text-sm border border-gray-200 rounded-md
-                             focus:ring-2 focus:ring-primary-500 focus:border-transparent
-                             transition-all duration-200 resize-none
-                             disabled:bg-gray-50 disabled:text-gray-500"
-                    disabled={disabled || !field.enabled}
-                  />
+                  <div className="relative">
+                    <textarea
+                      value={field.text}
+                      onChange={(e) => onUpdateField(field.id, { text: e.target.value })}
+                      placeholder="Text to type into this field..."
+                      className="w-full h-14 px-3 py-2 text-sm border border-gray-200 rounded-md
+                               focus:ring-2 focus:ring-primary-500 focus:border-transparent
+                               transition-all duration-200 resize-none
+                               disabled:bg-gray-50 disabled:text-gray-500"
+                      disabled={disabled || !field.enabled}
+                    />
+                    
+                    {/* Individual AI Fill Button */}
+                    {onAIFillField && field.enabled && (
+                      <button
+                        type="button"
+                        onClick={() => onAIFillField(field.id)}
+                        disabled={disabled || isAIFilling}
+                        className="absolute top-2 right-2 p-1.5 bg-gradient-to-r from-purple-100 to-blue-100 
+                                 hover:from-purple-200 hover:to-blue-200
+                                 disabled:from-gray-100 disabled:to-gray-100 disabled:cursor-not-allowed
+                                 text-purple-600 hover:text-purple-700
+                                 rounded-md transition-all duration-200 shadow-sm hover:shadow-md
+                                 transform hover:scale-105 active:scale-95"
+                        title="Fill this field with AI"
+                      >
+                        <Bot className={`w-3.5 h-3.5 ${isAIFilling ? 'animate-pulse' : ''}`} />
+                      </button>
+                    )}
+                  </div>
 
                   {/* Character Count & Selector Info */}
                   <div className="flex justify-between text-xs text-gray-500">

@@ -24,12 +24,20 @@ export interface DetectedField {
   selector: string;
   elementType: 'input' | 'textarea' | 'contenteditable';
   placeholder?: string;
+  // Enhanced metadata for AI context
+  name?: string;
+  type?: string;
+  formContext?: string;
+  fieldContext?: string;
 }
 
 export interface AdvancedTypingConfig {
   initialDelay: number; // 0-10 seconds
   hideExtension: boolean;
   interFieldDelay: number; // 0-5 seconds
+  // AI auto-fill settings
+  aiEnabled: boolean;
+  aiTemperature: number; // 0.1-1.0 for creativity control
 }
 
 export interface AdvancedTypingState {
