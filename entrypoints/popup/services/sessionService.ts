@@ -1,8 +1,8 @@
-import { ref, set, onValue, off, serverTimestamp, type DatabaseReference } from 'firebase/database';
+import { type DatabaseReference, off, onValue, ref, serverTimestamp, set } from 'firebase/database';
 import QRCode from 'qrcode';
 import { database } from '../firebase/config';
-import { TypingEngine } from '../utils/typingEngine';
 import type { TypingInstruction } from '../types';
+import { TypingEngine } from '../utils/typingEngine';
 
 export class SessionService {
   private sessionCode: string | null = null;
@@ -22,7 +22,7 @@ export class SessionService {
 
   async createSession(): Promise<{ sessionCode: string; qrCodeUrl: string }> {
     const sessionCode = this.generateSessionCode();
-    
+
     // Set the session code immediately for demo purposes
     this.sessionCode = sessionCode;
 
@@ -56,8 +56,8 @@ export class SessionService {
         active: true,
         createdAt: serverTimestamp(),
         lastSeen: serverTimestamp(),
-        expiresAt: Date.now() + (5 * 60 * 1000), // 5 minutes
-        typingData: null
+        expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes
+        typingData: null,
       };
 
       await set(sessionRef, sessionData);
@@ -76,8 +76,8 @@ export class SessionService {
         margin: 1,
         color: {
           dark: '#000000',
-          light: '#FFFFFF'
-        }
+          light: '#FFFFFF',
+        },
       });
     } catch (error) {
       console.error('Failed to generate QR code:', error);
@@ -106,20 +106,24 @@ export class SessionService {
 
     this.typingRef = ref(database, `sessions/${this.sessionCode}/typingData`);
 
-    this.listener = onValue(this.typingRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        this.handleTypingInstruction(data);
-        // Clear the instruction after processing
-        try {
-          set(this.typingRef!, null);
-        } catch (error) {
-          console.error('Failed to clear typing instruction:', error);
+    this.listener = onValue(
+      this.typingRef,
+      (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          this.handleTypingInstruction(data);
+          // Clear the instruction after processing
+          try {
+            set(this.typingRef!, null);
+          } catch (error) {
+            console.error('Failed to clear typing instruction:', error);
+          }
         }
+      },
+      (error) => {
+        console.error('Firebase listener error:', error);
       }
-    }, (error) => {
-      console.error('Firebase listener error:', error);
-    });
+    );
   }
 
   private async handleTypingInstruction(data: TypingInstruction): Promise<void> {
