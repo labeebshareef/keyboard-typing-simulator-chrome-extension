@@ -39,3 +39,19 @@ export interface AdvancedTypingState {
   currentFieldIndex: number;
   progress: number;
 }
+
+// Remote Typing Types
+export interface RemoteSession {
+  sessionCode: string;
+  isActive: boolean;
+  lastSeen: number;
+  qrCodeUrl: string;
+  expiresAt: number;
+}
+
+export interface TypingInstruction {
+  text: string;
+  mode: 'basic' | 'advanced' | 'field-specific';
+  targetField?: string;
+  config: TypingConfig & AdvancedTypingConfig;
+}

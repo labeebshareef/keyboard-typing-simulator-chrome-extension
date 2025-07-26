@@ -1,8 +1,8 @@
 import type React from 'react';
 
 interface TabNavigationProps {
-  activeTab: 'basic' | 'advanced';
-  onTabChange: (tab: 'basic' | 'advanced') => void;
+  activeTab: 'basic' | 'advanced' | 'remote';
+  onTabChange: (tab: 'basic' | 'advanced' | 'remote') => void;
   disabled?: boolean;
 }
 
@@ -36,6 +36,18 @@ const TabNavigation: React.FC<TabNavigationProps> = ({
         } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
         Advanced Typing
+      </button>
+      <button
+        type="button"
+        onClick={() => onTabChange('remote')}
+        disabled={disabled}
+        className={`flex-1 py-1.5 px-3 text-sm font-medium rounded-md transition-all duration-200 ${
+          activeTab === 'remote'
+            ? 'bg-white text-gray-900 shadow-sm'
+            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+        } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+      >
+        Remote Typing
       </button>
     </div>
   );
