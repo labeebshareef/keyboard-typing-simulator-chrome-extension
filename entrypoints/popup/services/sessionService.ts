@@ -22,34 +22,50 @@ export class SessionService {
 
   async createSession(): Promise<{ sessionCode: string; qrCodeUrl: string }> {
     const sessionCode = this.generateSessionCode();
-    const sessionRef = ref(database, `sessions/${sessionCode}`);
+    
+    // Set the session code immediately for demo purposes
+    this.sessionCode = sessionCode;
 
-    const sessionData = {
-      active: true,
-      createdAt: serverTimestamp(),
-      lastSeen: serverTimestamp(),
-      expiresAt: Date.now() + (5 * 60 * 1000), // 5 minutes
-      typingData: null
-    };
+    // Try Firebase with timeout
+    const firebasePromise = this.tryFirebaseConnection(sessionCode);
+    const timeoutPromise = new Promise((resolve) => {
+      setTimeout(() => resolve(false), 3000); // 3 second timeout
+    });
 
     try {
-      await set(sessionRef, sessionData);
+      const result = await Promise.race([firebasePromise, timeoutPromise]);
+      if (!result) {
+        console.warn('Firebase connection timed out, continuing in demo mode');
+      }
+    } catch (error) {
+      console.error('Firebase connection failed:', error);
+    }
 
-      this.sessionCode = sessionCode;
+    // For demo purposes, use a placeholder web app URL
+    // In production, this would be your actual web app URL
+    const webAppUrl = 'https://your-remote-typing-app.com';
+    const qrCodeUrl = await this.generateQRCode(`${webAppUrl}/remote/${sessionCode}`);
+
+    return { sessionCode, qrCodeUrl };
+  }
+
+  private async tryFirebaseConnection(sessionCode: string): Promise<boolean> {
+    try {
+      const sessionRef = ref(database, `sessions/${sessionCode}`);
+      const sessionData = {
+        active: true,
+        createdAt: serverTimestamp(),
+        lastSeen: serverTimestamp(),
+        expiresAt: Date.now() + (5 * 60 * 1000), // 5 minutes
+        typingData: null
+      };
+
+      await set(sessionRef, sessionData);
       this.startHeartbeat();
       this.listenForTypingInstructions();
-
-      // For demo purposes, use a placeholder web app URL
-      // In production, this would be your actual web app URL
-      const webAppUrl = 'https://your-remote-typing-app.com';
-      const qrCodeUrl = await this.generateQRCode(`${webAppUrl}/remote/${sessionCode}`);
-
-      return { sessionCode, qrCodeUrl };
+      return true;
     } catch (error) {
-      console.error('Failed to create Firebase session:', error);
-      // For demo purposes, still return the session info but log the error
-      const qrCodeUrl = await this.generateQRCode(`demo://remote/${sessionCode}`);
-      return { sessionCode, qrCodeUrl };
+      throw error;
     }
   }
 
