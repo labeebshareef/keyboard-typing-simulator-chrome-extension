@@ -45,17 +45,28 @@ const RemoteTyping: React.FC<RemoteTypingProps> = ({
     setIsCreatingSession(true);
     try {
       const { sessionCode, qrCodeUrl } = await sessionService.createSession();
-
+      
       setSession({
         sessionCode,
         isActive: true,
         lastSeen: Date.now(),
         qrCodeUrl,
-        expiresAt: Date.now() + 5 * 60 * 1000,
+        expiresAt: Date.now() + (5 * 60 * 1000)
       });
     } catch (error) {
       console.error('Failed to create session:', error);
-      alert('Failed to start remote session. Please try again.');
+      
+      // More specific error handling for production
+      let errorMessage = 'Failed to start remote session. ';
+      if (error.message?.includes('Firebase configuration')) {
+        errorMessage += 'Firebase is not properly configured. Please contact support.';
+      } else if (error.message?.includes('QR code')) {
+        errorMessage += 'Could not generate QR code. Please try again.';
+      } else {
+        errorMessage += 'Please check your internet connection and try again.';
+      }
+      
+      alert(errorMessage);
     } finally {
       setIsCreatingSession(false);
     }
@@ -210,14 +221,7 @@ const RemoteTyping: React.FC<RemoteTypingProps> = ({
         </ol>
       </div>
 
-      {/* Demo Note */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-        <p className="text-xs text-blue-700">
-          <strong>Demo Mode:</strong> This is a demonstration of the Remote Typing feature. In a
-          production environment, you would have a companion web app for mobile devices that
-          connects to the same Firebase database.
-        </p>
-      </div>
+
     </div>
   );
 };
