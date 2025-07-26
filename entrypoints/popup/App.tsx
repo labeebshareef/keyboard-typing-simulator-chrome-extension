@@ -1,15 +1,16 @@
 import { Keyboard } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
+import logo from './assets/images/ktsLogo.png?url';
 import AdvancedTyping from './components/AdvancedTyping';
 import BasicTyping from './components/BasicTyping';
+import RemoteTyping from './components/RemoteTyping';
 import SettingsSidebar from './components/SettingsSidebar';
 import TabNavigation from './components/TabNavigation';
 import type { AdvancedTypingConfig, TypingConfig } from './types';
-import logo from './assets/images/ktsLogo.png?url';
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'basic' | 'advanced'>('basic');
+  const [activeTab, setActiveTab] = useState<'basic' | 'advanced' | 'remote'>('basic');
   const [typingConfig, setTypingConfig] = useState<TypingConfig>({
     delay: 50,
     includeMistakes: false,
@@ -74,8 +75,16 @@ const App: React.FC = () => {
         <div className="flex-1 overflow-y-auto">
           {activeTab === 'basic' ? (
             <BasicTyping config={typingConfig} updateConfig={updateTypingConfig} />
-          ) : (
+          ) : activeTab === 'advanced' ? (
             <AdvancedTyping
+              config={advancedConfig}
+              typingConfig={typingConfig}
+              updateConfig={updateAdvancedConfig}
+              updateTypingConfig={updateTypingConfig}
+              disabled={isTypingInProgress}
+            />
+          ) : (
+            <RemoteTyping
               config={advancedConfig}
               typingConfig={typingConfig}
               updateConfig={updateAdvancedConfig}
@@ -89,10 +98,10 @@ const App: React.FC = () => {
         <SettingsSidebar
           typingConfig={typingConfig}
           updateTypingConfig={updateTypingConfig}
-          advancedConfig={activeTab === 'advanced' ? advancedConfig : undefined}
-          updateAdvancedConfig={activeTab === 'advanced' ? updateAdvancedConfig : undefined}
+          advancedConfig={activeTab === 'advanced' || activeTab === 'remote' ? advancedConfig : undefined}
+          updateAdvancedConfig={activeTab === 'advanced' || activeTab === 'remote' ? updateAdvancedConfig : undefined}
           disabled={isTypingInProgress}
-          showAdvancedSettings={activeTab === 'advanced'}
+          showAdvancedSettings={activeTab === 'advanced' || activeTab === 'remote'}
         />
       </div>
 
