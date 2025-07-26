@@ -41,11 +41,7 @@ const App: React.FC = () => {
         <div className="flex items-center justify-center space-x-2 mb-1">
           <div className="p-1.5 bg-primary-100 rounded-lg">
             {/* <Keyboard className="w-5 h-5 text-white" /> */}
-            <img
-              src={logo}
-              alt="KTS Logo"
-              className="w-8 rounded-full"
-            />
+            <img src={logo} alt="KTS Logo" className="w-8 rounded-full" />
           </div>
           {/* <h1 className="text-2xl font-bold text-gray-600 tracking-wider">TYPE SIMULATOR</h1> */}
           {/* first letter of each word 2xl other letter xl */}
@@ -55,9 +51,7 @@ const App: React.FC = () => {
           {/* cursor animation */}
           <span className="ml-2 mb-1 animate-blink text-xl font-extrabold text-gray-600">|</span>
         </div>
-        <p className="text-xs text-gray-600">
-          Advanced typing simulation with realistic features
-        </p>
+        <p className="text-xs text-gray-600">Advanced typing simulation with realistic features</p>
       </div>
 
       {/* Tab Navigation */}
@@ -98,8 +92,12 @@ const App: React.FC = () => {
         <SettingsSidebar
           typingConfig={typingConfig}
           updateTypingConfig={updateTypingConfig}
-          advancedConfig={activeTab === 'advanced' || activeTab === 'remote' ? advancedConfig : undefined}
-          updateAdvancedConfig={activeTab === 'advanced' || activeTab === 'remote' ? updateAdvancedConfig : undefined}
+          advancedConfig={
+            activeTab === 'advanced' || activeTab === 'remote' ? advancedConfig : undefined
+          }
+          updateAdvancedConfig={
+            activeTab === 'advanced' || activeTab === 'remote' ? updateAdvancedConfig : undefined
+          }
           disabled={isTypingInProgress}
           showAdvancedSettings={activeTab === 'advanced' || activeTab === 'remote'}
         />

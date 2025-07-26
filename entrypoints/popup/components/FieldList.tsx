@@ -33,7 +33,7 @@ const FieldList: React.FC<FieldListProps> = ({
     const scrollSpeed = 5; // pixels per frame
 
     const mouseY = e.clientY - rect.top;
-    
+
     if (mouseY < scrollThreshold) {
       // Scroll up
       if (autoScrollRef.current) clearInterval(autoScrollRef.current);
@@ -97,7 +97,7 @@ const FieldList: React.FC<FieldListProps> = ({
     if (disabled) return;
     e.preventDefault();
     setDragOverItem(null);
-    
+
     // Clear auto-scroll
     if (autoScrollRef.current) {
       clearInterval(autoScrollRef.current);
@@ -143,8 +143,8 @@ const FieldList: React.FC<FieldListProps> = ({
   };
 
   const handlePrioritySubmit = (fieldId: string) => {
-    const newPriority = parseInt(tempPriority, 10);
-    
+    const newPriority = Number.parseInt(tempPriority, 10);
+
     if (isNaN(newPriority) || newPriority < 1 || newPriority > fields.length) {
       // Invalid priority, reset
       setEditingPriority(null);
@@ -153,7 +153,7 @@ const FieldList: React.FC<FieldListProps> = ({
     }
 
     // Find current field and target position
-    const currentField = fields.find(f => f.id === fieldId);
+    const currentField = fields.find((f) => f.id === fieldId);
     if (!currentField || currentField.priority === newPriority) {
       setEditingPriority(null);
       setTempPriority('');
@@ -162,9 +162,9 @@ const FieldList: React.FC<FieldListProps> = ({
 
     // Reorder fields based on new priority
     const newFields = [...fields];
-    const currentIndex = newFields.findIndex(f => f.id === fieldId);
+    const currentIndex = newFields.findIndex((f) => f.id === fieldId);
     const [removed] = newFields.splice(currentIndex, 1);
-    
+
     // Insert at new position (convert 1-based priority to 0-based index)
     const targetIndex = Math.min(newPriority - 1, newFields.length);
     newFields.splice(targetIndex, 0, removed);
@@ -214,11 +214,11 @@ const FieldList: React.FC<FieldListProps> = ({
         <span className="text-xs text-gray-500">({fields.length})</span>
       </div>
 
-      <div 
+      <div
         ref={containerRef}
         className="max-h-[170px] overflow-y-auto space-y-2 relative"
         style={{
-          scrollBehavior: 'smooth'
+          scrollBehavior: 'smooth',
         }}
       >
         {fields.map((field, index) => (

@@ -1,8 +1,8 @@
-import { ref, set, onValue, off, serverTimestamp, type DatabaseReference } from 'firebase/database';
+import { type DatabaseReference, off, onValue, ref, serverTimestamp, set } from 'firebase/database';
 import QRCode from 'qrcode';
 import { database } from '../firebase/config';
-import { TypingEngine } from '../utils/typingEngine';
 import type { TypingInstruction } from '../types';
+import { TypingEngine } from '../utils/typingEngine';
 
 export class SessionService {
   private sessionCode: string | null = null;
@@ -22,28 +22,15 @@ export class SessionService {
 
   async createSession(): Promise<{ sessionCode: string; qrCodeUrl: string }> {
     const sessionCode = this.generateSessionCode();
-    
-    // Set the session code immediately for demo purposes
     this.sessionCode = sessionCode;
 
-    // Try Firebase with timeout
-    const firebasePromise = this.tryFirebaseConnection(sessionCode);
-    const timeoutPromise = new Promise((resolve) => {
-      setTimeout(() => resolve(false), 3000); // 3 second timeout
-    });
+    // Initialize Firebase session
+    await this.tryFirebaseConnection(sessionCode);
 
-    try {
-      const result = await Promise.race([firebasePromise, timeoutPromise]);
-      if (!result) {
-        console.warn('Firebase connection timed out, continuing in demo mode');
-      }
-    } catch (error) {
-      console.error('Firebase connection failed:', error);
-    }
-
-    // For demo purposes, use a placeholder web app URL
-    // In production, this would be your actual web app URL
-    const webAppUrl = 'https://your-remote-typing-app.com';
+    // Get production web app URL from environment variables
+    const webAppUrl = import.meta.env.VITE_REMOTE_TYPING_WEB_APP_URL || 
+                     process.env.REMOTE_TYPING_WEB_APP_URL || 
+                     'https://remote-typing.app'; // Default production URL
     const qrCodeUrl = await this.generateQRCode(`${webAppUrl}/remote/${sessionCode}`);
 
     return { sessionCode, qrCodeUrl };
@@ -56,8 +43,8 @@ export class SessionService {
         active: true,
         createdAt: serverTimestamp(),
         lastSeen: serverTimestamp(),
-        expiresAt: Date.now() + (5 * 60 * 1000), // 5 minutes
-        typingData: null
+        expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes
+        typingData: null,
       };
 
       await set(sessionRef, sessionData);
@@ -76,13 +63,12 @@ export class SessionService {
         margin: 1,
         color: {
           dark: '#000000',
-          light: '#FFFFFF'
-        }
+          light: '#FFFFFF',
+        },
       });
     } catch (error) {
       console.error('Failed to generate QR code:', error);
-      // Return a placeholder data URL for a simple QR-like pattern
-      return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiBmaWxsPSJ3aGl0ZSIvPgo8cmVjdCB4PSIxNiIgeT0iMTYiIHdpZHRoPSI5NiIgaGVpZ2h0PSI5NiIgZmlsbD0iYmxhY2siLz4KPHJlY3QgeD0iMjQiIHk9IjI0IiB3aWR0aD0iODAiIGhlaWdodD0iODAiIGZpbGw9IndoaXRlIi8+Cjx0ZXh0IHg9IjY0IiB5PSI3MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iYmxhY2siIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTIiPlFSPC90ZXh0Pgo8L3N2Zz4K';
+      throw new Error('Failed to generate QR code for remote session');
     }
   }
 
@@ -106,20 +92,24 @@ export class SessionService {
 
     this.typingRef = ref(database, `sessions/${this.sessionCode}/typingData`);
 
-    this.listener = onValue(this.typingRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        this.handleTypingInstruction(data);
-        // Clear the instruction after processing
-        try {
-          set(this.typingRef!, null);
-        } catch (error) {
-          console.error('Failed to clear typing instruction:', error);
+    this.listener = onValue(
+      this.typingRef,
+      (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          this.handleTypingInstruction(data);
+          // Clear the instruction after processing
+          try {
+            set(this.typingRef!, null);
+          } catch (error) {
+            console.error('Failed to clear typing instruction:', error);
+          }
         }
+      },
+      (error) => {
+        console.error('Firebase listener error:', error);
       }
-    }, (error) => {
-      console.error('Firebase listener error:', error);
-    });
+    );
   }
 
   private async handleTypingInstruction(data: TypingInstruction): Promise<void> {

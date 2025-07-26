@@ -240,7 +240,9 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           <option value="word-by-word">Word-by-Word</option>
         </select>
 
-        <p className="text-xs text-gray-500">{getTypingStyleDescription(typingConfig.typingStyle)}</p>
+        <p className="text-xs text-gray-500">
+          {getTypingStyleDescription(typingConfig.typingStyle)}
+        </p>
       </div>
 
       {/* Include Mistakes */}
@@ -268,7 +270,6 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           />
         </button>
       </div>
-
     </div>
   );
 };
