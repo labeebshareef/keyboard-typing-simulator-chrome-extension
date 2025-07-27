@@ -81,7 +81,24 @@ Your companion web app should:
 
 ## Troubleshooting
 
+### Firebase Connection Issues
+
+**CSP (Content Security Policy) Errors**:
+If you see errors like "Refused to load the script because it violates the following Content Security Policy directive", this is resolved in the latest version. The extension now includes proper CSP configuration to allow Firebase's connection mechanisms.
+
+**Connection Methods**:
+- The extension supports both WebSocket and long-polling connections
+- Use `https://` URLs in your Firebase configuration (recommended)
+- `wss://` URLs are also supported but will be converted to `https://` internally
+
+**Common Issues**:
 - If remote sessions fail to start, check Firebase configuration
-- Ensure your companion web app is accessible at the configured URL
+- Ensure your companion web app is accessible at the configured URL  
 - Check browser console for detailed error messages
 - Verify Firebase security rules allow read/write access
+- Make sure all required environment variables are set
+
+**Firebase Database URL Format**:
+- Correct: `https://your-project-default-rtdb.firebaseio.com`
+- Also supported: `wss://your-project-default-rtdb.firebaseio.com`
+- Incorrect: URLs without proper domain or protocol
