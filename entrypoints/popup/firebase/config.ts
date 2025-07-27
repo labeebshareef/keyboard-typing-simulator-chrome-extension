@@ -5,18 +5,30 @@ import { getDatabase } from 'firebase/database';
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || process.env.FIREBASE_AUTH_DOMAIN,
-  // Note: To force WebSocket-only connections (no long-polling fallback), 
-  // use wss:// scheme instead of https:// in the database URL
-  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL || process.env.FIREBASE_DATABASE_URL,
+  // Normalize database URL - handle both https:// and wss:// schemes
+  databaseURL: normalizeDatabaseURL(import.meta.env.VITE_FIREBASE_DATABASE_URL || process.env.FIREBASE_DATABASE_URL),
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID,
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || process.env.FIREBASE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || process.env.FIREBASE_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID || process.env.FIREBASE_APP_ID,
 };
 
+function normalizeDatabaseURL(url: string | undefined): string | undefined {
+  if (!url) return url;
+  
+  // If user specified wss://, convert it back to https:// for Firebase SDK
+  // The SDK will handle WebSocket connections internally
+  if (url.startsWith('wss://')) {
+    console.log('Converting wss:// URL to https:// for Firebase SDK compatibility');
+    return url.replace('wss://', 'https://');
+  }
+  
+  return url;
+}
+
 // Validate required Firebase configuration
 const requiredFields = ['apiKey', 'authDomain', 'databaseURL', 'projectId'];
-const missingFields = requiredFields.filter((field) => !firebaseConfig[field]);
+const missingFields = requiredFields.filter((field) => !firebaseConfig[field as keyof typeof firebaseConfig]);
 
 if (missingFields.length > 0) {
   throw new Error(`Missing required Firebase configuration: ${missingFields.join(', ')}. Please set the environment variables.`);

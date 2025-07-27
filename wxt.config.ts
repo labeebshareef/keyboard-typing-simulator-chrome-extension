@@ -12,7 +12,7 @@ export default defineConfig({
     host_permissions: ['https://*.firebaseio.com/*', 'https://*.googleapis.com/*'],
     content_security_policy: {
       extension_pages:
-        "script-src 'self' https://*.firebaseio.com https://*.googleapis.com; script-src-elem 'self' https://*.firebaseio.com https://*.googleapis.com; object-src 'self'; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com;",
+        "script-src 'self' 'unsafe-eval' https://*.firebaseio.com https://*.googleapis.com; script-src-elem 'self' https://*.firebaseio.com https://*.googleapis.com; object-src 'self'; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com wss://*.firebaseio.com;",
     },
     icons: {
       16: '/icons/icon16.png',
