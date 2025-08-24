@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Wifi, WifiOff, Copy, QrCode, Clock } from 'lucide-react';
+import { Clock, Copy, QrCode, Wifi, WifiOff } from 'lucide-react';
+import type React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { SessionService } from '../services/sessionService';
-import type { AdvancedTypingConfig, TypingConfig, RemoteSession } from '../types';
+import type { AdvancedTypingConfig, RemoteSession, TypingConfig } from '../types';
 
 interface RemoteTypingProps {
   config: AdvancedTypingConfig;
@@ -16,7 +17,7 @@ const RemoteTyping: React.FC<RemoteTypingProps> = ({
   typingConfig,
   updateConfig,
   updateTypingConfig,
-  disabled
+  disabled,
 }) => {
   const [sessionService] = useState(() => new SessionService());
   const [session, setSession] = useState<RemoteSession | null>(null);
@@ -31,7 +32,7 @@ const RemoteTyping: React.FC<RemoteTypingProps> = ({
     const interval = setInterval(() => {
       const remaining = Math.max(0, session.expiresAt - Date.now());
       setTimeRemaining(remaining);
-      
+
       if (remaining === 0) {
         handleEndSession();
       }
@@ -54,7 +55,18 @@ const RemoteTyping: React.FC<RemoteTypingProps> = ({
       });
     } catch (error) {
       console.error('Failed to create session:', error);
-      alert('Failed to start remote session. Please try again.');
+      
+      // More specific error handling for production
+      let errorMessage = 'Failed to start remote session. ';
+      if (error.message?.includes('Firebase configuration')) {
+        errorMessage += 'Firebase is not properly configured. Please contact support.';
+      } else if (error.message?.includes('QR code')) {
+        errorMessage += 'Could not generate QR code. Please try again.';
+      } else {
+        errorMessage += 'Please check your internet connection and try again.';
+      }
+      
+      alert(errorMessage);
     } finally {
       setIsCreatingSession(false);
     }
@@ -70,13 +82,16 @@ const RemoteTyping: React.FC<RemoteTypingProps> = ({
 
   const copySessionCode = useCallback(() => {
     if (session?.sessionCode) {
-      navigator.clipboard.writeText(session.sessionCode).then(() => {
-        setCopyFeedback(true);
-        setTimeout(() => setCopyFeedback(false), 2000);
-      }).catch(() => {
-        // Fallback for browsers without clipboard API
-        alert(`Session Code: ${session.sessionCode}`);
-      });
+      navigator.clipboard
+        .writeText(session.sessionCode)
+        .then(() => {
+          setCopyFeedback(true);
+          setTimeout(() => setCopyFeedback(false), 2000);
+        })
+        .catch(() => {
+          // Fallback for browsers without clipboard API
+          alert(`Session Code: ${session.sessionCode}`);
+        });
     }
   }, [session?.sessionCode]);
 
@@ -100,9 +115,7 @@ const RemoteTyping: React.FC<RemoteTypingProps> = ({
     <div className="p-4 space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h2 className="text-lg font-semibold text-gray-800 mb-2">
-          Remote Typing Control
-        </h2>
+        <h2 className="text-lg font-semibold text-gray-800 mb-2">Remote Typing Control</h2>
         <p className="text-sm text-gray-600">
           Control typing from your mobile device or another browser
         </p>
@@ -117,7 +130,7 @@ const RemoteTyping: React.FC<RemoteTypingProps> = ({
             <div className="text-3xl font-mono font-bold text-blue-900 tracking-wider">
               {session.sessionCode}
             </div>
-            <button 
+            <button
               type="button"
               onClick={copySessionCode}
               className="mt-2 px-3 py-1 text-sm text-blue-600 hover:text-blue-800 
@@ -133,13 +146,11 @@ const RemoteTyping: React.FC<RemoteTypingProps> = ({
           <div className="text-center p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center justify-center space-x-2 mb-3">
               <QrCode className="w-4 h-4 text-gray-600" />
-              <h4 className="text-sm font-medium text-gray-700">
-                Scan with Mobile Device
-              </h4>
+              <h4 className="text-sm font-medium text-gray-700">Scan with Mobile Device</h4>
             </div>
             <div className="inline-block p-2 bg-white rounded-lg shadow-sm">
-              <img 
-                src={session.qrCodeUrl} 
+              <img
+                src={session.qrCodeUrl}
                 alt="QR Code for Remote Connection"
                 className="w-32 h-32"
               />
@@ -149,9 +160,7 @@ const RemoteTyping: React.FC<RemoteTypingProps> = ({
           {/* Status */}
           <div className="flex items-center justify-center space-x-2 p-3 rounded-lg bg-gray-100">
             <div className={`w-3 h-3 rounded-full ${getStatusColor()}`}></div>
-            <span className="text-sm font-medium text-gray-700">
-              {getStatusText()}
-            </span>
+            <span className="text-sm font-medium text-gray-700">{getStatusText()}</span>
             <div className="flex items-center space-x-1 text-xs text-gray-500 ml-2">
               <Clock className="w-3 h-3" />
               <span>{formatTimeRemaining()}</span>
@@ -176,9 +185,7 @@ const RemoteTyping: React.FC<RemoteTypingProps> = ({
         <div className="space-y-4">
           <div className="text-center p-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
             <Wifi className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-            <h3 className="text-lg font-medium text-gray-700 mb-2">
-              No Active Session
-            </h3>
+            <h3 className="text-lg font-medium text-gray-700 mb-2">No Active Session</h3>
             <p className="text-sm text-gray-500 mb-4">
               Start a remote session to control typing from another device
             </p>
@@ -214,14 +221,7 @@ const RemoteTyping: React.FC<RemoteTypingProps> = ({
         </ol>
       </div>
 
-      {/* Demo Note */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-        <p className="text-xs text-blue-700">
-          <strong>Demo Mode:</strong> This is a demonstration of the Remote Typing feature. 
-          In a production environment, you would have a companion web app for mobile devices 
-          that connects to the same Firebase database.
-        </p>
-      </div>
+
     </div>
   );
 };

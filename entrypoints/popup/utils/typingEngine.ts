@@ -1,4 +1,9 @@
-import type { TypingConfig, AdvancedTypingConfig, DetectedField, TypingInstruction } from '../types';
+import type {
+  AdvancedTypingConfig,
+  DetectedField,
+  TypingConfig,
+  TypingInstruction,
+} from '../types';
 
 export class TypingEngine {
   static async executeBasicTyping(
@@ -22,7 +27,7 @@ export class TypingEngine {
     await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       func: executeBasicTypingScript,
-      args: [{ text, config }]
+      args: [{ text, config }],
     });
   }
 
@@ -43,15 +48,19 @@ export class TypingEngine {
     await chrome.scripting.executeScript({
       target: { tabId: tab.id! },
       func: executeAdvancedTyping,
-      args: [{
-        fields: [{
-          ...fields[0],
-          text,
-          enabled: true
-        }],
-        typingConfig: config,
-        advancedConfig: config
-      }]
+      args: [
+        {
+          fields: [
+            {
+              ...fields[0],
+              text,
+              enabled: true,
+            },
+          ],
+          typingConfig: config,
+          advancedConfig: config,
+        },
+      ],
     });
   }
 
@@ -61,7 +70,7 @@ export class TypingEngine {
     config: TypingConfig & AdvancedTypingConfig
   ): Promise<void> {
     const fields = await this.scanCurrentPage();
-    const field = fields.find(f => f.id === targetField || f.selector === targetField);
+    const field = fields.find((f) => f.id === targetField || f.selector === targetField);
 
     if (!field) {
       throw new Error(`Target field not found: ${targetField}`);
@@ -72,15 +81,19 @@ export class TypingEngine {
     await chrome.scripting.executeScript({
       target: { tabId: tab.id! },
       func: executeAdvancedTyping,
-      args: [{
-        fields: [{
-          ...field,
-          text,
-          enabled: true
-        }],
-        typingConfig: config,
-        advancedConfig: config
-      }]
+      args: [
+        {
+          fields: [
+            {
+              ...field,
+              text,
+              enabled: true,
+            },
+          ],
+          typingConfig: config,
+          advancedConfig: config,
+        },
+      ],
     });
   }
 
@@ -132,21 +145,27 @@ export class TypingEngine {
 // Content script for basic typing
 function executeBasicTypingScript({
   text,
-  config
+  config,
 }: {
   text: string;
   config: TypingConfig & AdvancedTypingConfig;
 }): void {
   // Find the currently focused element or the first input field
-  let targetElement = document.activeElement as HTMLInputElement | HTMLTextAreaElement | HTMLElement;
+  let targetElement = document.activeElement as
+    | HTMLInputElement
+    | HTMLTextAreaElement
+    | HTMLElement;
 
-  if (!targetElement || (
-    targetElement.tagName !== 'INPUT' &&
-    targetElement.tagName !== 'TEXTAREA' &&
-    !targetElement.isContentEditable
-  )) {
+  if (
+    !targetElement ||
+    (targetElement.tagName !== 'INPUT' &&
+      targetElement.tagName !== 'TEXTAREA' &&
+      !targetElement.isContentEditable)
+  ) {
     // Find first available input field
-    const inputs = document.querySelectorAll('input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="image"]):not([type="file"]), textarea, [contenteditable="true"]');
+    const inputs = document.querySelectorAll(
+      'input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="image"]):not([type="file"]), textarea, [contenteditable="true"]'
+    );
     targetElement = inputs[0] as HTMLInputElement | HTMLTextAreaElement | HTMLElement;
   }
 
