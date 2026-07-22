@@ -2,31 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: "montserrat";
-  src: url("./assets/fonts/montserrat/Montserrat-VariableFont_wght.ttf") format("truetype");
-  font-weight: 300 900;
-  font-style: normal;
-  font-display: swap;
+:root {
+  color-scheme: light;
+  --surface: #f8fafc;
+  --surface-raised: #ffffff;
+  --text: #172033;
+  --text-muted: #5b6474;
+  --border: #d7dce3;
+  --focus: #2563eb;
 }
 
-/* @font-face {
-  font-family: "montserrat";
-  src: url("./assets/fonts/montserrat/Montserrat-Italic-VariableFont_wght.ttf") format("truetype");
-  font-weight: 300 900;
-  font-style: italic;
-  font-display: swap;
-} */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface: #17191d;
+  --surface-raised: #22252a;
+  --text: #f3f4f6;
+  --text-muted: #b9bec8;
+  --border: #3d424a;
+  --focus: #60a5fa;
+}
 
 body {
-  font-family: "montserrat", sans-serif;
+  font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
   padding: 0;
-  width: 790px; /* Increased by ~50% from 380px */
-  min-height: 600px;
+  width: 460px;
+  height: 600px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+:root[data-theme="dark"] .bg-white,
+:root[data-theme="dark"] .bg-gray-50,
+:root[data-theme="dark"] .bg-gray-100 {
+  background-color: var(--surface-raised);
+}
+
+:root[data-theme="dark"] .text-gray-900,
+:root[data-theme="dark"] .text-gray-800,
+:root[data-theme="dark"] .text-gray-700,
+:root[data-theme="dark"] .text-gray-600 {
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .text-gray-500,
+:root[data-theme="dark"] .text-gray-400 {
+  color: var(--text-muted);
+}
+
+:root[data-theme="dark"] .border-gray-100,
+:root[data-theme="dark"] .border-gray-200,
+:root[data-theme="dark"] .border-gray-300 {
+  border-color: var(--border);
 }
 
 /* Custom scrollbar styling */
@@ -46,4 +81,15 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

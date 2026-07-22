@@ -22,6 +22,7 @@ const FieldList: React.FC<FieldListProps> = ({
   const [tempPriority, setTempPriority] = useState<string>('');
   const containerRef = useRef<HTMLDivElement>(null);
   const autoScrollRef = useRef<number | null>(null);
+  const priorityInputRef = useRef<HTMLInputElement>(null);
 
   // Auto-scroll during drag
   const handleAutoScroll = (e: React.DragEvent) => {
@@ -33,7 +34,7 @@ const FieldList: React.FC<FieldListProps> = ({
     const scrollSpeed = 5; // pixels per frame
 
     const mouseY = e.clientY - rect.top;
-    
+
     if (mouseY < scrollThreshold) {
       // Scroll up
       if (autoScrollRef.current) clearInterval(autoScrollRef.current);
@@ -67,6 +68,10 @@ const FieldList: React.FC<FieldListProps> = ({
     };
   }, []);
 
+  useEffect(() => {
+    if (editingPriority) priorityInputRef.current?.focus();
+  }, [editingPriority]);
+
   const handleDragStart = (e: React.DragEvent, fieldId: string) => {
     if (disabled) return;
     setDraggedItem(fieldId);
@@ -97,7 +102,7 @@ const FieldList: React.FC<FieldListProps> = ({
     if (disabled) return;
     e.preventDefault();
     setDragOverItem(null);
-    
+
     // Clear auto-scroll
     if (autoScrollRef.current) {
       clearInterval(autoScrollRef.current);
@@ -143,9 +148,9 @@ const FieldList: React.FC<FieldListProps> = ({
   };
 
   const handlePrioritySubmit = (fieldId: string) => {
-    const newPriority = parseInt(tempPriority, 10);
-    
-    if (isNaN(newPriority) || newPriority < 1 || newPriority > fields.length) {
+    const newPriority = Number.parseInt(tempPriority, 10);
+
+    if (Number.isNaN(newPriority) || newPriority < 1 || newPriority > fields.length) {
       // Invalid priority, reset
       setEditingPriority(null);
       setTempPriority('');
@@ -153,7 +158,7 @@ const FieldList: React.FC<FieldListProps> = ({
     }
 
     // Find current field and target position
-    const currentField = fields.find(f => f.id === fieldId);
+    const currentField = fields.find((f) => f.id === fieldId);
     if (!currentField || currentField.priority === newPriority) {
       setEditingPriority(null);
       setTempPriority('');
@@ -162,9 +167,9 @@ const FieldList: React.FC<FieldListProps> = ({
 
     // Reorder fields based on new priority
     const newFields = [...fields];
-    const currentIndex = newFields.findIndex(f => f.id === fieldId);
+    const currentIndex = newFields.findIndex((f) => f.id === fieldId);
     const [removed] = newFields.splice(currentIndex, 1);
-    
+
     // Insert at new position (convert 1-based priority to 0-based index)
     const targetIndex = Math.min(newPriority - 1, newFields.length);
     newFields.splice(targetIndex, 0, removed);
@@ -181,17 +186,6 @@ const FieldList: React.FC<FieldListProps> = ({
     } else if (e.key === 'Escape') {
       setEditingPriority(null);
       setTempPriority('');
-    }
-  };
-
-  const getElementTypeIcon = (type: DetectedField['elementType']) => {
-    switch (type) {
-      case 'textarea':
-        return '📝';
-      case 'contenteditable':
-        return '✏️';
-      default:
-        return '📄';
     }
   };
 
@@ -214,14 +208,8 @@ const FieldList: React.FC<FieldListProps> = ({
         <span className="text-xs text-gray-500">({fields.length})</span>
       </div>
 
-      <div 
-        ref={containerRef}
-        className="max-h-[170px] overflow-y-auto space-y-2 relative"
-        style={{
-          scrollBehavior: 'smooth'
-        }}
-      >
-        {fields.map((field, index) => (
+      <div ref={containerRef} className="relative space-y-2">
+        {fields.map((field) => (
           <div
             key={field.id}
             draggable={!disabled}
@@ -231,11 +219,11 @@ const FieldList: React.FC<FieldListProps> = ({
             onDrop={(e) => handleDrop(e, field.id)}
             onDragEnd={handleDragEnd}
             className={`
-              p-3 bg-white rounded-lg border border-gray-200 shadow-sm
+              p-3 bg-white rounded-md border border-gray-200
               ${dragOverItem === field.id ? 'border-blue-400 bg-blue-50 scale-[1.02] shadow-md ring-2 ring-blue-200' : ''}
               ${draggedItem === field.id ? 'opacity-60 rotate-1 scale-95 shadow-lg' : ''}
               ${!disabled ? 'cursor-move hover:border-gray-300 hover:shadow-md' : ''}
-              transition-all duration-200 ease-in-out transform
+              transition-colors duration-200
             `}
           >
             <div className="flex items-start space-x-3">
@@ -250,6 +238,8 @@ const FieldList: React.FC<FieldListProps> = ({
                   <Hash className="w-3 h-3 text-gray-400" />
                   {editingPriority === field.id ? (
                     <input
+                      ref={priorityInputRef}
+                      aria-label={`Priority for ${field.label}`}
                       type="number"
                       value={tempPriority}
                       onChange={(e) => setTempPriority(e.target.value)}
@@ -258,7 +248,6 @@ const FieldList: React.FC<FieldListProps> = ({
                       className="w-8 h-5 text-xs font-mono text-center border border-blue-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                       min="1"
                       max={fields.length}
-                      autoFocus
                     />
                   ) : (
                     <button
@@ -267,6 +256,7 @@ const FieldList: React.FC<FieldListProps> = ({
                       disabled={disabled}
                       className="text-xs font-mono text-gray-600 min-w-[1.5rem] text-center hover:bg-gray-100 hover:text-gray-800 px-1 py-0.5 rounded transition-colors"
                       title="Click to edit priority"
+                      aria-label={`Change priority for ${field.label}, currently ${field.priority}`}
                     >
                       {field.priority}
                     </button>
@@ -278,7 +268,6 @@ const FieldList: React.FC<FieldListProps> = ({
               <div className="flex-1 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <span className="text-lg">{getElementTypeIcon(field.elementType)}</span>
                     <div>
                       <div className="text-sm font-medium text-gray-900">{field.label}</div>
                       <div className="text-xs text-gray-500">
@@ -291,9 +280,12 @@ const FieldList: React.FC<FieldListProps> = ({
                   {/* Enable/Disable Toggle */}
                   <button
                     type="button"
+                    role="switch"
+                    aria-checked={field.enabled}
+                    aria-label={`${field.enabled ? 'Disable' : 'Enable'} ${field.label}`}
                     onClick={() => onUpdateField(field.id, { enabled: !field.enabled })}
                     disabled={disabled}
-                    className="flex items-center space-x-1 text-sm text-gray-600 hover:text-gray-800 transition-all p-1 rounded hover:bg-gray-50"
+                    className="flex items-center space-x-1 rounded p-1 text-sm text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-800"
                   >
                     {field.enabled ? (
                       <>
@@ -311,13 +303,17 @@ const FieldList: React.FC<FieldListProps> = ({
 
                 {/* Text Input */}
                 <div className="space-y-1">
+                  <label className="sr-only" htmlFor={`field-text-${field.id}`}>
+                    Text for {field.label}
+                  </label>
                   <textarea
+                    id={`field-text-${field.id}`}
                     value={field.text}
                     onChange={(e) => onUpdateField(field.id, { text: e.target.value })}
                     placeholder="Text to type into this field..."
                     className="w-full h-14 px-3 py-2 text-sm border border-gray-200 rounded-md
                              focus:ring-2 focus:ring-primary-500 focus:border-transparent
-                             transition-all duration-200 resize-none
+                             transition-colors duration-200 resize-none
                              disabled:bg-gray-50 disabled:text-gray-500"
                     disabled={disabled || !field.enabled}
                   />
@@ -346,7 +342,7 @@ const FieldList: React.FC<FieldListProps> = ({
 
       {/* Enhanced Drag and Drop Instructions */}
       {fields.length > 1 && !disabled && (
-        <div className="text-xs text-gray-500 text-center py-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
+        <div className="rounded-md border border-blue-100 bg-blue-50 py-2 text-center text-xs text-gray-500">
           <div className="space-y-1">
             <div className="flex items-center justify-center space-x-2">
               <GripVertical className="w-3 h-3" />

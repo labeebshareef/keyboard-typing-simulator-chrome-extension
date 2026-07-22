@@ -1,4 +1,5 @@
 export type TypingStyle = 'normal' | 'random' | 'word-by-word';
+export type ThemePreference = 'light' | 'dark' | 'system';
 
 export interface TypingConfig {
   delay: number;
@@ -17,6 +18,7 @@ export interface TypingState {
 // Advanced Typing Types
 export interface DetectedField {
   id: string;
+  scanToken: string;
   priority: number;
   label: string;
   text: string;
@@ -32,10 +34,31 @@ export interface AdvancedTypingConfig {
   interFieldDelay: number; // 0-5 seconds
 }
 
-export interface AdvancedTypingState {
-  isScanning: boolean;
-  detectedFields: DetectedField[];
-  isTyping: boolean;
-  currentFieldIndex: number;
+export type TypingSessionPhase =
+  | 'idle'
+  | 'validating'
+  | 'delaying'
+  | 'running'
+  | 'paused'
+  | 'stopping'
+  | 'stopped'
+  | 'completed'
+  | 'failed';
+
+export interface TypingSessionStatus {
+  sessionId: string | null;
+  mode: 'basic' | 'advanced' | null;
+  phase: TypingSessionPhase;
   progress: number;
+  currentFieldIndex: number;
+  totalFields: number;
+  completedFields: number;
+  failedFields: number;
+  message: string;
+}
+
+export interface TypingSessionStartResult {
+  ok: boolean;
+  status: TypingSessionStatus;
+  errorCode?: string;
 }

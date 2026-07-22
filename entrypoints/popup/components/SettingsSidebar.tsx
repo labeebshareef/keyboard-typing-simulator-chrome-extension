@@ -1,6 +1,6 @@
-import { Clock, EyeOff, Settings, Timer, Volume2, VolumeX, Zap } from 'lucide-react';
+import { Clock, EyeOff, Moon, Settings, Timer, Volume2, VolumeX, Zap } from 'lucide-react';
 import type React from 'react';
-import type { AdvancedTypingConfig, TypingConfig, TypingStyle } from '../types';
+import type { AdvancedTypingConfig, ThemePreference, TypingConfig, TypingStyle } from '../types';
 
 interface SettingsSidebarProps {
   typingConfig: TypingConfig;
@@ -9,6 +9,8 @@ interface SettingsSidebarProps {
   updateAdvancedConfig?: (updates: Partial<AdvancedTypingConfig>) => void;
   disabled: boolean;
   showAdvancedSettings?: boolean;
+  theme: ThemePreference;
+  updateTheme: (theme: ThemePreference) => void;
 }
 
 const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
@@ -18,6 +20,8 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
   updateAdvancedConfig,
   disabled,
   showAdvancedSettings = false,
+  theme,
+  updateTheme,
 }) => {
   const getDelayLabel = (delayValue: number): string => {
     if (delayValue <= 20) return 'Lightning Fast';
@@ -49,17 +53,24 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
   };
 
   return (
-    <div className="w-64 bg-gray-50 border-l border-gray-200 p-4 space-y-3 overflow-y-auto">
+    <section
+      aria-labelledby="settings-heading"
+      className="space-y-3 border-t border-gray-200 bg-gray-50 p-4"
+    >
       <div className="flex items-center space-x-2 mb-4">
         <Settings className="w-4 h-4 text-gray-600" />
-        <h3 className="text-sm font-semibold text-gray-700">Settings</h3>
+        <h2 id="settings-heading" className="text-sm font-semibold text-gray-700">
+          Settings
+        </h2>
       </div>
 
       {/* Typing Speed */}
       <div className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
         <div className="flex items-center space-x-2 mb-2">
           <Clock className="w-3 h-3 text-gray-600" />
-          <label className="text-xs font-semibold text-gray-700">Typing Speed</label>
+          <label htmlFor="typing-speed" className="text-xs font-semibold text-gray-700">
+            Typing Speed
+          </label>
         </div>
 
         <div className="space-y-2">
@@ -71,6 +82,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           </div>
 
           <input
+            id="typing-speed"
             type="range"
             min="1"
             max="300"
@@ -93,18 +105,22 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
       {showAdvancedSettings && advancedConfig && updateAdvancedConfig && (
         <>
           {/* Separator */}
-          <div className="border-t border-gray-300 my-4"></div>
+          <div className="border-t border-gray-300 my-4" />
           {/* Hide Extension */}
           <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
             <div className="flex items-center space-x-2">
               <EyeOff className="w-3 h-3 text-gray-600" />
               <div>
-                <label className="text-xs font-semibold text-gray-700">Hide Extension</label>
+                <span className="text-xs font-semibold text-gray-700">Hide Extension</span>
                 <p className="text-xs text-gray-500">Close during typing</p>
               </div>
             </div>
 
             <button
+              type="button"
+              role="switch"
+              aria-checked={advancedConfig.hideExtension}
+              aria-label="Hide extension while typing"
               onClick={() => updateAdvancedConfig({ hideExtension: !advancedConfig.hideExtension })}
               disabled={disabled}
               className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
@@ -121,7 +137,9 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           <div className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
             <div className="flex items-center space-x-2 mb-2">
               <Clock className="w-3 h-3 text-gray-600" />
-              <label className="text-xs font-semibold text-gray-700">Initial Delay</label>
+              <label htmlFor="initial-delay" className="text-xs font-semibold text-gray-700">
+                Initial Delay
+              </label>
             </div>
 
             <div className="space-y-2">
@@ -134,6 +152,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
               </div>
 
               <input
+                id="initial-delay"
                 type="range"
                 min="0"
                 max="10"
@@ -157,7 +176,9 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           <div className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
             <div className="flex items-center space-x-2 mb-2">
               <Timer className="w-3 h-3 text-gray-600" />
-              <label className="text-xs font-semibold text-gray-700">Inter-field Delay</label>
+              <label htmlFor="inter-field-delay" className="text-xs font-semibold text-gray-700">
+                Inter-field Delay
+              </label>
             </div>
 
             <div className="space-y-2">
@@ -170,6 +191,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
               </div>
 
               <input
+                id="inter-field-delay"
                 type="range"
                 min="0"
                 max="5"
@@ -201,12 +223,16 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
             )}
           </div>
           <div>
-            <label className="text-xs font-semibold text-gray-700">Typing Sounds</label>
+            <span className="text-xs font-semibold text-gray-700">Typing Sounds</span>
             <p className="text-xs text-gray-500">Audio feedback</p>
           </div>
         </div>
 
         <button
+          type="button"
+          role="switch"
+          aria-checked={typingConfig.soundEnabled}
+          aria-label="Typing sounds"
           onClick={() => updateTypingConfig({ soundEnabled: !typingConfig.soundEnabled })}
           disabled={disabled}
           className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
@@ -224,14 +250,17 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
       <div className="space-y-2 p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
         <div className="flex items-center space-x-2">
           <Zap className="w-3 h-3 text-gray-600" />
-          <label className="text-xs font-semibold text-gray-700">Typing Style</label>
+          <label htmlFor="typing-style" className="text-xs font-semibold text-gray-700">
+            Typing Style
+          </label>
         </div>
 
         <select
+          id="typing-style"
           value={typingConfig.typingStyle}
           onChange={(e) => updateTypingConfig({ typingStyle: e.target.value as TypingStyle })}
           className="w-full px-2 py-1.5 border border-gray-200 rounded-md focus:ring-1 
-                   focus:ring-primary-500 focus:border-transparent transition-all duration-200
+                   focus:ring-primary-500 focus:border-transparent transition-colors duration-200
                    bg-white text-xs"
           disabled={disabled}
         >
@@ -240,7 +269,29 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           <option value="word-by-word">Word-by-Word</option>
         </select>
 
-        <p className="text-xs text-gray-500">{getTypingStyleDescription(typingConfig.typingStyle)}</p>
+        <p className="text-xs text-gray-500">
+          {getTypingStyleDescription(typingConfig.typingStyle)}
+        </p>
+      </div>
+
+      <div className="space-y-2 p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+        <div className="flex items-center space-x-2">
+          <Moon aria-hidden="true" className="w-3 h-3 text-gray-600" />
+          <label htmlFor="theme-preference" className="text-xs font-semibold text-gray-700">
+            Theme
+          </label>
+        </div>
+        <select
+          id="theme-preference"
+          value={theme}
+          onChange={(event) => updateTheme(event.target.value as ThemePreference)}
+          className="w-full rounded-md border border-gray-200 bg-white px-2 py-1.5 text-xs focus:border-transparent focus:ring-2 focus:ring-primary-500"
+          disabled={disabled}
+        >
+          <option value="system">System</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
       </div>
 
       {/* Include Mistakes */}
@@ -250,12 +301,16 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
             <Settings className="w-3 h-3" />
           </div>
           <div>
-            <label className="text-xs font-semibold text-gray-700">Include Mistakes</label>
+            <span className="text-xs font-semibold text-gray-700">Include Mistakes</span>
             <p className="text-xs text-gray-500">Typos & corrections</p>
           </div>
         </div>
 
         <button
+          type="button"
+          role="switch"
+          aria-checked={typingConfig.includeMistakes}
+          aria-label="Include mistakes"
           onClick={() => updateTypingConfig({ includeMistakes: !typingConfig.includeMistakes })}
           disabled={disabled}
           className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
@@ -268,8 +323,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           />
         </button>
       </div>
-
-    </div>
+    </section>
   );
 };
 
