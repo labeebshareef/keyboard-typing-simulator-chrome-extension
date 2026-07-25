@@ -5,6 +5,7 @@ declare module "wxt/browser" {
   export type PublicPath =
     | "/"
     | "/background.js"
+    | "/export.html"
     | "/icons/icon128.png"
     | "/icons/icon16.png"
     | "/icons/icon32.png"

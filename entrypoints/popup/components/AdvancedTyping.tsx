@@ -36,6 +36,40 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const listHeadingRef = useRef<HTMLHeadingElement>(null);
 
+  /**
+   * Carry text and enabled state from the previous scan onto matching fields
+   * in a fresh scan (match by selector first, then label + element type), so
+   * "rescan and run the same thing again" never loses the user's input.
+   */
+  const mergePreviousFieldState = (
+    previous: DetectedField[],
+    next: DetectedField[]
+  ): { merged: DetectedField[]; kept: number } => {
+    const pool = previous.filter((field) => field.text.trim());
+    const used = new Set<string>();
+    let kept = 0;
+    const merged = next.map((field) => {
+      const match =
+        pool.find(
+          (candidate) =>
+            !used.has(candidate.id) &&
+            candidate.selector === field.selector &&
+            candidate.elementType === field.elementType
+        ) ??
+        pool.find(
+          (candidate) =>
+            !used.has(candidate.id) &&
+            candidate.label === field.label &&
+            candidate.elementType === field.elementType
+        );
+      if (!match) return field;
+      used.add(match.id);
+      kept += 1;
+      return { ...field, text: match.text, enabled: match.enabled };
+    });
+    return { merged, kept };
+  };
+
   const handleScanPage = async () => {
     setIsScanning(true);
     setScanMessage('Scanning editable fields');
@@ -60,11 +94,14 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
         return;
       }
 
-      onFieldsChange(scan.fields);
+      const { merged, kept } = mergePreviousFieldState(fields, scan.fields);
+      onFieldsChange(merged);
       setScanMessage(
-        scan.fields.length === 0
+        merged.length === 0
           ? 'No supported editable fields were found.'
-          : `Found ${scan.fields.length} editable field${scan.fields.length === 1 ? '' : 's'}.`
+          : `Found ${merged.length} editable field${merged.length === 1 ? '' : 's'}.${
+              kept > 0 ? ` Kept your text for ${kept}.` : ''
+            }`
       );
       // Land keyboard users on the results.
       if (scan.fields.length > 0) listHeadingRef.current?.focus();

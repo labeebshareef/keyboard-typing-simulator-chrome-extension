@@ -353,7 +353,7 @@ export function startPageTyping(request: PageTypingRequest): TypingSessionStartR
       message:
         request.mode === 'basic'
           ? 'Focus an editable text field on the page and try again'
-          : 'One or more fields changed after scanning. Scan the page again.',
+          : 'The page changed since the last scan. Rescan the page — your field text is kept.',
     };
     return { ok: false, errorCode: 'INVALID_TARGET', status };
   }
@@ -463,8 +463,12 @@ export function startPageTyping(request: PageTypingRequest): TypingSessionStartR
       if (sessionWindow.__ktsScan?.token === token) {
         if (sessionWindow.__ktsScan.cleanupTimer) {
           clearTimeout(sessionWindow.__ktsScan.cleanupTimer);
+          sessionWindow.__ktsScan.cleanupTimer = undefined;
         }
-        sessionWindow.__ktsScan = undefined;
+        // Keep the element registry (token + element references) alive so the
+        // user can immediately run the same fields again without rescanning.
+        // Only the visual markers (attributes + highlight style) are removed;
+        // the registry is replaced on the next scan and gone on navigation.
       }
     }
   };

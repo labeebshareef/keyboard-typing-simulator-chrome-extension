@@ -141,6 +141,82 @@ export const DEMO_PRESETS: DemoPreset[] = [
   },
 ];
 
+// ---------------------------------------------------------------------------
+// Site-aware presets — a "forced tool call" via structured output.
+//
+// The Prompt API has no shipped tool/function-calling surface (it exists only
+// as a spec proposal), so this uses the supported equivalent: the model is
+// forced to fill a JSON Schema via `responseConstraint`, which is exactly a
+// tool call with a fixed tool. The static DEMO_PRESETS list is the fallback
+// whenever this fails or AI is unavailable.
+// ---------------------------------------------------------------------------
+
+export interface PageContext {
+  host: string;
+  title: string;
+}
+
+const SITE_PRESET_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['presets'],
+  properties: {
+    presets: {
+      type: 'array',
+      minItems: 3,
+      maxItems: 4,
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['label', 'instruction'],
+        properties: {
+          label: { type: 'string', maxLength: 24 },
+          instruction: { type: 'string', maxLength: 220 },
+        },
+      },
+    },
+  },
+};
+
+/**
+ * Generate 3–4 presets tailored to the page the user is on. Only the tab's
+ * host and title are shared with the (fully local) model — no page content.
+ * Throws on any failure; callers keep the static presets.
+ */
+export async function generateSitePresets(
+  session: AiSession,
+  context: PageContext,
+  signal?: AbortSignal
+): Promise<DemoPreset[]> {
+  const raw = await session.prompt(
+    `The user is on the website "${context.title}" (${context.host}) and wants short sample ` +
+      'texts to type into input fields there for a product demo or test. Propose 3-4 preset ' +
+      'ideas. Each has a "label" (2-3 words, shown on a button) and an "instruction" (one ' +
+      'sentence telling a writer exactly what short text to produce, with an approximate ' +
+      'word count under 70). Make them specific to what people actually type on this site.',
+    { responseConstraint: SITE_PRESET_SCHEMA, signal }
+  );
+
+  const parsed = JSON.parse(raw) as { presets?: Array<{ label?: unknown; instruction?: unknown }> };
+  const presets = (parsed.presets ?? [])
+    .filter(
+      (entry): entry is { label: string; instruction: string } =>
+        typeof entry.label === 'string' &&
+        entry.label.trim().length > 0 &&
+        typeof entry.instruction === 'string' &&
+        entry.instruction.trim().length > 0
+    )
+    .slice(0, 4)
+    .map((entry, index) => ({
+      id: `site-${index}`,
+      label: entry.label.trim().slice(0, 24),
+      instruction: entry.instruction.trim(),
+    }));
+
+  if (presets.length < 3) throw new Error('Too few usable presets generated');
+  return presets;
+}
+
 export async function streamGeneration(
   session: AiSession,
   instruction: string,

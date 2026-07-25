@@ -4,12 +4,21 @@ import type React from 'react';
 import type { AiControls } from '../hooks/useAi';
 import {
   DEMO_PRESETS,
+  type DemoPreset,
   REWRITE_MODES,
   type RewriteMode,
+  generateSitePresets,
   streamGeneration,
   streamRewrite,
 } from '../utils/ai';
 import { LOCAL_DEMO_TEXTS } from '../utils/sample-data';
+
+const SITE_PRESETS_CACHE_KEY = 'sitePresets';
+
+interface SitePresetsCache {
+  host: string;
+  presets: DemoPreset[];
+}
 
 interface AiAssistProps {
   ai: AiControls;
@@ -32,6 +41,8 @@ const AiAssist: React.FC<AiAssistProps> = ({ ai, text, setText, disabled }) => {
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState('');
   const [prompt, setPrompt] = useState('');
+  const [presets, setPresets] = useState<DemoPreset[]>(DEMO_PRESETS);
+  const [presetsHost, setPresetsHost] = useState('');
   const abortRef = useRef<AbortController | null>(null);
 
   // Cancel any in-flight generation when the popup unmounts.
@@ -39,6 +50,53 @@ const AiAssist: React.FC<AiAssistProps> = ({ ai, text, setText, disabled }) => {
 
   const aiReady = ai.availability === 'available';
   const canUseControls = !disabled && !busy;
+
+  // Site-aware presets: when the model is ready, tailor the preset chips to
+  // the active tab (host + title only — never page content). Cached per host
+  // in session storage so this runs once per site per browser session; the
+  // static DEMO_PRESETS remain the fallback on any failure.
+  useEffect(() => {
+    if (!aiReady) return;
+    let disposed = false;
+
+    void (async () => {
+      try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        const url = tab?.url ?? '';
+        if (!tab?.title || /^(chrome|edge|about|chrome-extension|moz-extension):/.test(url)) return;
+        const host = new URL(url).hostname;
+        if (!host) return;
+
+        const stored = await chrome.storage.session.get(SITE_PRESETS_CACHE_KEY);
+        const cache = stored[SITE_PRESETS_CACHE_KEY] as SitePresetsCache | undefined;
+        if (cache?.host === host && Array.isArray(cache.presets) && cache.presets.length > 0) {
+          if (!disposed) {
+            setPresets(cache.presets);
+            setPresetsHost(host);
+          }
+          return;
+        }
+
+        // Model is already downloaded ('available'), so creating a session
+        // here needs no user gesture and no download.
+        const session = await ai.ensureSession();
+        if (!session || disposed) return;
+        const generated = await generateSitePresets(session, { host, title: tab.title });
+        if (disposed) return;
+        setPresets(generated);
+        setPresetsHost(host);
+        await chrome.storage.session
+          .set({ [SITE_PRESETS_CACHE_KEY]: { host, presets: generated } })
+          .catch(() => undefined);
+      } catch {
+        // Any failure: keep the static presets, say nothing.
+      }
+    })();
+
+    return () => {
+      disposed = true;
+    };
+  }, [ai.ensureSession, aiReady]);
 
   const runStream = async (
     run: (signal: AbortSignal) => Promise<string>,
@@ -66,22 +124,24 @@ const AiAssist: React.FC<AiAssistProps> = ({ ai, text, setText, disabled }) => {
   };
 
   const handlePreset = async (presetId: string) => {
-    const preset = DEMO_PRESETS.find((entry) => entry.id === presetId);
+    const preset = presets.find((entry) => entry.id === presetId);
     if (!preset) return;
+    // Site-generated presets have no canned text; static ones do.
+    const localText = LOCAL_DEMO_TEXTS[preset.id];
 
     if (!aiReady) {
-      setText(LOCAL_DEMO_TEXTS[preset.id] ?? '');
+      setText(localText ?? '');
       setNote('Inserted a built-in sample. Enable on-device AI for generated text.');
       return;
     }
     const session = await ai.ensureSession();
     if (!session) {
-      setText(LOCAL_DEMO_TEXTS[preset.id] ?? '');
+      if (localText) setText(localText);
       return;
     }
     await runStream(
       (signal) => streamGeneration(session, preset.instruction, setText, signal),
-      () => setText(LOCAL_DEMO_TEXTS[preset.id] ?? '')
+      localText ? () => setText(localText) : undefined
     );
   };
 
@@ -126,6 +186,11 @@ const AiAssist: React.FC<AiAssistProps> = ({ ai, text, setText, disabled }) => {
       <div className="flex items-center gap-1.5">
         <Sparkles aria-hidden="true" className="h-3.5 w-3.5 text-primary-500" />
         <h2 className="text-xs font-semibold text-[var(--text)]">AI Assist</h2>
+        {presetsHost && (
+          <span className="truncate text-[10px] text-[var(--text-muted)]" title={presetsHost}>
+            · presets for {presetsHost}
+          </span>
+        )}
         {busy && (
           <button
             type="button"
@@ -141,7 +206,7 @@ const AiAssist: React.FC<AiAssistProps> = ({ ai, text, setText, disabled }) => {
       </div>
 
       <div className="flex flex-wrap gap-1.5">
-        {DEMO_PRESETS.map((preset) => (
+        {presets.map((preset) => (
           <button
             key={preset.id}
             type="button"
