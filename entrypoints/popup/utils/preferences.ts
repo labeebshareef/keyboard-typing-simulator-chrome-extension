@@ -1,5 +1,6 @@
 import type {
   AdvancedTypingConfig,
+  AssistantPreferences,
   PopupTab,
   ShortcutPreferences,
   ThemePreference,
@@ -9,16 +10,17 @@ import type {
 } from '../types';
 
 export interface Preferences {
-  version: 3;
+  version: 4;
   typing: TypingConfig;
   advanced: AdvancedTypingConfig;
   theme: ThemePreference;
   ui: UiPreferences;
   shortcut: ShortcutPreferences;
+  assistant: AssistantPreferences;
 }
 
 export const defaultPreferences: Preferences = {
-  version: 3,
+  version: 4,
   typing: {
     delay: 50,
     includeMistakes: false,
@@ -43,6 +45,12 @@ export const defaultPreferences: Preferences = {
     // only. Users opt in to disk persistence explicitly.
     persistScript: false,
   },
+  assistant: {
+    // Master capability switch. True by default because icons still only
+    // appear when the user summons them on a page; the switch exists as the
+    // one-click kill for the whole feature.
+    enabled: true,
+  },
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -64,12 +72,14 @@ export const sanitizePreferences = (value: unknown): Preferences => {
   const ui = isRecord(value.ui) ? value.ui : {};
   // v1/v2 payloads have no `shortcut` section; defaults fill it in.
   const shortcut = isRecord(value.shortcut) ? value.shortcut : {};
+  // v1–v3 payloads have no `assistant` section; defaults fill it in.
+  const assistant = isRecord(value.assistant) ? value.assistant : {};
   const styles: TypingStyle[] = ['normal', 'random', 'word-by-word'];
   const themes: ThemePreference[] = ['light', 'dark', 'system'];
   const tabs: PopupTab[] = ['basic', 'advanced'];
 
   return {
-    version: 3,
+    version: 4,
     typing: {
       delay: clampNumber(typing.delay, 10, 300, defaultPreferences.typing.delay),
       includeMistakes: asBoolean(typing.includeMistakes, defaultPreferences.typing.includeMistakes),
@@ -108,6 +118,9 @@ export const sanitizePreferences = (value: unknown): Preferences => {
     },
     shortcut: {
       persistScript: asBoolean(shortcut.persistScript, defaultPreferences.shortcut.persistScript),
+    },
+    assistant: {
+      enabled: asBoolean(assistant.enabled, defaultPreferences.assistant.enabled),
     },
   };
 };

@@ -43,6 +43,7 @@ const AiAssist: React.FC<AiAssistProps> = ({ ai, text, setText, disabled }) => {
   const [prompt, setPrompt] = useState('');
   const [presets, setPresets] = useState<DemoPreset[]>(DEMO_PRESETS);
   const [presetsHost, setPresetsHost] = useState('');
+  const [generatingHost, setGeneratingHost] = useState('');
   const abortRef = useRef<AbortController | null>(null);
 
   // Cancel any in-flight generation when the popup unmounts.
@@ -78,7 +79,9 @@ const AiAssist: React.FC<AiAssistProps> = ({ ai, text, setText, disabled }) => {
         }
 
         // Model is already downloaded ('available'), so creating a session
-        // here needs no user gesture and no download.
+        // here needs no user gesture and no download. The default chips stay
+        // usable the whole time; only the header hints at the generation.
+        if (!disposed) setGeneratingHost(host);
         const session = await ai.ensureSession();
         if (!session || disposed) return;
         const generated = await generateSitePresets(session, { host, title: tab.title });
@@ -90,6 +93,8 @@ const AiAssist: React.FC<AiAssistProps> = ({ ai, text, setText, disabled }) => {
           .catch(() => undefined);
       } catch {
         // Any failure: keep the static presets, say nothing.
+      } finally {
+        if (!disposed) setGeneratingHost('');
       }
     })();
 
@@ -186,11 +191,23 @@ const AiAssist: React.FC<AiAssistProps> = ({ ai, text, setText, disabled }) => {
       <div className="flex items-center gap-1.5">
         <Sparkles aria-hidden="true" className="h-3.5 w-3.5 text-primary-500" />
         <h2 className="text-xs font-semibold text-[var(--text)]">AI Assist</h2>
-        {presetsHost && (
+        {presetsHost ? (
           <span className="truncate text-[10px] text-[var(--text-muted)]" title={presetsHost}>
             · presets for {presetsHost}
           </span>
-        )}
+        ) : generatingHost ? (
+          <span
+            aria-live="polite"
+            className="flex min-w-0 items-center gap-1 truncate text-[10px] text-[var(--text-muted)]"
+            title={`Generating presets for ${generatingHost}`}
+          >
+            <span
+              aria-hidden="true"
+              className="h-2 w-2 shrink-0 animate-spin rounded-full border border-primary-500 border-t-transparent"
+            />
+            <span className="animate-pulse truncate">generating presets for {generatingHost}…</span>
+          </span>
+        ) : null}
         {busy && (
           <button
             type="button"

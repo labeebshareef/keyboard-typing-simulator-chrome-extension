@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import logo from './assets/images/ktsLogo-popup.png?url';
 import ActionBar from './components/ActionBar';
 import AdvancedTyping from './components/AdvancedTyping';
+import AssistantToggle from './components/AssistantToggle';
 import BasicTyping from './components/BasicTyping';
 import HeaderMenu from './components/HeaderMenu';
 import ReviewAskCard from './components/ReviewAskCard';
@@ -12,6 +13,7 @@ import { useAi } from './hooks/useAi';
 import { useTypingSession } from './hooks/useTypingSession';
 import type {
   AdvancedTypingConfig,
+  AssistantPreferences,
   DetectedField,
   PopupTab,
   ShortcutPreferences,
@@ -33,6 +35,7 @@ const App: React.FC = () => {
   const [theme, setTheme] = useState<ThemePreference>(defaultPreferences.theme);
   const [ui, setUi] = useState<UiPreferences>(defaultPreferences.ui);
   const [shortcut, setShortcut] = useState<ShortcutPreferences>(defaultPreferences.shortcut);
+  const [assistant, setAssistant] = useState<AssistantPreferences>(defaultPreferences.assistant);
   const [preferencesLoaded, setPreferencesLoaded] = useState(false);
   const [showReviewAsk, setShowReviewAsk] = useState(false);
   const countedSessionRef = useRef<string | null>(null);
@@ -56,6 +59,7 @@ const App: React.FC = () => {
       setTheme(preferences.theme);
       setUi(preferences.ui);
       setShortcut(preferences.shortcut);
+      setAssistant(preferences.assistant);
       setPreferencesLoaded(true);
     });
     return () => {
@@ -66,14 +70,15 @@ const App: React.FC = () => {
   useEffect(() => {
     if (!preferencesLoaded) return;
     void savePreferences({
-      version: 3,
+      version: 4,
       typing: typingConfig,
       advanced: advancedConfig,
       theme,
       ui,
       shortcut,
+      assistant,
     }).catch(() => undefined);
-  }, [advancedConfig, preferencesLoaded, shortcut, theme, typingConfig, ui]);
+  }, [advancedConfig, assistant, preferencesLoaded, shortcut, theme, typingConfig, ui]);
 
   useEffect(() => {
     const media = window.matchMedia('(prefers-color-scheme: dark)');
@@ -119,6 +124,10 @@ const App: React.FC = () => {
 
   const updateShortcut = (updates: Partial<ShortcutPreferences>) => {
     setShortcut((prev) => ({ ...prev, ...updates }));
+  };
+
+  const updateAssistant = (updates: Partial<AssistantPreferences>) => {
+    setAssistant((prev) => ({ ...prev, ...updates }));
   };
 
   /** Hand the current script to the export page and open it in a tab. */
@@ -190,6 +199,8 @@ const App: React.FC = () => {
           />
         </div>
       </div>
+
+      <AssistantToggle assistant={assistant} updateAssistant={updateAssistant} />
 
       {/* Tab Navigation */}
       <div className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-raised)] px-4 py-2">

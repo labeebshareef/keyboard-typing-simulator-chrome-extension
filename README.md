@@ -36,6 +36,7 @@ The extension requests these permissions:
 - `activeTab`: access only the tab where the user invokes the extension (popup or keyboard shortcut)
 - `scripting`: scan fields and run a user-started typing session
 - `storage`: retain preferences such as speed, style, delays, sound, and theme
+- `clipboardRead` (optional, off by default): enables the clipboard-typing shortcut; requested only when the user turns it on in the gear menu, revocable there at any time. Clipboard content is typed transiently and never stored
 
 Typed text, detected fields, selectors, and passwords are not persisted to disk by default. For the keyboard shortcut, the most recent script is mirrored to `chrome.storage.session` (memory-only, cleared when the browser closes); an explicit opt-in setting ("Remember text after restart") additionally stores it in `chrome.storage.local`, and it can be cleared at any time from the settings menu.
 
@@ -46,6 +47,8 @@ The extension has no host permissions, accounts, analytics, or cloud synchroniza
 | Command | Default | Notes |
 | --- | --- | --- |
 | Type your saved text into the focused field | `Alt+Shift+T` | Uses the last script started from the popup |
+| Type your clipboard into the focused field | `Alt+Shift+C` | Requires the opt-in clipboard permission (gear menu) |
+| Show or hide AI icons on input fields | `Alt+Shift+A` | Field assistant; also available from the popup switch row |
 | Pause or resume the current typing session | `Alt+Shift+P` | |
 | Stop the current typing session | unbound | Assign at `chrome://extensions/shortcuts` |
 

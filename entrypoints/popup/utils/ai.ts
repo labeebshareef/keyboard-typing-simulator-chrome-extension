@@ -188,14 +188,17 @@ export async function generateSitePresets(
   context: PageContext,
   signal?: AbortSignal
 ): Promise<DemoPreset[]> {
-  const raw = await session.prompt(
-    `The user is on the website "${context.title}" (${context.host}) and wants short sample ` +
-      'texts to type into input fields there for a product demo or test. Propose 3-4 preset ' +
-      'ideas. Each has a "label" (2-3 words, shown on a button) and an "instruction" (one ' +
-      'sentence telling a writer exactly what short text to produce, with an approximate ' +
-      'word count under 70). Make them specific to what people actually type on this site.',
-    { responseConstraint: SITE_PRESET_SCHEMA, signal }
-  );
+  const instruction = [
+    `The user is on the website "${context.title}" (${context.host}) and wants short sample`,
+    'texts to type into input fields there for a product demo or test. Propose 3-4 preset',
+    'ideas. Each has a "label" (2-3 words, shown on a button) and an "instruction" (one',
+    'sentence telling a writer exactly what short text to produce, with an approximate',
+    'word count under 70). Make them specific to what people actually type on this site.',
+  ].join(' ');
+  const raw = await session.prompt(instruction, {
+    responseConstraint: SITE_PRESET_SCHEMA,
+    signal,
+  });
 
   const parsed = JSON.parse(raw) as { presets?: Array<{ label?: unknown; instruction?: unknown }> };
   const presets = (parsed.presets ?? [])

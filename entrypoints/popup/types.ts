@@ -35,6 +35,13 @@ export interface AdvancedTypingConfig {
   interFieldDelay: number; // 0-5 seconds
 }
 
+// Field assistant (in-page ✨ icons). `enabled` is the master kill switch:
+// when false, neither the popup button nor Alt+Shift+A can inject the
+// assistant. Icons only ever appear per-page on explicit invocation.
+export interface AssistantPreferences {
+  enabled: boolean;
+}
+
 // Keyboard-shortcut behavior. The last script is always mirrored to
 // chrome.storage.session (memory-only); persistScript opts in to keeping a
 // copy in chrome.storage.local so the shortcut works after a browser restart.
