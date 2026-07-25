@@ -35,6 +35,13 @@ export interface AdvancedTypingConfig {
   interFieldDelay: number; // 0-5 seconds
 }
 
+// Keyboard-shortcut behavior. The last script is always mirrored to
+// chrome.storage.session (memory-only); persistScript opts in to keeping a
+// copy in chrome.storage.local so the shortcut works after a browser restart.
+export interface ShortcutPreferences {
+  persistScript: boolean;
+}
+
 // UI state persisted across popup opens (accordion expansion, last tab)
 export interface UiPreferences {
   activeTab: PopupTab;

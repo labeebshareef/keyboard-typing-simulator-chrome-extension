@@ -27,9 +27,12 @@ describe('sanitizePreferences', () => {
           moreOptionsExpanded: false,
           timingExpanded: true,
         },
+        shortcut: {
+          persistScript: true,
+        },
       })
     ).toEqual({
-      version: 2,
+      version: 3,
       typing: {
         delay: 10,
         includeMistakes: true,
@@ -46,6 +49,9 @@ describe('sanitizePreferences', () => {
         activeTab: 'advanced',
         moreOptionsExpanded: false,
         timingExpanded: true,
+      },
+      shortcut: {
+        persistScript: true,
       },
     });
   });
@@ -67,12 +73,42 @@ describe('sanitizePreferences', () => {
       theme: 'light',
     });
 
-    expect(result.version).toBe(2);
+    expect(result.version).toBe(3);
     expect(result.typing.delay).toBe(120);
     expect(result.typing.typingStyle).toBe('word-by-word');
     expect(result.advanced.hideExtension).toBe(true);
     expect(result.theme).toBe('light');
     expect(result.ui).toEqual(defaultPreferences.ui);
+    expect(result.shortcut).toEqual(defaultPreferences.shortcut);
+  });
+
+  it('migrates v2 payloads (no shortcut section) without losing settings', () => {
+    const result = sanitizePreferences({
+      version: 2,
+      typing: {
+        delay: 80,
+        includeMistakes: false,
+        soundEnabled: true,
+        typingStyle: 'normal',
+      },
+      advanced: {
+        initialDelay: 3,
+        hideExtension: false,
+        interFieldDelay: 1,
+      },
+      theme: 'dark',
+      ui: {
+        activeTab: 'advanced',
+        moreOptionsExpanded: false,
+        timingExpanded: true,
+      },
+    });
+
+    expect(result.version).toBe(3);
+    expect(result.typing.delay).toBe(80);
+    expect(result.ui.activeTab).toBe('advanced');
+    // Privacy default: persistScript stays off unless explicitly enabled.
+    expect(result.shortcut).toEqual({ persistScript: false });
   });
 
   it('falls back to ui defaults for malformed ui values', () => {
@@ -87,9 +123,24 @@ describe('sanitizePreferences', () => {
     expect(result.ui).toEqual(defaultPreferences.ui);
   });
 
+  it('falls back to shortcut defaults for malformed shortcut values', () => {
+    const result = sanitizePreferences({
+      shortcut: {
+        persistScript: 'yes',
+      },
+    });
+
+    expect(result.shortcut).toEqual(defaultPreferences.shortcut);
+  });
+
   it('round-trips ui state', () => {
     const ui = { activeTab: 'advanced', moreOptionsExpanded: false, timingExpanded: true };
     expect(sanitizePreferences({ ...defaultPreferences, ui }).ui).toEqual(ui);
+  });
+
+  it('round-trips shortcut opt-in', () => {
+    const shortcut = { persistScript: true };
+    expect(sanitizePreferences({ ...defaultPreferences, shortcut }).shortcut).toEqual(shortcut);
   });
 
   it('does not copy unknown or sensitive values', () => {

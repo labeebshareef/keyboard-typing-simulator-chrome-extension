@@ -1,6 +1,6 @@
-# Keyboard Typing Simulator Chrome Extension
+# GhostType Chrome Extension
 
-A Manifest V3 extension built with WXT, React 18, TypeScript, Tailwind CSS, Lucide React, Vitest, and Biome.
+GhostType — Auto Typer & Typing Simulator. Realistic human-style typing for demos, screen recordings, tutorials, and form testing. A Manifest V3 extension built with WXT, React 18, TypeScript, Tailwind CSS, Lucide React, Vitest, and Biome.
 
 ## Development
 
@@ -33,14 +33,26 @@ Password inputs, browser-internal pages, Chrome Web Store pages, inaccessible fr
 
 The extension requests these permissions:
 
-- `activeTab`: access only the tab where the user invokes the extension
+- `activeTab`: access only the tab where the user invokes the extension (popup or keyboard shortcut)
 - `scripting`: scan fields and run a user-started typing session
 - `storage`: retain preferences such as speed, style, delays, sound, and theme
 
-Typed text, detected fields, selectors, passwords, and recent text are not persisted. The extension has no host permissions, accounts, analytics, cloud synchronization, or background service worker.
+Typed text, detected fields, selectors, and passwords are not persisted to disk by default. For the keyboard shortcut, the most recent script is mirrored to `chrome.storage.session` (memory-only, cleared when the browser closes); an explicit opt-in setting ("Remember text after restart") additionally stores it in `chrome.storage.local`, and it can be cleared at any time from the settings menu.
+
+The extension has no host permissions, accounts, analytics, or cloud synchronization. The only background component is an event-driven service worker that exists solely to handle keyboard shortcuts — it has no network access and registers no listeners beyond `chrome.commands.onCommand`.
+
+## Keyboard Shortcuts
+
+| Command | Default | Notes |
+| --- | --- | --- |
+| Type your saved text into the focused field | `Alt+Shift+T` | Uses the last script started from the popup |
+| Pause or resume the current typing session | `Alt+Shift+P` | |
+| Stop the current typing session | unbound | Assign at `chrome://extensions/shortcuts` |
+
+Defaults may install unbound if another extension already claimed them; the settings menu surfaces the current binding and links to `chrome://extensions/shortcuts` for rebinding.
 
 ## Architecture
 
-Both basic and advanced workflows use one tab-scoped injected typing engine. The page owns the active session so reopening the popup can recover progress and controls. Scans use opaque tokens and retained element references, selected fields are preflighted before mutation, and page modifications are cleaned on completion, stop, rescan, explicit clear, or timeout.
+Both basic and advanced workflows use one tab-scoped injected typing engine. The page owns the active session so reopening the popup can recover progress and controls. Scans use opaque tokens and retained element references, selected fields are preflighted before mutation, and page modifications are cleaned on completion, stop, rescan, explicit clear, or timeout. The background service worker reuses the same injected engine functions for shortcut-initiated sessions.
 
-The audit, implementation phases, performance budgets, and release checklist are tracked in [docs/modernization-plan.md](docs/modernization-plan.md).
+The audit, implementation phases, performance budgets, and release checklist are tracked in [docs/modernization-plan.md](docs/modernization-plan.md). The rebrand and feature roadmap is tracked in [docs/ghosttype-implementation-plan.md](docs/ghosttype-implementation-plan.md).

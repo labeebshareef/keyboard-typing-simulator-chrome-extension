@@ -1,8 +1,8 @@
 {
-  "name": "keyboard-typing-simulator",
-  "description": "Intelligent typing simulator extension for web developers with adjustable speed controls",
+  "name": "ghosttype",
+  "description": "GhostType — realistic human-style typing for demos, screen recordings, tutorials and form testing",
   "private": true,
-  "version": "2.3.0",
+  "version": "3.0.0",
   "type": "module",
   "scripts": {
     "dev": "wxt",

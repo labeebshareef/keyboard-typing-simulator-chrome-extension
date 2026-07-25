@@ -4,17 +4,18 @@ export default {
   theme: {
     extend: {
       colors: {
+        // GhostType brand indigo, anchored on #5B5BD6 (see brand brief).
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
+          50: '#f1f1fb',
+          100: '#e3e3f8',
+          200: '#c9c9f0',
+          300: '#ababe7',
+          400: '#8384dd',
+          500: '#5b5bd6',
+          600: '#4a48c4',
+          700: '#3d3aa5',
+          800: '#333185',
+          900: '#2d2c6b',
         },
       },
     },

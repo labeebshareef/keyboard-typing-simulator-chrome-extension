@@ -40,7 +40,9 @@ export function getPageTypingStatus(): TypingSessionStatus {
   );
 }
 
-export function controlPageTyping(action: 'pause' | 'resume' | 'stop'): TypingSessionStatus {
+export function controlPageTyping(
+  action: 'pause' | 'resume' | 'stop' | 'toggle-pause'
+): TypingSessionStatus {
   type SessionWindow = Window & {
     __ktsSession?: {
       status: TypingSessionStatus;
@@ -64,16 +66,21 @@ export function controlPageTyping(action: 'pause' | 'resume' | 'stop'): TypingSe
     };
   }
 
-  if (action === 'pause' && ['delaying', 'running'].includes(session.status.phase)) {
+  // Keyboard users can't see popup state, so the shortcut sends a toggle and
+  // the page-side session resolves it to pause or resume.
+  const resolvedAction =
+    action === 'toggle-pause' ? (session.status.phase === 'paused' ? 'resume' : 'pause') : action;
+
+  if (resolvedAction === 'pause' && ['delaying', 'running'].includes(session.status.phase)) {
     session.paused = true;
     session.status.phase = 'paused';
     session.status.message = 'Typing paused';
-  } else if (action === 'resume' && session.status.phase === 'paused') {
+  } else if (resolvedAction === 'resume' && session.status.phase === 'paused') {
     session.paused = false;
     session.status.phase = 'running';
     session.status.message = 'Typing resumed';
   } else if (
-    action === 'stop' &&
+    resolvedAction === 'stop' &&
     !['stopped', 'completed', 'failed', 'idle'].includes(session.status.phase)
   ) {
     session.stopped = true;
@@ -238,7 +245,7 @@ export function scanPageForTypingFields(): ScanResult {
   if (fields.length > 0) {
     const style = document.createElement('style');
     style.id = `kts-scan-style-${scanToken}`;
-    style.textContent = `[data-kts-scan-token="${CSS.escape(scanToken)}"] { outline: 2px solid rgba(37, 99, 235, 0.75) !important; outline-offset: 2px !important; }`;
+    style.textContent = `[data-kts-scan-token="${CSS.escape(scanToken)}"] { outline: 2px solid rgba(91, 91, 214, 0.8) !important; outline-offset: 2px !important; }`;
     (document.head ?? document.documentElement).append(style);
   }
 

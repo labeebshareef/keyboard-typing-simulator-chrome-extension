@@ -1,6 +1,7 @@
 import type {
   AdvancedTypingConfig,
   PopupTab,
+  ShortcutPreferences,
   ThemePreference,
   TypingConfig,
   TypingStyle,
@@ -8,15 +9,16 @@ import type {
 } from '../types';
 
 export interface Preferences {
-  version: 2;
+  version: 3;
   typing: TypingConfig;
   advanced: AdvancedTypingConfig;
   theme: ThemePreference;
   ui: UiPreferences;
+  shortcut: ShortcutPreferences;
 }
 
 export const defaultPreferences: Preferences = {
-  version: 2,
+  version: 3,
   typing: {
     delay: 50,
     includeMistakes: false,
@@ -35,6 +37,11 @@ export const defaultPreferences: Preferences = {
     // persists collapsed once the user collapses it.
     moreOptionsExpanded: true,
     timingExpanded: false,
+  },
+  shortcut: {
+    // Privacy default: the shortcut's saved script lives in session storage
+    // only. Users opt in to disk persistence explicitly.
+    persistScript: false,
   },
 };
 
@@ -55,12 +62,14 @@ export const sanitizePreferences = (value: unknown): Preferences => {
   const advanced = isRecord(value.advanced) ? value.advanced : {};
   // v1 payloads have no `ui` section; defaults fill it in.
   const ui = isRecord(value.ui) ? value.ui : {};
+  // v1/v2 payloads have no `shortcut` section; defaults fill it in.
+  const shortcut = isRecord(value.shortcut) ? value.shortcut : {};
   const styles: TypingStyle[] = ['normal', 'random', 'word-by-word'];
   const themes: ThemePreference[] = ['light', 'dark', 'system'];
   const tabs: PopupTab[] = ['basic', 'advanced'];
 
   return {
-    version: 2,
+    version: 3,
     typing: {
       delay: clampNumber(typing.delay, 10, 300, defaultPreferences.typing.delay),
       includeMistakes: asBoolean(typing.includeMistakes, defaultPreferences.typing.includeMistakes),
@@ -96,6 +105,9 @@ export const sanitizePreferences = (value: unknown): Preferences => {
         defaultPreferences.ui.moreOptionsExpanded
       ),
       timingExpanded: asBoolean(ui.timingExpanded, defaultPreferences.ui.timingExpanded),
+    },
+    shortcut: {
+      persistScript: asBoolean(shortcut.persistScript, defaultPreferences.shortcut.persistScript),
     },
   };
 };

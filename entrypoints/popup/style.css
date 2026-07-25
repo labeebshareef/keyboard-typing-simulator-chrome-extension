@@ -11,7 +11,7 @@
   --text: #172033;
   --text-muted: #5b6474;
   --border: #d7dce3;
-  --focus: #2563eb;
+  --focus: #5b5bd6;
 }
 
 :root[data-theme="dark"] {
@@ -21,7 +21,7 @@
   --text: #f3f4f6;
   --text-muted: #b9bec8;
   --border: #3d424a;
-  --focus: #60a5fa;
+  --focus: #8384dd;
 }
 
 body {
