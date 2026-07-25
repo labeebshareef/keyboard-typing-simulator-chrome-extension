@@ -7,7 +7,7 @@ export default defineConfig({
     name: 'GhostType — Auto Typer & Typing Simulator',
     description:
       'Types your text like a human — real speed, natural pauses, optional typos. For demos, screen recordings, tutorials & form testing.',
-    version: '3.0.0',
+    version: '3.1.0',
     // Unchanged permission set: pressing a command shortcut grants activeTab
     // for that tab, so the background worker can inject the engine without
     // any new permissions (and without a new install-time warning).

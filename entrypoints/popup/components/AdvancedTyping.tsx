@@ -1,8 +1,11 @@
-import { RotateCcw, Scan } from 'lucide-react';
+import { RotateCcw, Scan, Sparkles } from 'lucide-react';
 import { useRef, useState } from 'react';
 import type React from 'react';
+import type { AiControls } from '../hooks/useAi';
 import type { AdvancedTypingConfig, DetectedField } from '../types';
+import { aiFillFields } from '../utils/ai';
 import { cleanupPageScan, scanPageForTypingFields } from '../utils/injected-engine';
+import { localFillFields } from '../utils/sample-data';
 import FieldList from './FieldList';
 import TimingOptions from './TimingOptions';
 
@@ -11,6 +14,7 @@ interface AdvancedTypingProps {
   updateConfig: (updates: Partial<AdvancedTypingConfig>) => void;
   fields: DetectedField[];
   onFieldsChange: (fields: DetectedField[]) => void;
+  ai: AiControls;
   disabled: boolean;
   timingExpanded: boolean;
   onToggleTiming: (expanded: boolean) => void;
@@ -21,11 +25,13 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
   updateConfig,
   fields,
   onFieldsChange,
+  ai,
   disabled,
   timingExpanded,
   onToggleTiming,
 }) => {
   const [isScanning, setIsScanning] = useState(false);
+  const [isFilling, setIsFilling] = useState(false);
   const [scanMessage, setScanMessage] = useState('');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const listHeadingRef = useRef<HTMLHeadingElement>(null);
@@ -88,6 +94,41 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
     }
   };
 
+  /**
+   * Fill every enabled field with plausible sample values: on-device AI when
+   * Gemini Nano is ready, the deterministic local generator otherwise (and as
+   * silent fallback when AI fails). Only field metadata is ever sent to the
+   * model — never page content.
+   */
+  const handleAutoFill = async () => {
+    setIsFilling(true);
+    setScanMessage('Filling fields with sample data');
+    try {
+      let filled: DetectedField[];
+      let usedAi = false;
+      if (ai.availability === 'available') {
+        const session = await ai.ensureSession();
+        if (session) {
+          filled = await aiFillFields(session, fields);
+          usedAi = true;
+        } else {
+          filled = localFillFields(fields);
+        }
+      } else {
+        filled = localFillFields(fields);
+      }
+      onFieldsChange(filled);
+      const count = fields.filter((field) => field.enabled).length;
+      setScanMessage(
+        `Filled ${count} field${count === 1 ? '' : 's'} with ${
+          usedAi ? 'on-device AI' : 'built-in sample data'
+        }.`
+      );
+    } finally {
+      setIsFilling(false);
+    }
+  };
+
   const updateField = (id: string, updates: Partial<DetectedField>) => {
     onFieldsChange(fields.map((field) => (field.id === id ? { ...field, ...updates } : field)));
   };
@@ -115,6 +156,25 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
             <Scan aria-hidden="true" className="h-4 w-4" />
             {isScanning ? 'Scanning...' : fields.length ? 'Rescan page' : 'Scan page'}
           </button>
+          {fields.length > 0 && !disabled && (
+            <button
+              type="button"
+              onClick={() => void handleAutoFill()}
+              disabled={isFilling || isScanning}
+              className="inline-flex items-center justify-center gap-1.5 rounded-md border
+                         border-[var(--border)] px-2.5 text-xs font-medium text-[var(--text-muted)]
+                         hover:bg-black/5 hover:text-[var(--text)] disabled:cursor-not-allowed
+                         disabled:opacity-50 dark:hover:bg-white/5"
+              title={
+                ai.availability === 'available'
+                  ? 'Fill enabled fields using on-device AI'
+                  : 'Fill enabled fields with built-in sample data'
+              }
+            >
+              <Sparkles aria-hidden="true" className="h-3.5 w-3.5" />
+              {isFilling ? 'Filling…' : 'Auto-fill'}
+            </button>
+          )}
           {fields.length > 0 && !disabled && (
             <button
               type="button"

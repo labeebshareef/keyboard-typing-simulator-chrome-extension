@@ -1,5 +1,7 @@
 import type React from 'react';
+import type { AiControls } from '../hooks/useAi';
 import type { TypingConfig } from '../types';
+import AiAssist from './AiAssist';
 import InlineTuning from './InlineTuning';
 import MoreOptions from './MoreOptions';
 import TypingArea from './TypingArea';
@@ -9,6 +11,7 @@ interface BasicTypingProps {
   setText: (text: string) => void;
   typingConfig: TypingConfig;
   updateTypingConfig: (updates: Partial<TypingConfig>) => void;
+  ai: AiControls;
   disabled: boolean;
   moreOptionsExpanded: boolean;
   onToggleMoreOptions: (expanded: boolean) => void;
@@ -19,6 +22,7 @@ const BasicTyping: React.FC<BasicTypingProps> = ({
   setText,
   typingConfig,
   updateTypingConfig,
+  ai,
   disabled,
   moreOptionsExpanded,
   onToggleMoreOptions,
@@ -26,6 +30,8 @@ const BasicTyping: React.FC<BasicTypingProps> = ({
   return (
     <div className="scroll-region min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
       <TypingArea text={text} setText={setText} disabled={disabled} />
+
+      <AiAssist ai={ai} text={text} setText={setText} disabled={disabled} />
 
       <InlineTuning
         typingConfig={typingConfig}

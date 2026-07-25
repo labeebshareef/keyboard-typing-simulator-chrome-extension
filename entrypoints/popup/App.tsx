@@ -7,6 +7,7 @@ import BasicTyping from './components/BasicTyping';
 import HeaderMenu from './components/HeaderMenu';
 import ReviewAskCard from './components/ReviewAskCard';
 import TabNavigation from './components/TabNavigation';
+import { useAi } from './hooks/useAi';
 import { useTypingSession } from './hooks/useTypingSession';
 import type {
   AdvancedTypingConfig,
@@ -21,7 +22,7 @@ import { saveLastScript } from './utils/last-script';
 import { defaultPreferences, loadPreferences, savePreferences } from './utils/preferences';
 import { recordCompletedSession } from './utils/review-ask';
 
-const APP_VERSION = 'v3.0.0';
+const APP_VERSION = 'v3.1.0';
 
 const App: React.FC = () => {
   const [typingConfig, setTypingConfig] = useState<TypingConfig>(defaultPreferences.typing);
@@ -41,6 +42,7 @@ const App: React.FC = () => {
   const [detectedFields, setDetectedFields] = useState<DetectedField[]>([]);
 
   const typingSession = useTypingSession();
+  const ai = useAi();
   const isTypingInProgress = typingSession.isActive;
   const activeTab = ui.activeTab;
 
@@ -178,6 +180,7 @@ const App: React.FC = () => {
             setText={setText}
             typingConfig={typingConfig}
             updateTypingConfig={updateTypingConfig}
+            ai={ai}
             disabled={isTypingInProgress}
             moreOptionsExpanded={ui.moreOptionsExpanded}
             onToggleMoreOptions={(expanded) => updateUi({ moreOptionsExpanded: expanded })}
@@ -188,6 +191,7 @@ const App: React.FC = () => {
             updateConfig={updateAdvancedConfig}
             fields={detectedFields}
             onFieldsChange={setDetectedFields}
+            ai={ai}
             disabled={isTypingInProgress}
             timingExpanded={ui.timingExpanded}
             onToggleTiming={(expanded) => updateUi({ timingExpanded: expanded })}
