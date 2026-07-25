@@ -1,3 +1,4 @@
+import { Clapperboard } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import logo from './assets/images/ktsLogo-popup.png?url';
@@ -22,7 +23,7 @@ import { saveLastScript } from './utils/last-script';
 import { defaultPreferences, loadPreferences, savePreferences } from './utils/preferences';
 import { recordCompletedSession } from './utils/review-ask';
 
-const APP_VERSION = 'v3.1.0';
+const APP_VERSION = 'v3.2.0';
 
 const App: React.FC = () => {
   const [typingConfig, setTypingConfig] = useState<TypingConfig>(defaultPreferences.typing);
@@ -120,6 +121,16 @@ const App: React.FC = () => {
     setShortcut((prev) => ({ ...prev, ...updates }));
   };
 
+  /** Hand the current script to the export page and open it in a tab. */
+  const handleOpenExport = async () => {
+    try {
+      await chrome.storage.session.set({ exportPayload: { text, typingConfig } });
+    } catch {
+      // The export page falls back to manual text entry.
+    }
+    void chrome.tabs.create({ url: chrome.runtime.getURL('/export.html') });
+  };
+
   const canStart =
     activeTab === 'basic'
       ? text.trim().length > 0
@@ -153,7 +164,23 @@ const App: React.FC = () => {
       <div className="flex shrink-0 items-center gap-2 border-b border-[var(--border)] px-4 py-2.5">
         <img src={logo} alt="" className="h-7 w-auto" />
         <h1 className="text-sm font-semibold">GhostType</h1>
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-0.5">
+          <button
+            type="button"
+            onClick={() => void handleOpenExport()}
+            disabled={!text.trim()}
+            aria-label="Export typing as video or GIF"
+            title={
+              text.trim()
+                ? 'Export typing as video or GIF'
+                : 'Enter text in the Basic tab to export a typing video'
+            }
+            className="flex items-center justify-center rounded-md p-1.5 text-[var(--text-muted)]
+                       transition-colors hover:bg-black/5 hover:text-[var(--text)]
+                       disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-white/5"
+          >
+            <Clapperboard aria-hidden="true" className="h-4 w-4" />
+          </button>
           <HeaderMenu
             theme={theme}
             updateTheme={setTheme}

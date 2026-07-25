@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --surface: #f8fafc;
+  --surface-raised: #ffffff;
+  --text: #172033;
+  --text-muted: #5b6474;
+  --border: #d7dce3;
+  --focus: #5b5bd6;
+}
+
+body {
+  font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+  margin: 0;
+  background: var(--surface);
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
