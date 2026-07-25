@@ -1,53 +1,45 @@
-import { useState } from 'react';
 import type React from 'react';
-import type { TypingConfig, TypingSessionStatus } from '../types';
-import ProgressDisplay from './ProgressDisplay';
+import type { TypingConfig } from '../types';
+import InlineTuning from './InlineTuning';
+import MoreOptions from './MoreOptions';
 import TypingArea from './TypingArea';
-import TypingControls from './TypingControls';
 
 interface BasicTypingProps {
-  config: TypingConfig;
-  session: {
-    status: TypingSessionStatus;
-    isActive: boolean;
-    startBasic: (text: string, config: TypingConfig) => Promise<boolean>;
-    pause: () => Promise<void>;
-    resume: () => Promise<void>;
-    stop: () => Promise<void>;
-  };
+  text: string;
+  setText: (text: string) => void;
+  typingConfig: TypingConfig;
+  updateTypingConfig: (updates: Partial<TypingConfig>) => void;
+  disabled: boolean;
+  moreOptionsExpanded: boolean;
+  onToggleMoreOptions: (expanded: boolean) => void;
 }
 
-const BasicTyping: React.FC<BasicTypingProps> = ({ config, session }) => {
-  const [text, setText] = useState('');
-
-  const getButtonState = () => {
-    if (!session.isActive) return 'start';
-    if (session.status.phase === 'paused') return 'resume';
-    return 'pause';
-  };
-
-  const handleMainAction = () => {
-    if (!session.isActive) return session.startBasic(text, config);
-    return session.status.phase === 'paused' ? session.resume() : session.pause();
-  };
-
+const BasicTyping: React.FC<BasicTypingProps> = ({
+  text,
+  setText,
+  typingConfig,
+  updateTypingConfig,
+  disabled,
+  moreOptionsExpanded,
+  onToggleMoreOptions,
+}) => {
   return (
-    <div className="p-4 space-y-4">
-      {/* Typing Area */}
-      <TypingArea text={text} setText={setText} disabled={session.isActive} />
+    <div className="scroll-region min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
+      <TypingArea text={text} setText={setText} disabled={disabled} />
 
-      {/* Typing Controls */}
-      <TypingControls
-        buttonState={getButtonState()}
-        onStart={handleMainAction}
-        onPauseResume={handleMainAction}
-        onStop={session.stop}
-        disabled={!session.isActive && !text.trim()}
-        isTyping={session.isActive}
+      <InlineTuning
+        typingConfig={typingConfig}
+        updateTypingConfig={updateTypingConfig}
+        disabled={disabled}
       />
 
-      {/* Progress Display */}
-      {session.isActive && <ProgressDisplay progress={session.status.progress} />}
+      <MoreOptions
+        typingConfig={typingConfig}
+        updateTypingConfig={updateTypingConfig}
+        disabled={disabled}
+        expanded={moreOptionsExpanded}
+        onToggle={onToggleMoreOptions}
+      />
     </div>
   );
 };

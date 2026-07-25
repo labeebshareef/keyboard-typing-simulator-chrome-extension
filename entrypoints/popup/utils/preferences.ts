@@ -1,14 +1,22 @@
-import type { AdvancedTypingConfig, ThemePreference, TypingConfig, TypingStyle } from '../types';
+import type {
+  AdvancedTypingConfig,
+  PopupTab,
+  ThemePreference,
+  TypingConfig,
+  TypingStyle,
+  UiPreferences,
+} from '../types';
 
 export interface Preferences {
-  version: 1;
+  version: 2;
   typing: TypingConfig;
   advanced: AdvancedTypingConfig;
   theme: ThemePreference;
+  ui: UiPreferences;
 }
 
 export const defaultPreferences: Preferences = {
-  version: 1,
+  version: 2,
   typing: {
     delay: 50,
     includeMistakes: false,
@@ -21,6 +29,13 @@ export const defaultPreferences: Preferences = {
     interFieldDelay: 1,
   },
   theme: 'system',
+  ui: {
+    activeTab: 'basic',
+    // Expanded on first run so newcomers see what lives behind the disclosure;
+    // persists collapsed once the user collapses it.
+    moreOptionsExpanded: true,
+    timingExpanded: false,
+  },
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -31,25 +46,25 @@ const clampNumber = (value: unknown, minimum: number, maximum: number, fallback:
     ? Math.min(maximum, Math.max(minimum, value))
     : fallback;
 
+const asBoolean = (value: unknown, fallback: boolean) =>
+  typeof value === 'boolean' ? value : fallback;
+
 export const sanitizePreferences = (value: unknown): Preferences => {
   if (!isRecord(value)) return defaultPreferences;
   const typing = isRecord(value.typing) ? value.typing : {};
   const advanced = isRecord(value.advanced) ? value.advanced : {};
+  // v1 payloads have no `ui` section; defaults fill it in.
+  const ui = isRecord(value.ui) ? value.ui : {};
   const styles: TypingStyle[] = ['normal', 'random', 'word-by-word'];
   const themes: ThemePreference[] = ['light', 'dark', 'system'];
+  const tabs: PopupTab[] = ['basic', 'advanced'];
 
   return {
-    version: 1,
+    version: 2,
     typing: {
       delay: clampNumber(typing.delay, 10, 300, defaultPreferences.typing.delay),
-      includeMistakes:
-        typeof typing.includeMistakes === 'boolean'
-          ? typing.includeMistakes
-          : defaultPreferences.typing.includeMistakes,
-      soundEnabled:
-        typeof typing.soundEnabled === 'boolean'
-          ? typing.soundEnabled
-          : defaultPreferences.typing.soundEnabled,
+      includeMistakes: asBoolean(typing.includeMistakes, defaultPreferences.typing.includeMistakes),
+      soundEnabled: asBoolean(typing.soundEnabled, defaultPreferences.typing.soundEnabled),
       typingStyle: styles.includes(typing.typingStyle as TypingStyle)
         ? (typing.typingStyle as TypingStyle)
         : defaultPreferences.typing.typingStyle,
@@ -61,10 +76,7 @@ export const sanitizePreferences = (value: unknown): Preferences => {
         10,
         defaultPreferences.advanced.initialDelay
       ),
-      hideExtension:
-        typeof advanced.hideExtension === 'boolean'
-          ? advanced.hideExtension
-          : defaultPreferences.advanced.hideExtension,
+      hideExtension: asBoolean(advanced.hideExtension, defaultPreferences.advanced.hideExtension),
       interFieldDelay: clampNumber(
         advanced.interFieldDelay,
         0,
@@ -75,6 +87,16 @@ export const sanitizePreferences = (value: unknown): Preferences => {
     theme: themes.includes(value.theme as ThemePreference)
       ? (value.theme as ThemePreference)
       : defaultPreferences.theme,
+    ui: {
+      activeTab: tabs.includes(ui.activeTab as PopupTab)
+        ? (ui.activeTab as PopupTab)
+        : defaultPreferences.ui.activeTab,
+      moreOptionsExpanded: asBoolean(
+        ui.moreOptionsExpanded,
+        defaultPreferences.ui.moreOptionsExpanded
+      ),
+      timingExpanded: asBoolean(ui.timingExpanded, defaultPreferences.ui.timingExpanded),
+    },
   };
 };
 

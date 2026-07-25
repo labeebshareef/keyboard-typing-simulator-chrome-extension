@@ -1,24 +1,41 @@
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import logo from './assets/images/ktsLogo-popup.png?url';
+import ActionBar from './components/ActionBar';
 import AdvancedTyping from './components/AdvancedTyping';
 import BasicTyping from './components/BasicTyping';
-import SettingsSidebar from './components/SettingsSidebar';
+import HeaderMenu from './components/HeaderMenu';
 import TabNavigation from './components/TabNavigation';
 import { useTypingSession } from './hooks/useTypingSession';
-import type { AdvancedTypingConfig, ThemePreference, TypingConfig } from './types';
+import type {
+  AdvancedTypingConfig,
+  DetectedField,
+  PopupTab,
+  ThemePreference,
+  TypingConfig,
+  UiPreferences,
+} from './types';
 import { defaultPreferences, loadPreferences, savePreferences } from './utils/preferences';
 
+const APP_VERSION = 'v2.3.0';
+
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'basic' | 'advanced'>('basic');
   const [typingConfig, setTypingConfig] = useState<TypingConfig>(defaultPreferences.typing);
   const [advancedConfig, setAdvancedConfig] = useState<AdvancedTypingConfig>(
     defaultPreferences.advanced
   );
   const [theme, setTheme] = useState<ThemePreference>(defaultPreferences.theme);
+  const [ui, setUi] = useState<UiPreferences>(defaultPreferences.ui);
   const [preferencesLoaded, setPreferencesLoaded] = useState(false);
+
+  // Session inputs live here so the ActionBar can gate Start and scan
+  // results survive tab switches.
+  const [text, setText] = useState('');
+  const [detectedFields, setDetectedFields] = useState<DetectedField[]>([]);
+
   const typingSession = useTypingSession();
   const isTypingInProgress = typingSession.isActive;
+  const activeTab = ui.activeTab;
 
   useEffect(() => {
     let disposed = false;
@@ -27,6 +44,7 @@ const App: React.FC = () => {
       setTypingConfig(preferences.typing);
       setAdvancedConfig(preferences.advanced);
       setTheme(preferences.theme);
+      setUi(preferences.ui);
       setPreferencesLoaded(true);
     });
     return () => {
@@ -37,12 +55,13 @@ const App: React.FC = () => {
   useEffect(() => {
     if (!preferencesLoaded) return;
     void savePreferences({
-      version: 1,
+      version: 2,
       typing: typingConfig,
       advanced: advancedConfig,
       theme,
+      ui,
     }).catch(() => undefined);
-  }, [advancedConfig, preferencesLoaded, theme, typingConfig]);
+  }, [advancedConfig, preferencesLoaded, theme, typingConfig, ui]);
 
   useEffect(() => {
     const media = window.matchMedia('(prefers-color-scheme: dark)');
@@ -55,6 +74,13 @@ const App: React.FC = () => {
     return () => media.removeEventListener('change', applyTheme);
   }, [theme]);
 
+  // When the popup reopens mid-session, land on the tab of the running mode.
+  const sessionMode = typingSession.status.mode;
+  useEffect(() => {
+    if (!isTypingInProgress || !sessionMode) return;
+    setUi((prev) => (prev.activeTab === sessionMode ? prev : { ...prev, activeTab: sessionMode }));
+  }, [isTypingInProgress, sessionMode]);
+
   const updateTypingConfig = (updates: Partial<TypingConfig>) => {
     setTypingConfig((prev) => ({ ...prev, ...updates }));
   };
@@ -63,56 +89,84 @@ const App: React.FC = () => {
     setAdvancedConfig((prev) => ({ ...prev, ...updates }));
   };
 
+  const updateUi = (updates: Partial<UiPreferences>) => {
+    setUi((prev) => ({ ...prev, ...updates }));
+  };
+
+  const canStart =
+    activeTab === 'basic'
+      ? text.trim().length > 0
+      : detectedFields.some((field) => field.enabled && field.text.trim());
+
+  const startHint =
+    activeTab === 'basic'
+      ? 'Enter text to begin'
+      : detectedFields.length === 0
+        ? 'Scan the page to detect fields'
+        : 'Enable at least one field and add text';
+
+  const handleStart = async () => {
+    if (activeTab === 'basic') {
+      await typingSession.startBasic(text, typingConfig);
+      return;
+    }
+    const fields = detectedFields
+      .filter((field) => field.enabled && field.text.trim())
+      .sort((left, right) => left.priority - right.priority);
+    if (fields.length === 0) return;
+    const started = await typingSession.startAdvanced(fields, typingConfig, advancedConfig);
+    if (started && advancedConfig.hideExtension) window.close();
+  };
+
   return (
-    <div className="app-shell flex h-[600px] w-full flex-col bg-[var(--surface)] text-[var(--text)]">
-      <div className="flex items-center gap-2 border-b border-[var(--border)] px-4 py-3">
+    <div className="app-shell flex max-h-[var(--popup-max-height)] min-h-[320px] w-full flex-col bg-[var(--surface)] text-[var(--text)]">
+      <div className="flex shrink-0 items-center gap-2 border-b border-[var(--border)] px-4 py-2.5">
         <img src={logo} alt="" className="h-7 w-auto" />
-        <h1 className="text-base font-semibold">Keyboard Typing Simulator</h1>
-        <span className="ml-auto text-xs text-[var(--text-muted)]">v2.3.0</span>
+        <h1 className="text-sm font-semibold">Keyboard Typing Simulator</h1>
+        <div className="ml-auto">
+          <HeaderMenu theme={theme} updateTheme={setTheme} version={APP_VERSION} />
+        </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="border-b border-[var(--border)] bg-[var(--surface-raised)] px-4 py-2">
+      <div className="shrink-0 border-b border-[var(--border)] bg-[var(--surface-raised)] px-4 py-2">
         <TabNavigation
           activeTab={activeTab}
-          onTabChange={setActiveTab}
+          onTabChange={(tab: PopupTab) => updateUi({ activeTab: tab })}
           disabled={isTypingInProgress}
         />
       </div>
 
-      <div className="flex-1 overflow-y-auto">
-        <main>
-          {activeTab === 'basic' ? (
-            <BasicTyping config={typingConfig} session={typingSession} />
-          ) : (
-            <AdvancedTyping
-              config={advancedConfig}
-              typingConfig={typingConfig}
-              disabled={isTypingInProgress}
-              session={typingSession}
-            />
-          )}
-        </main>
+      <main className="flex min-h-0 flex-1 flex-col">
+        {activeTab === 'basic' ? (
+          <BasicTyping
+            text={text}
+            setText={setText}
+            typingConfig={typingConfig}
+            updateTypingConfig={updateTypingConfig}
+            disabled={isTypingInProgress}
+            moreOptionsExpanded={ui.moreOptionsExpanded}
+            onToggleMoreOptions={(expanded) => updateUi({ moreOptionsExpanded: expanded })}
+          />
+        ) : (
+          <AdvancedTyping
+            config={advancedConfig}
+            updateConfig={updateAdvancedConfig}
+            fields={detectedFields}
+            onFieldsChange={setDetectedFields}
+            disabled={isTypingInProgress}
+            timingExpanded={ui.timingExpanded}
+            onToggleTiming={(expanded) => updateUi({ timingExpanded: expanded })}
+          />
+        )}
+      </main>
 
-        <SettingsSidebar
-          typingConfig={typingConfig}
-          updateTypingConfig={updateTypingConfig}
-          advancedConfig={activeTab === 'advanced' ? advancedConfig : undefined}
-          updateAdvancedConfig={activeTab === 'advanced' ? updateAdvancedConfig : undefined}
-          disabled={isTypingInProgress}
-          showAdvancedSettings={activeTab === 'advanced'}
-          theme={theme}
-          updateTheme={setTheme}
-        />
-      </div>
-
-      <div
-        aria-live="polite"
-        className="min-h-9 border-t border-[var(--border)] bg-[var(--surface-raised)] px-4 py-2 text-xs text-[var(--text-muted)]"
-        role={typingSession.error ? 'alert' : 'status'}
-      >
-        {typingSession.error || typingSession.status.message || 'Ready'}
-      </div>
+      <ActionBar
+        session={typingSession}
+        canStart={canStart && !isTypingInProgress}
+        startHint={startHint}
+        onStart={handleStart}
+      />
     </div>
   );
 };

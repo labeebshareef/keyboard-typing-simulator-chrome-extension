@@ -1,5 +1,6 @@
 export type TypingStyle = 'normal' | 'random' | 'word-by-word';
 export type ThemePreference = 'light' | 'dark' | 'system';
+export type PopupTab = 'basic' | 'advanced';
 
 export interface TypingConfig {
   delay: number;
@@ -32,6 +33,13 @@ export interface AdvancedTypingConfig {
   initialDelay: number; // 0-10 seconds
   hideExtension: boolean;
   interFieldDelay: number; // 0-5 seconds
+}
+
+// UI state persisted across popup opens (accordion expansion, last tab)
+export interface UiPreferences {
+  activeTab: PopupTab;
+  moreOptionsExpanded: boolean;
+  timingExpanded: boolean;
 }
 
 export type TypingSessionPhase =

@@ -1,43 +1,34 @@
-import { Pause, Play, RotateCcw, Scan, Square } from 'lucide-react';
-import { useState } from 'react';
+import { RotateCcw, Scan } from 'lucide-react';
+import { useRef, useState } from 'react';
 import type React from 'react';
-import type {
-  AdvancedTypingConfig,
-  DetectedField,
-  TypingConfig,
-  TypingSessionStatus,
-} from '../types';
+import type { AdvancedTypingConfig, DetectedField } from '../types';
 import { cleanupPageScan, scanPageForTypingFields } from '../utils/injected-engine';
 import FieldList from './FieldList';
-import ProgressDisplay from './ProgressDisplay';
+import TimingOptions from './TimingOptions';
 
 interface AdvancedTypingProps {
   config: AdvancedTypingConfig;
-  typingConfig: TypingConfig;
+  updateConfig: (updates: Partial<AdvancedTypingConfig>) => void;
+  fields: DetectedField[];
+  onFieldsChange: (fields: DetectedField[]) => void;
   disabled: boolean;
-  session: {
-    status: TypingSessionStatus;
-    isActive: boolean;
-    startAdvanced: (
-      fields: DetectedField[],
-      typingConfig: TypingConfig,
-      advancedConfig: AdvancedTypingConfig
-    ) => Promise<boolean>;
-    pause: () => Promise<void>;
-    resume: () => Promise<void>;
-    stop: () => Promise<void>;
-  };
+  timingExpanded: boolean;
+  onToggleTiming: (expanded: boolean) => void;
 }
 
 const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
   config,
-  typingConfig,
+  updateConfig,
+  fields,
+  onFieldsChange,
   disabled,
-  session,
+  timingExpanded,
+  onToggleTiming,
 }) => {
-  const [detectedFields, setDetectedFields] = useState<DetectedField[]>([]);
   const [isScanning, setIsScanning] = useState(false);
   const [scanMessage, setScanMessage] = useState('');
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const listHeadingRef = useRef<HTMLHeadingElement>(null);
 
   const handleScanPage = async () => {
     setIsScanning(true);
@@ -63,12 +54,14 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
         return;
       }
 
-      setDetectedFields(scan.fields);
+      onFieldsChange(scan.fields);
       setScanMessage(
         scan.fields.length === 0
           ? 'No supported editable fields were found.'
           : `Found ${scan.fields.length} editable field${scan.fields.length === 1 ? '' : 's'}.`
       );
+      // Land keyboard users on the results.
+      if (scan.fields.length > 0) listHeadingRef.current?.focus();
     } catch {
       setScanMessage('The page could not be scanned. Refresh it and try again.');
     } finally {
@@ -77,8 +70,8 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
   };
 
   const handleClearScan = async () => {
-    const scanToken = detectedFields[0]?.scanToken;
-    setDetectedFields([]);
+    const scanToken = fields[0]?.scanToken;
+    onFieldsChange([]);
     setScanMessage('Scan cleared');
     if (!scanToken) return;
 
@@ -95,110 +88,80 @@ const AdvancedTyping: React.FC<AdvancedTypingProps> = ({
     }
   };
 
-  const handleStartTyping = async () => {
-    const fields = detectedFields
-      .filter((field) => field.enabled && field.text.trim())
-      .sort((left, right) => left.priority - right.priority);
-    if (fields.length === 0) {
-      setScanMessage('Enable at least one field and add text before starting.');
-      return;
-    }
-
-    const started = await session.startAdvanced(fields, typingConfig, config);
-    if (started && config.hideExtension) window.close();
-  };
-
   const updateField = (id: string, updates: Partial<DetectedField>) => {
-    setDetectedFields((fields) =>
-      fields.map((field) => (field.id === id ? { ...field, ...updates } : field))
-    );
+    onFieldsChange(fields.map((field) => (field.id === id ? { ...field, ...updates } : field)));
   };
 
   const reorderFields = (newFields: DetectedField[]) => {
-    setDetectedFields(newFields.map((field, index) => ({ ...field, priority: index + 1 })));
+    onFieldsChange(newFields.map((field, index) => ({ ...field, priority: index + 1 })));
   };
 
-  const isPaused = session.status.phase === 'paused';
-
   return (
-    <div className="space-y-4 p-4">
-      <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={handleScanPage}
-          disabled={disabled || isScanning}
-          className="flex flex-1 items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2.5 font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300"
-        >
-          <Scan aria-hidden="true" className="h-4 w-4" />
-          {isScanning ? 'Scanning...' : detectedFields.length ? 'Scan again' : 'Scan page'}
-        </button>
-        {detectedFields.length > 0 && !session.isActive && (
+    <div className="flex min-h-0 flex-1 flex-col">
+      {/* Pinned scan bar */}
+      <div className="shrink-0 px-4 pb-2 pt-3">
+        <div className="flex gap-2">
           <button
             type="button"
-            onClick={handleClearScan}
-            className="inline-flex items-center justify-center rounded-md border border-gray-300 p-2.5 text-gray-700 hover:bg-gray-50"
-            aria-label="Clear detected fields and page highlights"
-            title="Clear scan"
+            onClick={handleScanPage}
+            disabled={disabled || isScanning}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 font-semibold
+                       transition-colors disabled:cursor-not-allowed disabled:bg-gray-300 ${
+                         fields.length > 0
+                           ? 'border border-[var(--border)] bg-[var(--surface-raised)] py-2 text-sm text-[var(--text)] hover:bg-black/5 dark:hover:bg-white/5'
+                           : 'bg-primary-500 py-2.5 text-white hover:bg-primary-600'
+                       }`}
           >
-            <RotateCcw aria-hidden="true" className="h-4 w-4" />
+            <Scan aria-hidden="true" className="h-4 w-4" />
+            {isScanning ? 'Scanning...' : fields.length ? 'Rescan page' : 'Scan page'}
           </button>
-        )}
+          {fields.length > 0 && !disabled && (
+            <button
+              type="button"
+              onClick={handleClearScan}
+              className="inline-flex items-center justify-center rounded-md border
+                         border-[var(--border)] p-2 text-[var(--text-muted)]
+                         hover:bg-black/5 hover:text-[var(--text)] dark:hover:bg-white/5"
+              aria-label="Clear detected fields and page highlights"
+              title="Clear scan"
+            >
+              <RotateCcw aria-hidden="true" className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+        <p
+          aria-live="polite"
+          className="mt-1.5 min-h-4 text-center text-xs text-[var(--text-muted)]"
+        >
+          {scanMessage}
+        </p>
       </div>
 
-      <p aria-live="polite" className="min-h-5 text-center text-xs text-gray-600">
-        {scanMessage}
-      </p>
-
-      {detectedFields.length > 0 && (
+      {/* The one scroll region: the unbounded field list */}
+      <div
+        ref={scrollContainerRef}
+        className="scroll-region min-h-0 flex-1 overflow-y-auto px-4 pb-2"
+      >
         <FieldList
-          fields={detectedFields}
+          fields={fields}
           onUpdateField={updateField}
           onReorderFields={reorderFields}
-          disabled={session.isActive}
+          disabled={disabled}
+          scrollContainerRef={scrollContainerRef}
+          headingRef={listHeadingRef}
         />
-      )}
+      </div>
 
-      {session.isActive && session.status.mode === 'advanced' ? (
-        <div className="space-y-3">
-          <ProgressDisplay progress={session.status.progress} />
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={isPaused ? session.resume : session.pause}
-              className="flex flex-1 items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2.5 font-semibold text-white hover:bg-blue-700"
-            >
-              {isPaused ? (
-                <Play aria-hidden="true" className="h-4 w-4" />
-              ) : (
-                <Pause aria-hidden="true" className="h-4 w-4" />
-              )}
-              {isPaused ? 'Resume' : 'Pause'}
-            </button>
-            <button
-              type="button"
-              onClick={session.stop}
-              className="flex items-center justify-center gap-2 rounded-md bg-red-600 px-4 py-2.5 font-semibold text-white hover:bg-red-700"
-            >
-              <Square aria-hidden="true" className="h-4 w-4" />
-              Stop
-            </button>
-          </div>
-        </div>
-      ) : (
-        detectedFields.length > 0 && (
-          <button
-            type="button"
-            onClick={handleStartTyping}
-            disabled={
-              disabled || detectedFields.every((field) => !field.enabled || !field.text.trim())
-            }
-            className="flex w-full items-center justify-center gap-2 rounded-md bg-green-600 px-4 py-2.5 font-semibold text-white transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-300"
-          >
-            <Play aria-hidden="true" className="h-4 w-4" />
-            Start typing
-          </button>
-        )
-      )}
+      {/* Pinned timing accordion */}
+      <div className="shrink-0 px-4 pb-3 pt-1">
+        <TimingOptions
+          config={config}
+          updateConfig={updateConfig}
+          disabled={disabled}
+          expanded={timingExpanded}
+          onToggle={onToggleTiming}
+        />
+      </div>
     </div>
   );
 };

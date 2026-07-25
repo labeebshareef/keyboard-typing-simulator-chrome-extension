@@ -1,10 +1,16 @@
 import type React from 'react';
+import type { PopupTab } from '../types';
 
 interface TabNavigationProps {
-  activeTab: 'basic' | 'advanced';
-  onTabChange: (tab: 'basic' | 'advanced') => void;
+  activeTab: PopupTab;
+  onTabChange: (tab: PopupTab) => void;
   disabled?: boolean;
 }
+
+const TABS: Array<{ id: PopupTab; label: string }> = [
+  { id: 'basic', label: 'Basic Typing' },
+  { id: 'advanced', label: 'Advanced Typing' },
+];
 
 const TabNavigation: React.FC<TabNavigationProps> = ({
   activeTab,
@@ -12,35 +18,28 @@ const TabNavigation: React.FC<TabNavigationProps> = ({
   disabled = false,
 }) => {
   return (
-    <div className="flex rounded-md bg-gray-100 p-1" role="tablist" aria-label="Typing mode">
-      <button
-        type="button"
-        role="tab"
-        aria-selected={activeTab === 'basic'}
-        onClick={() => onTabChange('basic')}
-        disabled={disabled}
-        className={`flex-1 py-1.5 px-3 text-sm font-medium rounded-md transition-colors duration-200 ${
-          activeTab === 'basic'
-            ? 'bg-white text-gray-900 shadow-sm'
-            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-        } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-      >
-        Basic Typing
-      </button>
-      <button
-        type="button"
-        role="tab"
-        aria-selected={activeTab === 'advanced'}
-        onClick={() => onTabChange('advanced')}
-        disabled={disabled}
-        className={`flex-1 py-1.5 px-3 text-sm font-medium rounded-md transition-colors duration-200 ${
-          activeTab === 'advanced'
-            ? 'bg-white text-gray-900 shadow-sm'
-            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-        } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-      >
-        Advanced Typing
-      </button>
+    <div
+      className="flex rounded-md border border-[var(--border)] bg-[var(--surface)] p-1"
+      role="tablist"
+      aria-label="Typing mode"
+    >
+      {TABS.map((tab) => (
+        <button
+          key={tab.id}
+          type="button"
+          role="tab"
+          aria-selected={activeTab === tab.id}
+          onClick={() => onTabChange(tab.id)}
+          disabled={disabled}
+          className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors duration-200 ${
+            activeTab === tab.id
+              ? 'bg-[var(--surface-raised)] text-[var(--text)] shadow-sm'
+              : 'text-[var(--text-muted)] hover:text-[var(--text)]'
+          } ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}
+        >
+          {tab.label}
+        </button>
+      ))}
     </div>
   );
 };
