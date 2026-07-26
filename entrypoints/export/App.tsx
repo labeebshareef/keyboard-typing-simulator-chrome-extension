@@ -158,8 +158,8 @@ const App: React.FC = () => {
         signal: controller.signal,
       };
       const blob = kind === 'webm' ? await encodeWebM(job) : await encodeGif(job);
-      downloadBlob(blob, kind === 'webm' ? 'ghosttype-typing.webm' : 'ghosttype-typing.gif');
-      setNote(`Done — saved ghosttype-typing.${kind === 'webm' ? 'webm' : 'gif'}.`);
+      downloadBlob(blob, kind === 'webm' ? 'typereel-typing.webm' : 'typereel-typing.gif');
+      setNote(`Done — saved typereel-typing.${kind === 'webm' ? 'webm' : 'gif'}.`);
     } catch (error) {
       setNote(
         error instanceof DOMException && error.name === 'AbortError'
@@ -190,7 +190,7 @@ const App: React.FC = () => {
     <div className="mx-auto flex min-h-screen max-w-5xl flex-col gap-6 p-6">
       <header className="flex items-center gap-2">
         <Clapperboard aria-hidden="true" className="h-5 w-5 text-primary-500" />
-        <h1 className="text-lg font-semibold">GhostType — Typing video export</h1>
+        <h1 className="text-lg font-semibold">TypeReel — Typing video export</h1>
         <span className="ml-auto text-xs text-[var(--text-muted)]">
           ~{clipSeconds}s clip · runs entirely on your machine
         </span>
@@ -334,7 +334,7 @@ const App: React.FC = () => {
               disabled={isBusy}
               className="h-4 w-4 accent-primary-500"
             />
-            End with a “Typed with GhostType” frame
+            End with a “Typed with TypeReel” frame
           </label>
 
           <div className="space-y-2 border-t border-[var(--border)] pt-4">

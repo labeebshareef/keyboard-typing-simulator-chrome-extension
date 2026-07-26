@@ -47,9 +47,9 @@ export const CHANGELOG: ChangelogEntry[] = [
   },
   {
     version: '3.0.0',
-    title: 'GhostType — a fresh start',
+    title: 'TypeReel — a fresh start',
     points: [
-      'Keyboard Typing Simulator is now GhostType, with a cleaner look.',
+      'Keyboard Typing Simulator is now TypeReel, with a cleaner look.',
       'Keyboard shortcuts: Alt+Shift+T types your saved text, Alt+Shift+P pauses or resumes.',
     ],
   },

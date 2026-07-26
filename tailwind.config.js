@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // GhostType brand indigo, anchored on #5B5BD6 (see brand brief).
+        // TypeReel brand indigo, anchored on #5B5BD6 (see brand brief).
         primary: {
           50: '#f1f1fb',
           100: '#e3e3f8',

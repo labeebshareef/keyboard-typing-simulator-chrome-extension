@@ -235,7 +235,7 @@ const HeaderMenu: React.FC<HeaderMenuProps> = ({
           </button>
 
           <div className="my-1 border-t border-[var(--border)]" />
-          <p className="px-3 py-1 text-xs text-[var(--text-muted)]">GhostType {version}</p>
+          <p className="px-3 py-1 text-xs text-[var(--text-muted)]">TypeReel {version}</p>
         </div>
       )}
     </div>

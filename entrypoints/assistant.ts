@@ -170,7 +170,7 @@ function mount(): AssistantHandle {
   icon.type = 'button';
   icon.className = 'kts-icon';
   icon.innerHTML = CARET_GLYPH;
-  icon.title = 'Generate with GhostType (AI runs on your device) · Alt+Shift+A to hide';
+  icon.title = 'Generate with TypeReel (AI runs on your device) · Alt+Shift+A to hide';
   shadow.appendChild(icon);
 
   let currentField: HTMLElement | null = null;
@@ -272,8 +272,8 @@ function mount(): AssistantHandle {
     icon.classList.toggle('kts-stop', stop);
     icon.innerHTML = stop ? STOP_GLYPH : CARET_GLYPH;
     icon.title = stop
-      ? 'Stop GhostType typing'
-      : 'Generate with GhostType (AI runs on your device) · Alt+Shift+A to hide';
+      ? 'Stop TypeReel typing'
+      : 'Generate with TypeReel (AI runs on your device) · Alt+Shift+A to hide';
   };
 
   /** Poll runs ONLY while the icon is visible; drives the stop-morph. */
@@ -403,8 +403,8 @@ function mount(): AssistantHandle {
 
   showStatus(
     alreadyOnField
-      ? 'GhostType is on — tap the ✨ icon to generate. Alt+Shift+A hides it.'
-      : 'GhostType is on — click any text field to generate. Alt+Shift+A hides it.'
+      ? 'TypeReel is on — tap the ✨ icon to generate. Alt+Shift+A hides it.'
+      : 'TypeReel is on — click any text field to generate. Alt+Shift+A hides it.'
   );
 
   return {

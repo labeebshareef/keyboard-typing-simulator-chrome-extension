@@ -23,7 +23,7 @@ const ReviewAskCard: React.FC<ReviewAskCardProps> = ({ onClose }) => {
     >
       <Star aria-hidden="true" className="h-4 w-4 shrink-0 text-primary-500" />
       <p className="flex-1 text-xs text-[var(--text)]">
-        Enjoying GhostType? A review really helps an indie extension.
+        Enjoying TypeReel? A review really helps an indie extension.
       </p>
       <button
         type="button"

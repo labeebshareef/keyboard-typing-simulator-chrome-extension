@@ -18,11 +18,11 @@
  *   and the service worker without host permissions.
  */
 
-// Served from the public `ghosttype-config` repo (see
+// Served from the public `typereel-config` repo (see
 // docs/update-system-setup.md). If this URL ever 404s, the gate silently
 // stays open — safe either way.
 export const REMOTE_CONFIG_URL =
-  'https://raw.githubusercontent.com/labeebshareef/ghosttype-config/main/config.json';
+  'https://raw.githubusercontent.com/labeebshareef/typereel-config/main/config.json';
 
 /** Chrome Web Store listing — fallback target for the Update button. */
 export const STORE_URL =
@@ -52,7 +52,7 @@ export interface GateStatus {
 }
 
 const DEFAULT_MESSAGE =
-  'This version of GhostType is out of date and no longer supported. ' +
+  'This version of TypeReel is out of date and no longer supported. ' +
   'Update to the latest version to keep typing — it only takes a moment.';
 
 const VERSION_PATTERN = /^\d+(\.\d+){0,3}$/;

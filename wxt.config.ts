@@ -4,9 +4,11 @@ export default defineConfig({
   extensionApi: 'chrome',
   modules: ['@wxt-dev/module-react'],
   manifest: {
-    name: 'GhostType — Auto Typer & Typing Simulator',
+    // Store title (66/75 chars) — keyword rationale in webstore-deployment.md §1.
+    name: 'TypeReel — Realistic Typing Simulator & Auto Typer for Demo Videos',
+    // CWS summary (129/132 chars) — Variant A (demo hook), webstore-deployment.md §2.
     description:
-      'Types your text like a human — real speed, natural pauses, optional typos. For demos, screen recordings, tutorials & form testing.',
+      'Realistic human typing for demo videos, tutorials and screen recordings. On-device AI writes and fills forms. Export GIF or WebM.',
     version: '3.3.0',
     // Unchanged permission set: pressing a command shortcut grants activeTab
     // for that tab, so the background worker can inject the engine without

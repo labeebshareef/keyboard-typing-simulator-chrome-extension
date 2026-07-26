@@ -198,7 +198,7 @@ const App: React.FC = () => {
     <div className="app-shell flex max-h-[var(--popup-max-height)] min-h-[320px] w-full flex-col bg-[var(--surface)] text-[var(--text)]">
       <div className="flex shrink-0 items-center gap-2 border-b border-[var(--border)] px-4 py-2.5">
         <img src={logo} alt="" className="h-7 w-auto" />
-        <h1 className="text-sm font-semibold">GhostType</h1>
+        <h1 className="text-sm font-semibold">TypeReel</h1>
         <div className="ml-auto flex items-center gap-0.5">
           <button
             type="button"

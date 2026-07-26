@@ -1,6 +1,6 @@
 {
-  "name": "ghosttype",
-  "description": "GhostType — realistic human-style typing for demos, screen recordings, tutorials and form testing",
+  "name": "typereel",
+  "description": "TypeReel — realistic human-style typing for demos, screen recordings, tutorials and form testing",
   "private": true,
   "version": "3.3.0",
   "type": "module",

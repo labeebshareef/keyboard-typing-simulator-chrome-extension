@@ -1,6 +1,6 @@
-# GhostType Chrome Extension
+# TypeReel Chrome Extension
 
-GhostType — Auto Typer & Typing Simulator. Realistic human-style typing for demos, screen recordings, tutorials, and form testing. A Manifest V3 extension built with WXT, React 18, TypeScript, Tailwind CSS, Lucide React, Vitest, and Biome.
+TypeReel — Realistic Typing Simulator & Auto Typer for Demo Videos. Human-like typing for demo videos, screen recordings, tutorials, and form testing. A Manifest V3 extension built with WXT, React 18, TypeScript, Tailwind CSS, Lucide React, Vitest, and Biome.
 
 ## Development
 

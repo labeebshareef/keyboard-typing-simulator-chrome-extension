@@ -14,7 +14,7 @@ Shipped in v3.3.0. Two pieces:
 
 ## One-time setup (~2 minutes)
 
-1. Create a **public** GitHub repo named `ghosttype-config` (any GitHub
+1. Create a **public** GitHub repo named `typereel-config` (any GitHub
    account, free).
 2. Add a file `config.json` at the repo root — copy
    `docs/remote-config/config.json` from this project. Keep `minVersion` at
@@ -34,7 +34,7 @@ lowest version you still allow, e.g.:
 ```json
 {
   "minVersion": "4.0.0",
-  "message": "This version of GhostType is out of date and no longer supported. Update to keep typing.",
+  "message": "This version of TypeReel is out of date and no longer supported. Update to keep typing.",
   "updateUrl": "https://chromewebstore.google.com/detail/flieihjecdghlbgbmjbilfcabbdplanh"
 }
 ```

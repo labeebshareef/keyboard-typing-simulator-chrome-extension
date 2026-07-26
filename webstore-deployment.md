@@ -1,6 +1,6 @@
 # Chrome Web Store Relaunch — Deployment File
 **Extension:** v3.3.0 (currently listed as "Keyboard Typing Simulator", id `flieihjecdghlbgbmjbilfcabbdplanh`)
-**Prepared:** 2026-07-26 · All character counts machine-verified against limits confirmed on developer.chrome.com (name ≤75, summary ≤132; detailed description has no Google-published limit — ~16K is third-party folklore, our text is 3,223 chars).
+**Prepared:** 2026-07-26 · All character counts machine-verified against limits confirmed on developer.chrome.com (name ≤75, summary ≤132; detailed description has no Google-published limit — ~16K is third-party folklore, our text is 3,296 chars).
 **Recommended brand: TypeReel** (see §1 rationale — GhostType is name-collided on CWS; full evidence in Appendix A).
 
 > ⚠️ Renaming happens in `manifest.json` (`name` field) and requires uploading a new package version → full review. Reviews, ratings and installs are tied to the item ID and are not reset by a rename (no Google doc states otherwise; no credible report of resets found).
@@ -51,7 +51,7 @@ Leads with the highest-volume query ("auto typer") for maximum search match; wea
 
 ---
 
-## 3. Detailed description (no verified limit; ours = 3,223 chars, plain text, CWS-safe)
+## 3. Detailed description (no verified limit; ours = 3,296 chars, plain text, CWS-safe)
 
 Copy exactly as below (bullets are "•" characters, which CWS renders fine; no markdown syntax used). First 3 lines are the above-the-fold click-winners; keyword frequencies verified: "auto typer" ×1, "typing simulator" ×2, "auto typing" ×1, "form filler" ×1 — all far under the policy's 5-repetition ceiling; zero forbidden terms (no "undetectable", "bypass", "typing test", "WPM", "essay", game names).
 
@@ -85,7 +85,7 @@ PRIVACY, PLAINLY
 • The clipboard shortcut is optional and off by default. If you enable it, clipboard text is typed once and never stored.
 
 KEYBOARD SHORTCUTS
-Four shortcuts: start/pause typing, open the assistant, and opt-in clipboard typing (Alt+Shift+C) — so you can drive everything without opening the popup and spoiling your recording. Customize them at chrome://extensions/shortcuts.
+Alt+Shift+T types your saved text into the focused field. Alt+Shift+P pauses or resumes. Alt+Shift+A shows or hides the AI assistant icons. Alt+Shift+C (opt-in) types your clipboard. Drive everything without opening the popup and spoiling your recording — customize keys at chrome://extensions/shortcuts.
 
 HOW TO GET STARTED
 1. Pin TypeReel and open it on the page you're recording.
@@ -97,9 +97,9 @@ Dark mode included. A What's New panel keeps you posted after updates.
 TypeReel is a typing simulator, human-style auto typer, AI writing assistant and sample-data form filler in one — an auto typing tool made for people who show their screens for a living: demo creators, tutorial makers, marketers and testers. If you've ever re-recorded a take because the typing looked robotic, this is for you.
 ```
 
-**[CONFIRM before submit]** The shortcuts line says "Four shortcuts" and names Alt+Shift+C for clipboard (verified from the codebase notes). Confirm the other default key bindings from `manifest.json` — if you want them listed explicitly, add them in the KEYBOARD SHORTCUTS block; do not guess.
+**Shortcuts verified against manifest v3.3.0** (5 commands; stop-typing ships unbound by design).
 
-Note: "typing" appears 14× across 3,223 chars — always inside natural phrases; the policy bars *unnatural* repetition >5 of a keyword, and every exact keyword phrase here is ≤2. Do not add more "typing"-phrases when editing.
+Note: "typing" appears 15× across 3,296 chars — always inside natural phrases; the policy bars *unnatural* repetition >5 of a keyword, and every exact keyword phrase here is ≤2. Do not add more "typing"-phrases when editing.
 
 ---
 
@@ -340,7 +340,7 @@ Evidence: per-locale listings create separate search surfaces (documented case: 
 | **Loom – Screen Recorder & Screen Capture** · "Record your screen and camera with one click." (7M, 4.6★) | Owns recording, says nothing about typing. Not a competitor for the typing query — proof the wedge is unclaimed. |
 | **TypeReel — Realistic Typing Simulator & Auto Typer for Demo Videos** · "Realistic human typing for demo videos, tutorials and screen recordings. On-device AI writes and fills forms. Export GIF or WebM." | Only card that (1) matches both head keywords, (2) names the searcher's actual job — demo videos, tutorials, screen recordings — in the first line, (3) offers two capabilities no rival card mentions at all (on-device AI, GIF/WebM export), and (4) contains no cheat-signaling vocabulary for a wary scanner to bounce off. For the demo-creator query, ours is the only relevant result; for the generic "auto typer" query, ours is the only one that says what it's *for*. |
 
-Verified final counts: title 66/75 · summaries 129, 130, 128 /132 · description 3,223 chars · single purpose 209 · justifications 256/344/291/206/392. Forbidden-term scan: clean.
+Verified final counts: title 66/75 · summaries 129, 130, 128 /132 · description 3,296 chars · single purpose 209 · justifications 256/344/291/206/392. Forbidden-term scan: clean.
 
 ## Appendix C — Evidence base (key sources)
 

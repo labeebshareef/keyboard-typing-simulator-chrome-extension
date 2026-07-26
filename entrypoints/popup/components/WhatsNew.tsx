@@ -32,12 +32,12 @@ const WhatsNew: React.FC<WhatsNewProps> = ({ entries, onClose }) => {
       // biome-ignore lint/a11y/useSemanticElements: native <dialog> needs showModal() for backdrop + modality; a role="dialog" overlay is simpler inside the extension popup
       role="dialog"
       aria-modal="true"
-      aria-label="What's new in GhostType"
+      aria-label="What's new in TypeReel"
     >
       <div className="flex w-full max-w-sm flex-col rounded-xl border border-[var(--border)] bg-[var(--surface-raised)] shadow-xl">
         <div className="flex items-center gap-2 border-b border-[var(--border)] px-4 py-3">
           <Sparkles aria-hidden="true" className="h-4 w-4 text-primary-500" />
-          <h2 className="flex-1 text-sm font-semibold text-[var(--text)]">GhostType updated</h2>
+          <h2 className="flex-1 text-sm font-semibold text-[var(--text)]">TypeReel updated</h2>
           <button
             type="button"
             onClick={finish}

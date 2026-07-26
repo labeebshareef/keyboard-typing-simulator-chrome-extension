@@ -155,7 +155,7 @@ export function drawEndFrame(context: CanvasRenderingContext2D, size: SizePreset
   context.fillStyle = '#5b5bd6';
   context.fillRect(0, 0, width, height);
 
-  const title = 'Typed with GhostType';
+  const title = 'Typed with TypeReel';
   const titleSize = Math.round(fontSize * 1.1);
   context.font = `600 ${titleSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
   context.textBaseline = 'middle';

@@ -157,7 +157,7 @@ async function handleCommand(command: string, tabId: number): Promise<void> {
   const gate = await getGateStatus();
   if (gate.blocked) {
     void refreshRemoteConfig();
-    await toast(tabId, 'GhostType: an update is required — click the GhostType icon to update.');
+    await toast(tabId, 'TypeReel: an update is required — click the TypeReel icon to update.');
     // Ask Chrome to fetch the update in the background as well.
     try {
       chrome.runtime.requestUpdateCheck(() => undefined);
@@ -174,10 +174,7 @@ async function handleCommand(command: string, tabId: number): Promise<void> {
         .contains({ permissions: ['clipboardRead'] })
         .catch(() => false);
       if (!hasPermission) {
-        await toast(
-          tabId,
-          'GhostType: enable clipboard typing first — extension icon → gear menu.'
-        );
+        await toast(tabId, 'TypeReel: enable clipboard typing first — extension icon → gear menu.');
         return;
       }
       try {
@@ -187,7 +184,7 @@ async function handleCommand(command: string, tabId: number): Promise<void> {
         });
         const clipboard = (read[0]?.result ?? '').slice(0, 50_000);
         if (!clipboard.trim()) {
-          await toast(tabId, 'GhostType: your clipboard is empty.');
+          await toast(tabId, 'TypeReel: your clipboard is empty.');
           return;
         }
         const preferences = await loadPreferences();
@@ -199,10 +196,10 @@ async function handleCommand(command: string, tabId: number): Promise<void> {
         });
         const result = results[0]?.result;
         if (result && !result.ok) {
-          await toast(tabId, `GhostType: ${result.status.message || 'could not type here.'}`);
+          await toast(tabId, `TypeReel: ${result.status.message || 'could not type here.'}`);
         }
       } catch {
-        await toast(tabId, 'GhostType: this page does not allow typing.');
+        await toast(tabId, 'TypeReel: this page does not allow typing.');
       }
       return;
     }
@@ -210,7 +207,7 @@ async function handleCommand(command: string, tabId: number): Promise<void> {
     case 'type-into-focused-field': {
       const [script, preferences] = await Promise.all([loadLastScript(), loadPreferences()]);
       if (!script) {
-        await toast(tabId, 'GhostType: no text saved yet — open the popup and enter text once.');
+        await toast(tabId, 'TypeReel: no text saved yet — open the popup and enter text once.');
         return;
       }
       try {
@@ -224,11 +221,11 @@ async function handleCommand(command: string, tabId: number): Promise<void> {
         });
         const result = results[0]?.result;
         if (result && !result.ok) {
-          await toast(tabId, `GhostType: ${result.status.message || 'could not type here.'}`);
+          await toast(tabId, `TypeReel: ${result.status.message || 'could not type here.'}`);
         }
       } catch {
         // Chrome-internal pages, the Web Store, blocked frames, etc.
-        await toast(tabId, 'GhostType: this page does not allow typing.');
+        await toast(tabId, 'TypeReel: this page does not allow typing.');
       }
       return;
     }
@@ -236,17 +233,14 @@ async function handleCommand(command: string, tabId: number): Promise<void> {
     case 'toggle-field-assistant': {
       const preferences = await loadPreferences();
       if (!preferences.assistant.enabled) {
-        await toast(
-          tabId,
-          'GhostType: field assistant is off — turn it on in the GhostType popup.'
-        );
+        await toast(tabId, 'TypeReel: field assistant is off — turn it on in the TypeReel popup.');
         return;
       }
       // Executing the assistant file IS the toggle: it mounts on the first
       // run and unmounts on the next (window.__ktsAssistant guard).
       await chrome.scripting
         .executeScript({ target: { tabId }, files: ['assistant.js'] })
-        .catch(() => toast(tabId, 'GhostType: the assistant cannot run on this page.'));
+        .catch(() => toast(tabId, 'TypeReel: the assistant cannot run on this page.'));
       return;
     }
 

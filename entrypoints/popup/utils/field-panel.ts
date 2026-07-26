@@ -110,7 +110,7 @@ export function createFieldPanel(deps: FieldPanelDeps) {
   panel.innerHTML = `
     <div class="kts-row" title="Drag to move">
       <span class="kts-drag-hint" aria-hidden="true">⠿</span>
-      <span class="kts-title">GhostType ✨</span>
+      <span class="kts-title">TypeReel ✨</span>
       <span class="kts-sub" data-el="sub"></span>
       <button class="kts-x" data-el="close" aria-label="Close" title="Close (Esc)">✕</button>
     </div>
@@ -182,7 +182,7 @@ export function createFieldPanel(deps: FieldPanelDeps) {
     noteEl.textContent = ready
       ? 'Runs on your device · nothing leaves your machine.'
       : availability === 'downloadable' || availability === 'downloading'
-        ? 'Enable on-device AI from the GhostType popup. Chips insert samples meanwhile.'
+        ? 'Enable on-device AI from the TypeReel popup. Chips insert samples meanwhile.'
         : 'On-device AI needs Chrome 138+ on a supported desktop. Chips insert samples.';
     setBusy(false);
     reclamp();
