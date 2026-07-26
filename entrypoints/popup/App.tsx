@@ -2,6 +2,7 @@ import { Clapperboard } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import logo from './assets/images/typereelLogo-popup.png?url';
+import wordmark from './assets/images/typereelWordmark.png?url';
 import ActionBar from './components/ActionBar';
 import AdvancedTyping from './components/AdvancedTyping';
 import AssistantToggle from './components/AssistantToggle';
@@ -198,7 +199,22 @@ const App: React.FC = () => {
     <div className="app-shell flex max-h-[var(--popup-max-height)] min-h-[320px] w-full flex-col bg-[var(--surface)] text-[var(--text)]">
       <div className="flex shrink-0 items-center gap-2 border-b border-[var(--border)] px-4 py-2.5">
         <img src={logo} alt="" className="h-7 w-auto" />
-        <h1 className="text-sm font-semibold">TypeReel</h1>
+        {/* Brand wordmark. Painted as a CSS mask so it inherits --text and stays
+            legible in both themes (the source artwork is white-on-transparent). */}
+        <h1
+          aria-label="TypeReel"
+          className="h-4 w-[79px] shrink-0 bg-[var(--text)]"
+          style={{
+            WebkitMaskImage: `url(${wordmark})`,
+            maskImage: `url(${wordmark})`,
+            WebkitMaskSize: 'contain',
+            maskSize: 'contain',
+            WebkitMaskRepeat: 'no-repeat',
+            maskRepeat: 'no-repeat',
+            WebkitMaskPosition: 'center',
+            maskPosition: 'center',
+          }}
+        />
         <div className="ml-auto flex items-center gap-0.5">
           <button
             type="button"
