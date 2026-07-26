@@ -18,11 +18,32 @@ import {
 import { controlPageTyping, startPageTyping } from './popup/utils/injected-engine';
 import { loadLastScript } from './popup/utils/last-script';
 import { loadPreferences } from './popup/utils/preferences';
+import { getGateStatus, refreshRemoteConfig } from './popup/utils/version-gate';
+import { recordInstallEvent } from './popup/utils/whats-new';
 
 export default defineBackground(() => {
   chrome.commands.onCommand.addListener((command, tab) => {
     if (!tab?.id) return; // fired on a window with no eligible tab
     void handleCommand(command, tab.id);
+  });
+
+  // Record install/update events for the one-time release notes, and pull a
+  // fresh compatibility config right away on every version change.
+  chrome.runtime.onInstalled.addListener((details) => {
+    void recordInstallEvent(details.reason, details.previousVersion);
+    void refreshRemoteConfig(true);
+  });
+
+  // Refresh the compatibility config once per browser start (throttled).
+  chrome.runtime.onStartup.addListener(() => {
+    void refreshRemoteConfig();
+  });
+
+  // Apply a downloaded update the moment Chrome reports it. Safe even during
+  // a typing session: the engine runs injected in the page and finishes on
+  // its own — only the popup/worker restart.
+  chrome.runtime.onUpdateAvailable.addListener(() => {
+    chrome.runtime.reload();
   });
 
   // The field assistant's in-page panel connects here to run generation in
@@ -131,6 +152,22 @@ function readPageClipboard(): Promise<string> {
 }
 
 async function handleCommand(command: string, tabId: number): Promise<void> {
+  // Compatibility gate: outdated versions refuse to run. Decision comes from
+  // the cached config (instant); the network refresh happens off this path.
+  const gate = await getGateStatus();
+  if (gate.blocked) {
+    void refreshRemoteConfig();
+    await toast(tabId, 'GhostType: an update is required — click the GhostType icon to update.');
+    // Ask Chrome to fetch the update in the background as well.
+    try {
+      chrome.runtime.requestUpdateCheck(() => undefined);
+    } catch {
+      // throttled or unavailable — the popup path still covers it
+    }
+    return;
+  }
+  void refreshRemoteConfig();
+
   switch (command) {
     case 'type-clipboard-into-field': {
       const hasPermission = await chrome.permissions

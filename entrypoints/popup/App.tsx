@@ -9,6 +9,8 @@ import BasicTyping from './components/BasicTyping';
 import HeaderMenu from './components/HeaderMenu';
 import ReviewAskCard from './components/ReviewAskCard';
 import TabNavigation from './components/TabNavigation';
+import UpdateRequired from './components/UpdateRequired';
+import WhatsNew from './components/WhatsNew';
 import { useAi } from './hooks/useAi';
 import { useTypingSession } from './hooks/useTypingSession';
 import type {
@@ -24,8 +26,10 @@ import type {
 import { saveLastScript } from './utils/last-script';
 import { defaultPreferences, loadPreferences, savePreferences } from './utils/preferences';
 import { recordCompletedSession } from './utils/review-ask';
+import { type GateStatus, checkVersionGate } from './utils/version-gate';
+import { type ChangelogEntry, getPendingWhatsNew } from './utils/whats-new';
 
-const APP_VERSION = 'v3.2.0';
+const APP_VERSION = 'v3.3.0';
 
 const App: React.FC = () => {
   const [typingConfig, setTypingConfig] = useState<TypingConfig>(defaultPreferences.typing);
@@ -38,6 +42,8 @@ const App: React.FC = () => {
   const [assistant, setAssistant] = useState<AssistantPreferences>(defaultPreferences.assistant);
   const [preferencesLoaded, setPreferencesLoaded] = useState(false);
   const [showReviewAsk, setShowReviewAsk] = useState(false);
+  const [gate, setGate] = useState<GateStatus | null>(null);
+  const [whatsNew, setWhatsNew] = useState<ChangelogEntry[] | null>(null);
   const countedSessionRef = useRef<string | null>(null);
 
   // Session inputs live here so the ActionBar can gate Start and scan
@@ -61,6 +67,21 @@ const App: React.FC = () => {
       setShortcut(preferences.shortcut);
       setAssistant(preferences.assistant);
       setPreferencesLoaded(true);
+    });
+    return () => {
+      disposed = true;
+    };
+  }, []);
+
+  // Compatibility gate + one-time release notes. Both resolve from local
+  // storage instantly; the gate's network refresh is throttled internally.
+  useEffect(() => {
+    let disposed = false;
+    void checkVersionGate().then((status) => {
+      if (!disposed && status.blocked) setGate(status);
+    });
+    void getPendingWhatsNew().then((entries) => {
+      if (!disposed && entries) setWhatsNew(entries);
     });
     return () => {
       disposed = true;
@@ -168,6 +189,11 @@ const App: React.FC = () => {
     if (started && advancedConfig.hideExtension) window.close();
   };
 
+  // Below the remote minimum version: the update screen replaces the app.
+  if (gate?.blocked) {
+    return <UpdateRequired status={gate} />;
+  }
+
   return (
     <div className="app-shell flex max-h-[var(--popup-max-height)] min-h-[320px] w-full flex-col bg-[var(--surface)] text-[var(--text)]">
       <div className="flex shrink-0 items-center gap-2 border-b border-[var(--border)] px-4 py-2.5">
@@ -238,6 +264,8 @@ const App: React.FC = () => {
       </main>
 
       {showReviewAsk && <ReviewAskCard onClose={() => setShowReviewAsk(false)} />}
+
+      {whatsNew && <WhatsNew entries={whatsNew} onClose={() => setWhatsNew(null)} />}
 
       <ActionBar
         session={typingSession}

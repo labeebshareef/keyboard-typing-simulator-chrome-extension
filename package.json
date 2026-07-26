@@ -2,7 +2,7 @@
   "name": "ghosttype",
   "description": "GhostType — realistic human-style typing for demos, screen recordings, tutorials and form testing",
   "private": true,
-  "version": "3.2.0",
+  "version": "3.3.0",
   "type": "module",
   "scripts": {
     "dev": "wxt",
