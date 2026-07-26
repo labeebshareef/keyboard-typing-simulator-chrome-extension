@@ -1,7 +1,7 @@
 import { RefreshCw } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
-import logo from '../assets/images/ktsLogo-popup.png?url';
+import logo from '../assets/images/typereelLogo-popup.png?url';
 import type { GateStatus } from '../utils/version-gate';
 
 interface UpdateRequiredProps {

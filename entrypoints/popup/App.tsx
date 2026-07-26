@@ -1,7 +1,7 @@
 import { Clapperboard } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import logo from './assets/images/ktsLogo-popup.png?url';
+import logo from './assets/images/typereelLogo-popup.png?url';
 import ActionBar from './components/ActionBar';
 import AdvancedTyping from './components/AdvancedTyping';
 import AssistantToggle from './components/AssistantToggle';
