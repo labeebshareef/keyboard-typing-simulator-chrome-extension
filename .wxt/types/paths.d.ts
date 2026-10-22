@@ -4,6 +4,9 @@ import "wxt/browser";
 declare module "wxt/browser" {
   export type PublicPath =
     | "/"
+    | "/_locales/en/messages.json"
+    | "/_locales/es/messages.json"
+    | "/_locales/pt_BR/messages.json"
     | "/assistant.js"
     | "/background.js"
     | "/export.html"

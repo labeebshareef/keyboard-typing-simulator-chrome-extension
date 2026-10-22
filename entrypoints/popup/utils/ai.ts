@@ -11,6 +11,10 @@
  * - The model can self-evict when free disk drops below ~10 GB, so
  *   availability is re-checked on every popup open and never cached.
  * - Structured output: pass a JSON Schema as `responseConstraint` (137+).
+ * - Language: create() and availability() take `expectedInputs` /
+ *   `expectedOutputs` with BCP-47 codes. Omitting the output language makes
+ *   Chrome log "No output language was specified in a LanguageModel API
+ *   request" on the extensions page. We prompt and generate in English.
  *
  * Design rule: every entry point has a deterministic local fallback
  * (sample-data.ts), so the feature works for 100% of users and never blocks
@@ -35,7 +39,17 @@ export interface AiSession {
   destroy(): void;
 }
 
-interface AiCreateOptions {
+interface AiLanguageExpectation {
+  type: 'text' | 'image' | 'audio';
+  languages: string[];
+}
+
+interface AiLanguageOptions {
+  expectedInputs?: AiLanguageExpectation[];
+  expectedOutputs?: AiLanguageExpectation[];
+}
+
+interface AiCreateOptions extends AiLanguageOptions {
   initialPrompts?: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>;
   temperature?: number;
   topK?: number;
@@ -44,9 +58,19 @@ interface AiCreateOptions {
 }
 
 interface LanguageModelStatic {
-  availability(): Promise<string>;
+  availability(options?: AiLanguageOptions): Promise<string>;
   create(options?: AiCreateOptions): Promise<AiSession>;
 }
+
+/**
+ * The system prompt and every generator in this file are English, so declare
+ * English in and out. Passed to availability() too, so an unsupported
+ * language reports 'unavailable' instead of failing later in create().
+ */
+const LANGUAGE_OPTIONS: AiLanguageOptions = {
+  expectedInputs: [{ type: 'text', languages: ['en'] }],
+  expectedOutputs: [{ type: 'text', languages: ['en'] }],
+};
 
 /** Feature-detect the Prompt API without polluting the global type space. */
 const getLanguageModel = (): LanguageModelStatic | undefined =>
@@ -64,7 +88,7 @@ export async function getAiAvailability(): Promise<AiAvailability> {
   const languageModel = getLanguageModel();
   if (!languageModel) return 'unavailable';
   try {
-    const state = await languageModel.availability();
+    const state = await languageModel.availability(LANGUAGE_OPTIONS);
     return KNOWN_STATES.includes(state as AiAvailability)
       ? (state as AiAvailability)
       : 'unavailable';
@@ -88,6 +112,7 @@ export async function createAiSession(
   const languageModel = getLanguageModel();
   if (!languageModel) throw new Error('Prompt API unavailable');
   return languageModel.create({
+    ...LANGUAGE_OPTIONS,
     initialPrompts: [{ role: 'system', content: SYSTEM_PROMPT }],
     signal,
     monitor(monitor) {

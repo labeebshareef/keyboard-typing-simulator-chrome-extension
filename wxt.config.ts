@@ -4,12 +4,18 @@ export default defineConfig({
   extensionApi: 'chrome',
   modules: ['@wxt-dev/module-react'],
   manifest: {
-    // Store title (66/75 chars) — keyword rationale in webstore-deployment.md §1.
-    name: 'TypeReel — Realistic Typing Simulator & Auto Typer for Demo Videos',
-    // CWS summary (129/132 chars) — Variant A (demo hook), webstore-deployment.md §2.
-    description:
-      'Realistic human typing for demo videos, tutorials and screen recordings. On-device AI writes and fills forms. Export GIF or WebM.',
-    version: '3.3.0',
+    // Store title, short name and summary live in public/_locales/<lang>/messages.json
+    // (en = default, es, pt_BR). Chrome shows the localized title/summary in the
+    // Web Store search result for that language, so each locale is its own
+    // keyword surface. Limits per locale: title 75 chars, summary 132 chars —
+    // both verified by docs/listing-locales.md. Rationale in webstore-deployment.md §1–2, §12.
+    default_locale: 'en',
+    name: '__MSG_extName__',
+    short_name: '__MSG_extShortName__',
+    description: '__MSG_extDescription__',
+    // 3.3.1 = listing-only release (name order, summary, es/pt-BR locales,
+    // tagged store links). No engine changes.
+    version: '3.3.1',
     // Unchanged permission set: pressing a command shortcut grants activeTab
     // for that tab, so the background worker can inject the engine without
     // any new permissions (and without a new install-time warning).

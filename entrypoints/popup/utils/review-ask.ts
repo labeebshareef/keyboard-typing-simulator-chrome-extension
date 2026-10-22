@@ -4,11 +4,13 @@
  * nothing shown on failures.
  */
 
+import { storeUrl } from './store-links';
+
 const STORAGE_KEY = 'reviewAsk';
 const SESSIONS_BEFORE_ASK = 3;
 
-export const REVIEW_URL =
-  'https://chromewebstore.google.com/detail/flieihjecdghlbgbmjbilfcabbdplanh/reviews';
+/** Store review page, tagged so the dashboard can attribute visits to this card. */
+export const REVIEW_URL = storeUrl('popup', 'review-ask', '/reviews');
 
 interface ReviewAskState {
   completedSessions: number;

@@ -1,5 +1,5 @@
 # Chrome Web Store Relaunch — Deployment File
-**Extension:** v3.3.0 (currently listed as "Keyboard Typing Simulator", id `flieihjecdghlbgbmjbilfcabbdplanh`)
+**Extension:** v3.3.1 (currently listed as "Keyboard Typing Simulator", id `flieihjecdghlbgbmjbilfcabbdplanh`)
 **Prepared:** 2026-07-26 · All character counts machine-verified against limits confirmed on developer.chrome.com (name ≤75, summary ≤132; detailed description has no Google-published limit — ~16K is third-party folklore, our text is 3,296 chars).
 **Recommended brand: TypeReel** (see §1 rationale — GhostType is name-collided on CWS; full evidence in Appendix A).
 
@@ -9,10 +9,11 @@
 
 ## 1. Extension name / store title (limit: 75 chars, verified)
 
-**RECOMMENDED — 66/75 chars:**
+**RECOMMENDED — 66/75 chars (reordered 2026-10-22: keyword-first, brand last — the search result now opens with the words people type; CTR baseline 1.02%):**
 ```
-TypeReel — Realistic Typing Simulator & Auto Typer for Demo Videos
+Realistic Typing Simulator & Auto Typer for Demo Videos — TypeReel
 ```
+Previous (v3.3.0): `TypeReel — Realistic Typing Simulator & Auto Typer for Demo Videos`
 Rationale: "typing simulator" is the winnable head term (category leader has only 30K installs); "auto typer" is the niche's highest-volume pair-term, placed second so we match the query without leading with its cheat-contaminated neighborhood; "Realistic" is the clean differentiator adjective (vs. "human/undetectable" used by cheat-adjacent tools); "for Demo Videos" is the intent firewall — it tells both users and CWS reviewers what this is for. Em-dash separator matches the niche #1 (Duey.ai) pattern. Brand is 8 chars, leaving maximum room for keywords.
 
 **Alternate 1 (if you keep GhostType) — 61/75 chars:**
@@ -31,7 +32,13 @@ Use if you want the AI hypothesis expressed in the title. Weaker: "AI Writer" is
 
 ## 2. Short description / Summary (limit: 132 chars, verified — plain text, no HTML)
 
-**Variant A — demo-creator hook — RECOMMENDED — 129/132:**
+**Variant A2 — demo-creator hook + old name — RECOMMENDED (2026-10-22) — 131/132:**
+```
+Realistic typing animation & auto typer for demo videos and screen recordings. Export GIF/WebM. Formerly Keyboard Typing Simulator.
+```
+"Formerly Keyboard Typing Simulator" restores exact-match recall for the query the 2025 growth came from; the on-device AI mention moved to the detailed description to make room.
+
+**Variant A — previous (v3.3.0) — 129/132:**
 ```
 Realistic human typing for demo videos, tutorials and screen recordings. On-device AI writes and fills forms. Export GIF or WebM.
 ```
@@ -277,6 +284,8 @@ Evidence: per-locale listings create separate search surfaces (documented case: 
 3. **Spanish (es)** — largest aggregate reach across LatAm+Spain for one translation.
 4. **German (de)** — big market, strong QA/enterprise-tester segment, high privacy sensitivity (our on-device story lands hardest here).
 5. **French (fr)** — rounds out the top-5 reach; strong edtech/tutorial segment.
+
+**Shipped in v3.3.1 (2026-10-22):** `es` and `pt_BR` manifest strings (title, short name, summary) via `public/_locales/`; the dashboard paste copy for both — full detailed description included — is in `docs/listing-locales.md`. Needs a native-speaker read before submission. `ja`, `de`, `fr` still to do.
 
 **What to localize, in order:** (1) title's keyword tail (keep "TypeReel", translate "Realistic Typing Simulator & Auto Typer for Demo Videos"), (2) the 132-char summary, (3) the first three description lines + section headers, (4) full description, (5) screenshot captions (screenshots are localizable; tiles are not). Ship 1–3 for all five locales at relaunch; 4–5 in the first month. Use a native-check pass (Fiverr/DeepL+native review) — machine-only translations read as spam to reviewers.
 

@@ -72,8 +72,38 @@ declare module "wxt/browser" {
       substitutions?: string | string[],
       options?: GetMessageOptions,
     ): string;
+    /**
+     * Store title (max 75 chars). Keyword-first, brand last.
+     *
+     * "Realistic Typing Simulator & Auto Typer for Demo Videos — TypeReel"
+     */
     getMessage(
-      messageName: "@@extension_id" | "@@ui_locale" | "@@bidi_dir" | "@@bidi_reversed_dir" | "@@bidi_start_edge" | "@@bidi_end_edge",
+      messageName: "extName",
+      substitutions?: string | string[],
+      options?: GetMessageOptions,
+    ): string;
+    /**
+     * Used where Chrome has limited space.
+     *
+     * "TypeReel"
+     */
+    getMessage(
+      messageName: "extShortName",
+      substitutions?: string | string[],
+      options?: GetMessageOptions,
+    ): string;
+    /**
+     * Store summary (max 132 chars, plain text).
+     *
+     * "Realistic typing animation & auto typer for demo videos and screen recordings. Export GIF/WebM. Formerly Keyboard Typing Simulator."
+     */
+    getMessage(
+      messageName: "extDescription",
+      substitutions?: string | string[],
+      options?: GetMessageOptions,
+    ): string;
+    getMessage(
+      messageName: "@@extension_id" | "@@ui_locale" | "@@bidi_dir" | "@@bidi_reversed_dir" | "@@bidi_start_edge" | "@@bidi_end_edge" | "extName" | "extShortName" | "extDescription",
       substitutions?: string | string[],
       options?: GetMessageOptions,
     ): string;

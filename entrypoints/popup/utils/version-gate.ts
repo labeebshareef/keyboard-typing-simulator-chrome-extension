@@ -18,15 +18,16 @@
  *   and the service worker without host permissions.
  */
 
+import { storeUrl } from './store-links';
+
 // Served from the public `typereel-config` repo (see
 // docs/update-system-setup.md). If this URL ever 404s, the gate silently
 // stays open — safe either way.
 export const REMOTE_CONFIG_URL =
   'https://raw.githubusercontent.com/labeebshareef/typereel-config/main/config.json';
 
-/** Chrome Web Store listing — fallback target for the Update button. */
-export const STORE_URL =
-  'https://chromewebstore.google.com/detail/flieihjecdghlbgbmjbilfcabbdplanh';
+/** Fallback target for the Update button, tagged for the dashboard. */
+export const FALLBACK_UPDATE_URL = storeUrl('popup', 'update-required');
 
 const STORAGE_KEY = 'versionGate';
 /** Re-fetch at most every 6 hours; the file rarely changes. */
@@ -162,7 +163,7 @@ export async function getGateStatus(installedVersion?: string): Promise<GateStat
   return {
     blocked: config ? compareVersions(version, config.minVersion) < 0 : false,
     message: config?.message ?? DEFAULT_MESSAGE,
-    updateUrl: config?.updateUrl ?? STORE_URL,
+    updateUrl: config?.updateUrl ?? FALLBACK_UPDATE_URL,
   };
 }
 

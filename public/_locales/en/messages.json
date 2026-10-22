@@ -1,0 +1,14 @@
+{
+  "extName": {
+    "message": "Realistic Typing Simulator & Auto Typer for Demo Videos — TypeReel",
+    "description": "Store title (max 75 chars). Keyword-first, brand last."
+  },
+  "extShortName": {
+    "message": "TypeReel",
+    "description": "Used where Chrome has limited space."
+  },
+  "extDescription": {
+    "message": "Realistic typing animation & auto typer for demo videos and screen recordings. Export GIF/WebM. Formerly Keyboard Typing Simulator.",
+    "description": "Store summary (max 132 chars, plain text)."
+  }
+}
