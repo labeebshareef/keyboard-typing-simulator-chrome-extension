@@ -22,13 +22,13 @@ Animación de escritura realista y auto typer para videos demo, tutoriales y gra
 
 **Detailed description (paste into the Spanish slot):**
 ```
+Antes conocido como Keyboard Typing Simulator — la misma extensión, con nuevo nombre.
+
 TypeReel escribe como una persona: velocidad variable, ritmo natural, pequeños errores que vuelve a corregir. En cualquier campo de texto, en cualquier página que le indiques.
 
 Pensado para videos demo, tutoriales y grabaciones de pantalla: tus tomas de escritura se ven humanas a la primera, en cada toma.
 
 ¿Te faltan palabras? La IA integrada de Chrome (Gemini Nano) las escribe por ti, en tu dispositivo. ¿Listo? Exporta la toma como GIF o WebM. Nada sale de tu navegador.
-
-TypeReel es el nuevo nombre de Keyboard Typing Simulator: la misma extensión, con nueva imagen.
 
 PARA QUIÉN ES
 • Creadores de demos y grabaciones de pantalla que quieren una escritura que parezca real, no pegada
@@ -81,13 +81,13 @@ Animação de digitação realista e auto typer para demos em vídeo, tutoriais 
 
 **Detailed description (paste into the Portuguese (Brazil) slot):**
 ```
+Antes conhecido como Keyboard Typing Simulator — a mesma extensão, com novo nome.
+
 O TypeReel digita como uma pessoa: velocidade variável, ritmo natural, pequenos erros que ele volta e corrige. Em qualquer campo de texto, em qualquer página que você indicar.
 
 Feito para vídeos demo, tutoriais e gravações de tela: suas tomadas de digitação ficam humanas de primeira, em toda tomada.
 
 Precisa de texto? A IA integrada do Chrome (Gemini Nano) escreve para você, no seu dispositivo. Terminou? Exporte a tomada como GIF ou WebM. Nada sai do seu navegador.
-
-TypeReel é o novo nome do Keyboard Typing Simulator: a mesma extensão, com visual novo.
 
 PARA QUEM É
 • Criadores de demos e gravações de tela que querem uma digitação que pareça real, não colada

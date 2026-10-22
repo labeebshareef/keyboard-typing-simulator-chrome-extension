@@ -58,11 +58,13 @@ Leads with the highest-volume query ("auto typer") for maximum search match; wea
 
 ---
 
-## 3. Detailed description (no verified limit; ours = 3,296 chars, plain text, CWS-safe)
+## 3. Detailed description (no verified limit; ours = 3,359 chars, plain text, CWS-safe)
 
 Copy exactly as below (bullets are "•" characters, which CWS renders fine; no markdown syntax used). First 3 lines are the above-the-fold click-winners; keyword frequencies verified: "auto typer" ×1, "typing simulator" ×2, "auto typing" ×1, "form filler" ×1 — all far under the policy's 5-repetition ceiling; zero forbidden terms (no "undetectable", "bypass", "typing test", "WPM", "essay", game names).
 
 ```
+Formerly Keyboard Typing Simulator — same extension, new name.
+
 TypeReel types like a person: variable speed, natural rhythm, small typos it goes back and fixes. Into any text field, on any page you point it at.
 
 Built for demo videos, tutorials and screen recordings — your typing takes look human on the first try, every take.
